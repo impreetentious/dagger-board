@@ -1,0 +1,20 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# Next.js and static output
+/.next
+/out
+
+# tests and reports
+/coverage
+/playwright-report
+/test-results
+
+# local environment files
+.env*
+
+# editor and OS files
+.DS_Store
+*.tsbuildinfo
