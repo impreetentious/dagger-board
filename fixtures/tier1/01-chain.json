@@ -1,0 +1,22 @@
+{
+  "v": 1,
+  "id": "chain",
+  "derivation": "A conditioned non-collider blocks X -> M -> Y.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "x", "idx": 0, "name": "X", "kind": "observed" },
+      { "id": "m", "idx": 1, "name": "M", "kind": "observed" },
+      { "id": "y", "idx": 2, "name": "Y", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "x", "to": "m" },
+      { "from": "m", "to": "y" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": {
+    "dSeparation": [{ "from": "x", "to": "y", "conditioned": ["m"], "separated": true }],
+    "paths": [{ "conditioned": [], "primaryLabels": ["causal-open"] }]
+  }
+}

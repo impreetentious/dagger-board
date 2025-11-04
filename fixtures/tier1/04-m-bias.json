@@ -1,0 +1,120 @@
+{
+  "v": 1,
+  "id": "m-bias",
+  "derivation": "The hand-derived M-bias structure is closed marginally and opens when M is conditioned on.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      {
+        "id": "u1",
+        "idx": 0,
+        "name": "U1",
+        "kind": "latent"
+      },
+      {
+        "id": "u2",
+        "idx": 1,
+        "name": "U2",
+        "kind": "latent"
+      },
+      {
+        "id": "x",
+        "idx": 2,
+        "name": "X",
+        "kind": "observed"
+      },
+      {
+        "id": "m",
+        "idx": 3,
+        "name": "M",
+        "kind": "observed"
+      },
+      {
+        "id": "y",
+        "idx": 4,
+        "name": "Y",
+        "kind": "observed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "u1",
+        "to": "x"
+      },
+      {
+        "from": "u1",
+        "to": "m"
+      },
+      {
+        "from": "u2",
+        "to": "m"
+      },
+      {
+        "from": "u2",
+        "to": "y"
+      }
+    ],
+    "roles": {
+      "exposureId": "x",
+      "outcomeId": "y"
+    }
+  },
+  "expectedP1": {
+    "dSeparation": [
+      {
+        "from": "x",
+        "to": "y",
+        "conditioned": [],
+        "separated": true
+      },
+      {
+        "from": "x",
+        "to": "y",
+        "conditioned": [
+          "m"
+        ],
+        "separated": false
+      }
+    ],
+    "paths": [
+      {
+        "conditioned": [
+          "m"
+        ],
+        "primaryLabels": [
+          "collider-opened"
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "v": 1,
+    "edgeCoefficients": {
+      "u1\u0000x": 0.5,
+      "u1\u0000m": 0.5,
+      "u2\u0000m": 0.5,
+      "u2\u0000y": 0.5
+    },
+    "errorSds": {
+      "u1": 1,
+      "u2": 1,
+      "x": 1,
+      "m": 1,
+      "y": 1
+    }
+  },
+  "expectedP3": {
+    "totalEffect": 0,
+    "covariance": {
+      "x,m": 0.25,
+      "m,y": 0.25,
+      "m,m": 1.5,
+      "x,x": 1.25,
+      "x,y": 0
+    },
+    "ols": {
+      "empty": 0,
+      "m": -0.034482758620689655
+    }
+  }
+}

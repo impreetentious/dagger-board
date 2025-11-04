@@ -1,0 +1,22 @@
+{
+  "v": 1,
+  "id": "fork",
+  "derivation": "The common cause U creates the open backdoor X <- U -> Y; conditioning on U blocks it.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "u", "idx": 0, "name": "U", "kind": "observed" },
+      { "id": "x", "idx": 1, "name": "X", "kind": "observed" },
+      { "id": "y", "idx": 2, "name": "Y", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "u", "to": "x" },
+      { "from": "u", "to": "y" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": {
+    "dSeparation": [{ "from": "x", "to": "y", "conditioned": ["u"], "separated": true }],
+    "paths": [{ "conditioned": [], "primaryLabels": ["confounding"] }]
+  }
+}

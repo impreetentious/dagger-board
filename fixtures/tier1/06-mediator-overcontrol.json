@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "id": "mediator-overcontrol",
+  "derivation": "Conditioning on the mediator blocks the only proper causal path and is overcontrol for a total-effect query.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "x", "idx": 0, "name": "X", "kind": "observed" },
+      { "id": "m", "idx": 1, "name": "M", "kind": "observed" },
+      { "id": "y", "idx": 2, "name": "Y", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "x", "to": "m" },
+      { "from": "m", "to": "y" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": { "paths": [{ "conditioned": ["m"], "primaryLabels": ["causal-blocked"] }] }
+}

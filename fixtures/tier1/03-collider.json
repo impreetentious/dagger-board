@@ -1,0 +1,25 @@
+{
+  "v": 1,
+  "id": "collider",
+  "derivation": "X -> C <- Y is closed until C is conditioned on.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "x", "idx": 0, "name": "X", "kind": "observed" },
+      { "id": "c", "idx": 1, "name": "C", "kind": "observed" },
+      { "id": "y", "idx": 2, "name": "Y", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "x", "to": "c" },
+      { "from": "y", "to": "c" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": {
+    "dSeparation": [
+      { "from": "x", "to": "y", "conditioned": [], "separated": true },
+      { "from": "x", "to": "y", "conditioned": ["c"], "separated": false }
+    ],
+    "paths": [{ "conditioned": ["c"], "primaryLabels": ["collider-opened"] }]
+  }
+}
