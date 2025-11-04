@@ -27,7 +27,7 @@ export function ProvePanel() {
     return (
       <section className="space-y-4">
         <p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">PROVE</p>
-        <h1 className="text-2xl font-black tracking-[-0.05em]">Designate X and Y to inspect a claim.</h1>
+        <h2 className="text-2xl font-black tracking-[-0.05em]">Designate X and Y to inspect a claim.</h2>
         <p className="text-sm leading-6 text-[var(--muted)]">The engine only reads analyzable snapshots: one observed exposure and one observed outcome.</p>
       </section>
     );
@@ -45,7 +45,7 @@ export function ProvePanel() {
     <section aria-labelledby="prove-panel-title" className="space-y-5">
       <div>
         <p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">PROVE</p>
-        <h1 className="mt-2 text-2xl font-black tracking-[-0.05em]" id="prove-panel-title">Read what the graph commits you to.</h1>
+        <h2 className="mt-2 text-2xl font-black tracking-[-0.05em]" id="prove-panel-title">Read what the graph commits you to.</h2>
       </div>
       <article className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4">
         <p className="text-base font-black">{verdictCopy}</p>

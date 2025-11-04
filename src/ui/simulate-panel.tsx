@@ -109,7 +109,7 @@ export function SimulatePanel() {
     <section aria-labelledby="simulate-panel-title" className="space-y-5">
       <div>
         <p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">SIMULATE</p>
-        <h1 className="mt-2 text-2xl font-black tracking-[-0.05em]" id="simulate-panel-title">Show the finite sample beside its population target.</h1>
+        <h2 className="mt-2 text-2xl font-black tracking-[-0.05em]" id="simulate-panel-title">Show the finite sample beside its population target.</h2>
       </div>
       <div className="grid grid-cols-2 gap-2">
         <label className="text-xs font-bold">Seed<input aria-label="Simulation seed" className="field-input mt-1" max="4294967295" min="0" onChange={(event) => setSeed(Number(event.target.value))} type="number" value={seed} /></label>

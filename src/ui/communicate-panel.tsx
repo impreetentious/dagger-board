@@ -51,9 +51,9 @@ export function CommunicatePanel() {
     <section aria-labelledby="communicate-panel-title" className="space-y-5 adr-panel">
       <div>
         <p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">COMMUNICATE</p>
-        <h1 className="mt-2 text-2xl font-black tracking-[-0.05em]" id="communicate-panel-title">
+        <h2 className="mt-2 text-2xl font-black tracking-[-0.05em]" id="communicate-panel-title">
           Ship the reasoning, not just the plot.
-        </h1>
+        </h2>
       </div>
       {missingRoles ? (
         <p className="rounded-2xl border border-dashed border-[var(--line)] p-4 text-sm leading-6 text-[var(--muted)]">

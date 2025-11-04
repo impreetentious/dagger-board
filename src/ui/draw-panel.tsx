@@ -36,9 +36,9 @@ export function DrawPanel() {
     <section aria-labelledby="draw-panel-title" className="space-y-5">
       <div>
         <p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">DRAW</p>
-        <h1 className="mt-2 text-2xl font-black tracking-[-0.05em]" id="draw-panel-title">
+        <h2 className="mt-2 text-2xl font-black tracking-[-0.05em]" id="draw-panel-title">
           Make the assumption inspectable.
-        </h1>
+        </h2>
       </div>
 
       <div className="grid grid-cols-3 gap-2">

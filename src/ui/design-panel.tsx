@@ -31,7 +31,7 @@ export function DesignPanel() {
   }, [graph, measured, n, parameters, selection]);
 
   if (report instanceof Error) {
-    return <section><p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">DESIGN</p><h1 className="mt-2 text-2xl font-black tracking-[-0.05em]">Designate X and Y to compare designs.</h1><p className="mt-3 text-sm text-[var(--muted)]">{report.message}</p></section>;
+    return <section><p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">DESIGN</p><h2 className="mt-2 text-2xl font-black tracking-[-0.05em]">Designate X and Y to compare designs.</h2><p className="mt-3 text-sm text-[var(--muted)]">{report.message}</p></section>;
   }
 
   const topPercent = selection ? (1 - selection.quantile) * 100 : 100;
@@ -39,7 +39,7 @@ export function DesignPanel() {
     <section aria-labelledby="design-panel-title" className="space-y-5">
       <div>
         <p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">DESIGN</p>
-        <h1 className="mt-2 text-2xl font-black tracking-[-0.05em]" id="design-panel-title">Compare feasible estimators before data exists.</h1>
+        <h2 className="mt-2 text-2xl font-black tracking-[-0.05em]" id="design-panel-title">Compare feasible estimators before data exists.</h2>
       </div>
       <details open>
         <summary className="cursor-pointer text-sm font-bold">What will this design measure?</summary>

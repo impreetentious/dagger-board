@@ -2,7 +2,7 @@
 
 > Draw your assumptions. See your bias. Before the data.
 
-**Status:** Planning baseline — contract ratified, pre-build (no code yet)
+**Status:** v0.1.4 — P0 scaffold + foundations on `main`. Build continues.
 
 ---
 
@@ -64,4 +64,4 @@ This IST timestamp rule is permanent for all future workflows, commits, and AI a
 Follow this format for version control:
 
 * **Base Format Version:** 0.0.0 — the version of the version-block schema itself (the shape of these lines); it is bumped only when this block's structure changes, not on every commit.
-* **Product Version:** `v0.1.3_2025-11-04_03:50:23` (IST)
+* **Product Version:** `v0.1.4_2025-11-04_12:10:22` (IST)
