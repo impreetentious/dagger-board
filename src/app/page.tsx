@@ -54,12 +54,20 @@ export default function Home() {
         ))}
       </section>
 
-      <section aria-label="Example graphs" className="mt-10 rounded-[2rem] border border-[var(--line)] bg-[var(--surface)] p-7 sm:p-10">
+      <section
+        aria-label="Example graphs"
+        className="mt-10 rounded-[2rem] border border-[var(--line)] bg-[var(--surface)] p-7 sm:p-10"
+      >
         <p className="font-mono text-xs font-bold tracking-[0.2em] text-[var(--signal)]">GALLERY</p>
-        <h2 className="mt-5 text-3xl font-black tracking-[-0.055em]">Load a canon graph. Break it. Rebuild it.</h2>
+        <h2 className="mt-5 text-3xl font-black tracking-[-0.055em]">
+          Load a canon graph. Break it. Rebuild it.
+        </h2>
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           {EXAMPLE_GALLERY.map((example) => (
-            <article key={example.slug} className="rounded-3xl border border-[var(--line)] bg-[var(--surface-raised)] p-5">
+            <article
+              key={example.slug}
+              className="rounded-3xl border border-[var(--line)] bg-[var(--surface-raised)] p-5"
+            >
               <p className="font-mono text-xs tracking-[0.18em] text-[var(--signal)]">EXAMPLE</p>
               <h3 className="mt-4 text-xl font-bold tracking-[-0.03em]">{example.title}</h3>
               <p className="mt-2 leading-6 text-[var(--muted)]">{example.description}</p>

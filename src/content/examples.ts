@@ -20,7 +20,8 @@ function mBias(): LabSnapshot {
     roles: { exposureId: "x", outcomeId: "y" },
   };
   const parameters = defaultScmParameters(graph);
-  for (const edge of graph.edges) parameters.edgeCoefficients[edgeParameterKey(edge.from, edge.to)] = 0.5;
+  for (const edge of graph.edges)
+    parameters.edgeCoefficients[edgeParameterKey(edge.from, edge.to)] = 0.5;
   return pruneLabSnapshot({
     v: 1,
     graph,
@@ -65,6 +66,10 @@ export const EXAMPLE_SNAPSHOTS = {
 } as const;
 
 export const EXAMPLE_GALLERY = [
-  { slug: "m-bias", title: "M-bias", description: "Adjusting for M opens an otherwise closed path." },
+  {
+    slug: "m-bias",
+    title: "M-bias",
+    description: "Adjusting for M opens an otherwise closed path.",
+  },
   { slug: "chain", title: "Mediation", description: "A simple total effect through a mediator." },
 ] as const;

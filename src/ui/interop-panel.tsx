@@ -3,7 +3,12 @@
 import { useMemo, useState } from "react";
 import { graphFragmentStatus, snapshotJson, type LabSnapshot } from "@/lib/codec";
 import { exportDagittyText, importDagittyText } from "@/lib/dagitty-io";
-import { duplicateLibraryEntry, loadLibrary, saveToLibrary, type SavedLabModel } from "@/lib/persist";
+import {
+  duplicateLibraryEntry,
+  loadLibrary,
+  saveToLibrary,
+  type SavedLabModel,
+} from "@/lib/persist";
 import { useLabStore } from "@/store/lab-store";
 
 function snapshotFromStore(state: LabSnapshot): LabSnapshot {
@@ -78,37 +83,76 @@ export function InteropPanel() {
           >
             Save locally
           </button>
-          <button className="tool-button" onClick={share} type="button">Share URL</button>
-          <button className="tool-button" onClick={() => download("causal-model.json", snapshotJson(snapshot))} type="button">Export JSON</button>
+          <button className="tool-button" onClick={share} type="button">
+            Share URL
+          </button>
+          <button
+            className="tool-button"
+            onClick={() => download("causal-model.json", snapshotJson(snapshot))}
+            type="button"
+          >
+            Export JSON
+          </button>
           <label className="tool-button cursor-pointer text-center">
             Import JSON
-            <input accept="application/json" className="sr-only" onChange={(event) => void importJson(event.target.files?.[0])} type="file" />
+            <input
+              accept="application/json"
+              className="sr-only"
+              onChange={(event) => void importJson(event.target.files?.[0])}
+              type="file"
+            />
           </label>
         </div>
         {library.length > 0 ? (
           <div className="space-y-2 border-t border-[var(--line)] pt-3">
-            <p className="font-mono text-[11px] font-bold tracking-[0.12em] text-[var(--signal)]">SAVED MODELS</p>
+            <p className="font-mono text-[11px] font-bold tracking-[0.12em] text-[var(--signal)]">
+              SAVED MODELS
+            </p>
             {library.slice(0, 4).map((entry) => (
               <div className="flex items-center gap-2" key={entry.id}>
-                <button className="min-w-0 flex-1 truncate rounded-lg border border-[var(--line)] px-2 py-1.5 text-left text-xs font-bold hover:bg-[var(--moss-soft)]" onClick={() => store.loadSnapshot(entry.snapshot, `Loaded ${entry.name}.`)} type="button">
+                <button
+                  className="min-w-0 flex-1 truncate rounded-lg border border-[var(--line)] px-2 py-1.5 text-left text-xs font-bold hover:bg-[var(--moss-soft)]"
+                  onClick={() => store.loadSnapshot(entry.snapshot, `Loaded ${entry.name}.`)}
+                  type="button"
+                >
                   {entry.name}
                 </button>
-                <button className="tool-button px-2 py-1.5 text-xs" onClick={() => { duplicateLibraryEntry(entry); store.setNotice("Saved copy created."); }} type="button">Copy</button>
+                <button
+                  className="tool-button px-2 py-1.5 text-xs"
+                  onClick={() => {
+                    duplicateLibraryEntry(entry);
+                    store.setNotice("Saved copy created.");
+                  }}
+                  type="button"
+                >
+                  Copy
+                </button>
               </div>
             ))}
           </div>
         ) : null}
         <div className="border-t border-[var(--line)] pt-3">
           <div className="flex gap-2">
-            <button className="tool-button flex-1" onClick={() => setDagittyText(exportDagittyText(snapshot))} type="button">Export DAGitty text</button>
+            <button
+              className="tool-button flex-1"
+              onClick={() => setDagittyText(exportDagittyText(snapshot))}
+              type="button"
+            >
+              Export DAGitty text
+            </button>
             <button
               className="tool-button flex-1"
               onClick={() => {
                 try {
                   const result = importDagittyText(dagittyText);
-                  store.loadSnapshot(result.snapshot, result.warnings[0] ?? "DAGitty model imported.");
+                  store.loadSnapshot(
+                    result.snapshot,
+                    result.warnings[0] ?? "DAGitty model imported.",
+                  );
                 } catch (error) {
-                  store.setNotice(error instanceof Error ? error.message : "DAGitty text could not be read.");
+                  store.setNotice(
+                    error instanceof Error ? error.message : "DAGitty text could not be read.",
+                  );
                 }
               }}
               type="button"
@@ -120,7 +164,7 @@ export function InteropPanel() {
             aria-label="DAGitty model text"
             className="field-input mt-2 min-h-24 font-mono text-xs"
             onChange={(event) => setDagittyText(event.target.value)}
-            placeholder="dag { &quot;X&quot; [exposure] ... }"
+            placeholder='dag { "X" [exposure] ... }'
             value={dagittyText}
           />
         </div>

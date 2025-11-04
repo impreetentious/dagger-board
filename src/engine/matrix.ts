@@ -90,7 +90,9 @@ export function matricesClose(left: Matrix, right: Matrix, tolerance = 1e-9): bo
     left.every(
       (row, rowIndex) =>
         row.length === right[rowIndex]?.length &&
-        row.every((value, columnIndex) => relativeClose(value, right[rowIndex][columnIndex], tolerance)),
+        row.every((value, columnIndex) =>
+          relativeClose(value, right[rowIndex][columnIndex], tolerance),
+        ),
     )
   );
 }
@@ -133,9 +135,13 @@ export function symmetricEigenvalues(matrix: Matrix): number[] {
     const offDiagonal = work[row][column];
 
     work[row][row] =
-      cosine * cosine * rowDiagonal - 2 * sine * cosine * offDiagonal + sine * sine * columnDiagonal;
+      cosine * cosine * rowDiagonal -
+      2 * sine * cosine * offDiagonal +
+      sine * sine * columnDiagonal;
     work[column][column] =
-      sine * sine * rowDiagonal + 2 * sine * cosine * offDiagonal + cosine * cosine * columnDiagonal;
+      sine * sine * rowDiagonal +
+      2 * sine * cosine * offDiagonal +
+      cosine * cosine * columnDiagonal;
     work[row][column] = 0;
     work[column][row] = 0;
 

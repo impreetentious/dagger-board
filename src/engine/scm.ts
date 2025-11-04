@@ -55,7 +55,9 @@ export function edgeParameterKey(from: string, to: string): string {
 export function defaultScmParameters(graph: Graph): SCMParameters {
   return {
     v: 1,
-    edgeCoefficients: Object.fromEntries(graph.edges.map((edge) => [edgeParameterKey(edge.from, edge.to), 1])),
+    edgeCoefficients: Object.fromEntries(
+      graph.edges.map((edge) => [edgeParameterKey(edge.from, edge.to), 1]),
+    ),
     errorSds: Object.fromEntries(graph.nodes.map((node) => [node.id, 1])),
   };
 }
@@ -70,10 +72,12 @@ export function normalizeScmParameters(
   const knownNodes = new Set(graph.nodes.map((node) => node.id));
 
   for (const key of Object.keys(parsed.edgeCoefficients)) {
-    if (!knownEdges.has(key)) throw new ScmParameterError(`Parameter references a missing edge: ${key}.`);
+    if (!knownEdges.has(key))
+      throw new ScmParameterError(`Parameter references a missing edge: ${key}.`);
   }
   for (const key of Object.keys(parsed.errorSds)) {
-    if (!knownNodes.has(key)) throw new ScmParameterError(`Parameter references a missing node: ${key}.`);
+    if (!knownNodes.has(key))
+      throw new ScmParameterError(`Parameter references a missing node: ${key}.`);
   }
 
   const defaults = defaultScmParameters(graph);
@@ -96,13 +100,10 @@ export function normalizeScmParameters(
   return { v: 1, edgeCoefficients, errorSds };
 }
 
-export function edgeCoefficient(
-  parameters: SCMParameters,
-  from: string,
-  to: string,
-): number {
+export function edgeCoefficient(parameters: SCMParameters, from: string, to: string): number {
   const coefficient = parameters.edgeCoefficients[edgeParameterKey(from, to)];
-  if (coefficient === undefined) throw new ScmParameterError(`Missing coefficient for ${from} → ${to}.`);
+  if (coefficient === undefined)
+    throw new ScmParameterError(`Missing coefficient for ${from} → ${to}.`);
   return coefficient;
 }
 
@@ -130,13 +131,16 @@ export function buildScmModel(
   parameterInput: Partial<SCMParameters> | SCMParameters = {},
 ): ScmModel {
   const parameters = normalizeScmParameters(graph, parameterInput);
-  const nodeIds = [...graph.nodes].sort((left, right) => left.idx - right.idx).map((node) => node.id);
+  const nodeIds = [...graph.nodes]
+    .sort((left, right) => left.idx - right.idx)
+    .map((node) => node.id);
   const indexById = new Map(nodeIds.map((id, index) => [id, index]));
   const coefficientMatrix = zeros(nodeIds.length);
   for (const edge of graph.edges) {
     const from = indexById.get(edge.from);
     const to = indexById.get(edge.to);
-    if (from === undefined || to === undefined) throw new ScmParameterError("Graph index is invalid.");
+    if (from === undefined || to === undefined)
+      throw new ScmParameterError("Graph index is invalid.");
     coefficientMatrix[from][to] = edgeCoefficient(parameters, edge.from, edge.to);
   }
   const system = identity(nodeIds.length);
@@ -147,7 +151,10 @@ export function buildScmModel(
   }
   const propagationMatrix = inverse(system);
   const errorCovariance = diagonal(nodeIds.map((id) => errorVariance(parameters, id)));
-  const covariance = multiply(multiply(propagationMatrix, errorCovariance), transpose(propagationMatrix));
+  const covariance = multiply(
+    multiply(propagationMatrix, errorCovariance),
+    transpose(propagationMatrix),
+  );
   const eigenvalues = isFiniteMatrix(covariance) ? symmetricEigenvalues(covariance) : [Number.NaN];
   const maxEigenvalue = Math.max(...eigenvalues);
   const minEigenvalue = Math.min(...eigenvalues);
@@ -170,7 +177,11 @@ export function buildScmModel(
   };
 }
 
-export function covarianceAt(model: Pick<ScmModel, "indexById" | "covariance">, left: string, right: string): number {
+export function covarianceAt(
+  model: Pick<ScmModel, "indexById" | "covariance">,
+  left: string,
+  right: string,
+): number {
   const leftIndex = model.indexById.get(left);
   const rightIndex = model.indexById.get(right);
   if (leftIndex === undefined || rightIndex === undefined) {
@@ -207,21 +218,15 @@ export function auditScmIntegrity(
   outcomeId: string,
 ): IntegrityAudit {
   const coefficient: CoefficientLookup = (from, to) => edgeCoefficient(model.parameters, from, to);
-  const covarianceTrek = trekCovarianceMatrix(
-    model.graph,
-    model.nodeIds,
-    coefficient,
-    (nodeId) => errorVariance(model.parameters, nodeId),
+  const covarianceTrek = trekCovarianceMatrix(model.graph, model.nodeIds, coefficient, (nodeId) =>
+    errorVariance(model.parameters, nodeId),
   );
   const totalEffectMatrix = matrixTotalEffect(model, exposureId, outcomeId);
-  const totalEffectPaths = directedPathTotalEffect(
-    model.graph,
-    exposureId,
-    outcomeId,
-    coefficient,
-  );
+  const totalEffectPaths = directedPathTotalEffect(model.graph, exposureId, outcomeId, coefficient);
   const covarianceAgrees = matricesClose(model.covariance, covarianceTrek);
-  const totalEffectAgrees = Math.abs(totalEffectMatrix - totalEffectPaths) <= 1e-9 * Math.max(1, Math.abs(totalEffectMatrix), Math.abs(totalEffectPaths));
+  const totalEffectAgrees =
+    Math.abs(totalEffectMatrix - totalEffectPaths) <=
+    1e-9 * Math.max(1, Math.abs(totalEffectMatrix), Math.abs(totalEffectPaths));
   const ok = covarianceAgrees && totalEffectAgrees && !model.illConditioned;
   return {
     covarianceTrek,

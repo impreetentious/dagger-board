@@ -49,7 +49,12 @@ export function DrawPanel() {
         ))}
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <button className="tool-button" disabled={!selected} onClick={() => selected && startEdge(selected.id)} type="button">
+        <button
+          className="tool-button"
+          disabled={!selected}
+          onClick={() => selected && startEdge(selected.id)}
+          type="button"
+        >
           {edgeStartId ? "Pick target" : "Draw edge"}
         </button>
         <button className="tool-button" onClick={() => loadExample("m-bias")} type="button">
@@ -61,14 +66,21 @@ export function DrawPanel() {
         <button className="tool-button" onClick={redo} type="button">
           Redo
         </button>
-        <button className="tool-button col-span-2" disabled={graph.nodes.length === 0} onClick={applyLayoutAssist} type="button">
+        <button
+          className="tool-button col-span-2"
+          disabled={graph.nodes.length === 0}
+          onClick={applyLayoutAssist}
+          type="button"
+        >
           Arrange layers
         </button>
       </div>
 
       {selected ? (
         <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4">
-          <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">ACTIVE NODE</p>
+          <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">
+            ACTIVE NODE
+          </p>
           <label className="mt-3 block text-sm font-bold" htmlFor="node-name">
             Name
           </label>
@@ -88,18 +100,38 @@ export function DrawPanel() {
           <select
             className="field-input mt-1"
             id="node-kind"
-            onChange={(event) => setNodeKind(selected.id, event.target.value as typeof selected.kind)}
+            onChange={(event) =>
+              setNodeKind(selected.id, event.target.value as typeof selected.kind)
+            }
             value={selected.kind}
           >
             {nodeKinds.map(([kind, label]) => (
-              <option key={kind} value={kind}>{label}</option>
+              <option key={kind} value={kind}>
+                {label}
+              </option>
             ))}
           </select>
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <button className="tool-button" onClick={() => assignRole("exposureId", selected.id)} type="button">Set X</button>
-            <button className="tool-button" onClick={() => assignRole("outcomeId", selected.id)} type="button">Set Y</button>
+            <button
+              className="tool-button"
+              onClick={() => assignRole("exposureId", selected.id)}
+              type="button"
+            >
+              Set X
+            </button>
+            <button
+              className="tool-button"
+              onClick={() => assignRole("outcomeId", selected.id)}
+              type="button"
+            >
+              Set Y
+            </button>
           </div>
-          <button className="mt-2 w-full rounded-xl border border-[var(--signal)] px-3 py-2 text-sm font-bold text-[var(--signal)] hover:bg-[var(--signal-soft)]" onClick={() => deleteNode(selected.id)} type="button">
+          <button
+            className="mt-2 w-full rounded-xl border border-[var(--signal)] px-3 py-2 text-sm font-bold text-[var(--signal)] hover:bg-[var(--signal-soft)]"
+            onClick={() => deleteNode(selected.id)}
+            type="button"
+          >
             Delete node
           </button>
         </div>

@@ -93,7 +93,10 @@ a {
   font-weight: 700;
   line-height: 1.1;
   padding: 0.7rem 0.8rem;
-  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
 }
 
 .tool-button:hover:not(:disabled),

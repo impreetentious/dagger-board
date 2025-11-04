@@ -20,7 +20,11 @@ function diamondPoints(x: number, y: number, radius: number): string {
   return `${x},${y - radius} ${x + radius},${y} ${x},${y + radius} ${x - radius},${y}`;
 }
 
-function curvePath(from: { x: number; y: number }, to: { x: number; y: number }, bend: number): string {
+function curvePath(
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+  bend: number,
+): string {
   const middleX = (from.x + to.x) / 2;
   const middleY = (from.y + to.y) / 2;
   const length = Math.max(1, Math.hypot(to.x - from.x, to.y - from.y));
@@ -46,7 +50,9 @@ export function GraphCanvas() {
   const svgRef = useRef<SVGSVGElement>(null);
   const [viewport, setViewport] = useState<Viewport>({ x: 0, y: 0, width: 800, height: 520 });
   const [drag, setDrag] = useState<DragState | null>(null);
-  const [panStart, setPanStart] = useState<{ x: number; y: number; viewport: Viewport } | null>(null);
+  const [panStart, setPanStart] = useState<{ x: number; y: number; viewport: Viewport } | null>(
+    null,
+  );
   const [showHelp, setShowHelp] = useState(false);
 
   const pointFor = (event: PointerEvent<SVGSVGElement | SVGGElement>) => {
@@ -63,11 +69,16 @@ export function GraphCanvas() {
   const ordered = [...graph.nodes].sort((left, right) => left.idx - right.idx);
   const focusNode = (id: string) => {
     selectNode(id);
-    requestAnimationFrame(() => document.querySelector<SVGGElement>(`[data-node-id="${id}"]`)?.focus());
+    requestAnimationFrame(() =>
+      document.querySelector<SVGGElement>(`[data-node-id="${id}"]`)?.focus(),
+    );
   };
   const advanceFocus = (direction: number) => {
     if (ordered.length === 0) return;
-    const currentIndex = Math.max(0, ordered.findIndex((node) => node.id === selectedNodeId));
+    const currentIndex = Math.max(
+      0,
+      ordered.findIndex((node) => node.id === selectedNodeId),
+    );
     const next = ordered[(currentIndex + direction + ordered.length) % ordered.length];
     focusNode(next.id);
   };
@@ -223,13 +234,33 @@ export function GraphCanvas() {
       >
         <defs>
           <pattern height="32" id="field-grid" patternUnits="userSpaceOnUse" width="32">
-            <path d="M 32 0 L 0 0 0 32" fill="none" stroke="var(--line)" strokeOpacity="0.55" strokeWidth="1" />
+            <path
+              d="M 32 0 L 0 0 0 32"
+              fill="none"
+              stroke="var(--line)"
+              strokeOpacity="0.55"
+              strokeWidth="1"
+            />
           </pattern>
-          <marker id="causal-arrow" markerHeight="8" markerWidth="8" orient="auto" refX="7" refY="4">
+          <marker
+            id="causal-arrow"
+            markerHeight="8"
+            markerWidth="8"
+            orient="auto"
+            refX="7"
+            refY="4"
+          >
             <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--ink)" />
           </marker>
         </defs>
-        <rect fill="url(#field-grid)" height="100%" role="presentation" width="100%" x={viewport.x} y={viewport.y} />
+        <rect
+          fill="url(#field-grid)"
+          height="100%"
+          role="presentation"
+          width="100%"
+          x={viewport.x}
+          y={viewport.y}
+        />
         <g aria-hidden="true" role="presentation">
           {graph.edges.map((edge, index) => {
             const from = positions.get(edge.from);
@@ -253,7 +284,12 @@ export function GraphCanvas() {
           const position = positions.get(node.id)!;
           const isSelected = selectedNodeId === node.id;
           const isEdgeSource = edgeStartId === node.id;
-          const role = node.id === graph.roles.exposureId ? "X" : node.id === graph.roles.outcomeId ? "Y" : null;
+          const role =
+            node.id === graph.roles.exposureId
+              ? "X"
+              : node.id === graph.roles.outcomeId
+                ? "Y"
+                : null;
           const label = `${node.name}, ${node.kind}${role ? `, ${role === "X" ? "exposure" : "outcome"}` : ""}`;
           return (
             <g
@@ -270,8 +306,18 @@ export function GraphCanvas() {
             >
               {node.kind === "selection" ? (
                 <>
-                  <polygon fill="var(--surface-raised)" points={diamondPoints(position.x, position.y, 31)} stroke="var(--ink)" strokeWidth="2" />
-                  <polygon fill="none" points={diamondPoints(position.x, position.y, 23)} stroke="var(--moss)" strokeWidth="1.5" />
+                  <polygon
+                    fill="var(--surface-raised)"
+                    points={diamondPoints(position.x, position.y, 31)}
+                    stroke="var(--ink)"
+                    strokeWidth="2"
+                  />
+                  <polygon
+                    fill="none"
+                    points={diamondPoints(position.x, position.y, 23)}
+                    stroke="var(--moss)"
+                    strokeWidth="1.5"
+                  />
                 </>
               ) : (
                 <circle
@@ -285,15 +331,36 @@ export function GraphCanvas() {
                 />
               )}
               {isSelected || isEdgeSource ? (
-                <circle cx={position.x} cy={position.y} fill="none" r="38" stroke="var(--signal)" strokeWidth="2.5" />
+                <circle
+                  cx={position.x}
+                  cy={position.y}
+                  fill="none"
+                  r="38"
+                  stroke="var(--signal)"
+                  strokeWidth="2.5"
+                />
               ) : null}
-              <text fill="var(--ink)" fontSize="14" fontWeight="700" textAnchor="middle" x={position.x} y={position.y + 5}>
+              <text
+                fill="var(--ink)"
+                fontSize="14"
+                fontWeight="700"
+                textAnchor="middle"
+                x={position.x}
+                y={position.y + 5}
+              >
                 {node.name}
               </text>
               {role ? (
                 <g transform={`translate(${position.x + 22} ${position.y - 28})`}>
                   <circle cx="0" cy="0" fill="var(--signal)" r="11" />
-                  <text fill="var(--surface)" fontSize="10" fontWeight="800" textAnchor="middle" x="0" y="3.5">
+                  <text
+                    fill="var(--surface)"
+                    fontSize="10"
+                    fontWeight="800"
+                    textAnchor="middle"
+                    x="0"
+                    y="3.5"
+                  >
                     {role}
                   </text>
                 </g>
@@ -302,18 +369,30 @@ export function GraphCanvas() {
           );
         })}
         {graph.nodes.length === 0 ? (
-          <text fill="var(--muted)" fontSize="17" textAnchor="middle" x={viewport.x + viewport.width / 2} y={viewport.y + viewport.height / 2}>
+          <text
+            fill="var(--muted)"
+            fontSize="17"
+            textAnchor="middle"
+            x={viewport.x + viewport.width / 2}
+            y={viewport.y + viewport.height / 2}
+          >
             Press N or choose a node from the palette to begin.
           </text>
         ) : null}
       </svg>
       <p className="sr-only" id="canvas-help">
-        Press N to add a node, arrow keys to move focus, Alt and arrow keys to move the active node, E then Enter to draw an edge, and question mark for help.
+        Press N to add a node, arrow keys to move focus, Alt and arrow keys to move the active node,
+        E then Enter to draw an edge, and question mark for help.
       </p>
       {showHelp ? (
         <aside className="absolute bottom-4 left-4 max-w-sm rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 text-sm shadow-[var(--shadow)]">
-          <p className="font-mono text-xs font-bold tracking-[0.14em] text-[var(--signal)]">KEYBOARD</p>
-          <p className="mt-2 leading-6 text-[var(--muted)]">N add · arrows select · Alt+arrows move · E then Enter edge · X/Y roles · L/S kind · Delete remove · Cmd/Ctrl+Z undo</p>
+          <p className="font-mono text-xs font-bold tracking-[0.14em] text-[var(--signal)]">
+            KEYBOARD
+          </p>
+          <p className="mt-2 leading-6 text-[var(--muted)]">
+            N add · arrows select · Alt+arrows move · E then Enter edge · X/Y roles · L/S kind ·
+            Delete remove · Cmd/Ctrl+Z undo
+          </p>
         </aside>
       ) : null}
     </div>

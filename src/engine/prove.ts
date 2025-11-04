@@ -1,7 +1,10 @@
 import { enumerateAdjustmentSets, type AdjustmentResult } from "@/engine/adjust";
 import { classifyPaths, type PathClassificationResult } from "@/engine/classify";
 import { enumerateFrontdoorMediators, type FrontdoorResult } from "@/engine/frontdoor";
-import { enumerateImpliedConditionalIndependencies, type ConditionalIndependence } from "@/engine/implications";
+import {
+  enumerateImpliedConditionalIndependencies,
+  type ConditionalIndependence,
+} from "@/engine/implications";
 import { enumerateConditionalInstruments, type ConditionalInstrument } from "@/engine/iv";
 import { enumerateDirectedPaths, enumerateSimplePaths } from "@/engine/paths";
 import type { Graph } from "@/engine/graph";
@@ -45,8 +48,12 @@ export function proveGraph(
       anyPathCount: 0,
     };
   }
-  const directedPathCount = enumerateDirectedPaths(graph, exposureId, outcomeId).filter((path) => path.length > 1).length;
-  const anyPathCount = enumerateSimplePaths(graph, exposureId, outcomeId).filter((path) => path.nodeIds.length > 1).length;
+  const directedPathCount = enumerateDirectedPaths(graph, exposureId, outcomeId).filter(
+    (path) => path.length > 1,
+  ).length;
+  const anyPathCount = enumerateSimplePaths(graph, exposureId, outcomeId).filter(
+    (path) => path.nodeIds.length > 1,
+  ).length;
   const adjustment = enumerateAdjustmentSets(graph, exposureId, outcomeId);
   const frontdoor = enumerateFrontdoorMediators(graph, exposureId, outcomeId);
   const instruments = enumerateConditionalInstruments(graph, exposureId, outcomeId);
@@ -62,5 +69,14 @@ export function proveGraph(
           : instruments.length > 0
             ? "instrument"
             : "unsupported";
-  return { verdict, adjustment, paths, frontdoor, instruments, implications, directedPathCount, anyPathCount };
+  return {
+    verdict,
+    adjustment,
+    paths,
+    frontdoor,
+    instruments,
+    implications,
+    directedPathCount,
+    anyPathCount,
+  };
 }

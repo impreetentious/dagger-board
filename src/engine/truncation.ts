@@ -9,61 +9,33 @@ function polevl(x: number, coefficients: readonly number[]): number {
 
 function p1evl(x: number, coefficients: readonly number[]): number {
   let value = x + coefficients[0];
-  for (let index = 1; index < coefficients.length; index += 1) value = value * x + coefficients[index];
+  for (let index = 1; index < coefficients.length; index += 1)
+    value = value * x + coefficients[index];
   return value;
 }
 
 // Cody/Cephes-style rational coefficients. The resulting normal CDF is accurate
 // well beyond the contract's 1e-6 Φ-dependent tolerance over its UI range.
 const ERF_T = [
-  9.604973739870516,
-  90.02601972038427,
-  2232.005345946843,
-  7003.325141128051,
-  55592.301301039496,
+  9.604973739870516, 90.02601972038427, 2232.005345946843, 7003.325141128051, 55592.301301039496,
 ];
 const ERF_U = [
-  33.56171416475031,
-  521.3579497801527,
-  4594.323829709801,
-  22629.000061389092,
-  49267.39426086359,
+  33.56171416475031, 521.3579497801527, 4594.323829709801, 22629.000061389092, 49267.39426086359,
 ];
 const ERFC_P = [
-  2.461969814735305e-10,
-  0.5641895648310688,
-  7.463210564422699,
-  48.63719709856814,
-  196.5208329560771,
-  526.4451949954774,
-  934.5285271719576,
-  1027.5518868951572,
-  557.5353353693993,
+  2.461969814735305e-10, 0.5641895648310688, 7.463210564422699, 48.63719709856814,
+  196.5208329560771, 526.4451949954774, 934.5285271719576, 1027.5518868951572, 557.5353353693993,
 ];
 const ERFC_Q = [
-  13.2281951154745,
-  86.70721408859897,
-  354.9377788878199,
-  975.7085017432055,
-  1823.9091668790973,
-  2246.33760818711,
-  1656.6630919416135,
-  557.5353408177277,
+  13.2281951154745, 86.70721408859897, 354.9377788878199, 975.7085017432055, 1823.9091668790973,
+  2246.33760818711, 1656.6630919416135, 557.5353408177277,
 ];
 const ERFC_R = [
-  0.5641895835477551,
-  1.275366707599781,
-  5.019050422511805,
-  6.160210979930536,
-  7.409742699504489,
+  0.5641895835477551, 1.275366707599781, 5.019050422511805, 6.160210979930536, 7.409742699504489,
   2.9788666537210024,
 ];
 const ERFC_S = [
-  2.260528632201173,
-  9.396035249380014,
-  12.048953980809666,
-  17.08144507475659,
-  9.608968090632859,
+  2.260528632201173, 9.396035249380014, 12.048953980809666, 17.08144507475659, 9.608968090632859,
   3.369076451000815,
 ];
 
@@ -100,38 +72,25 @@ export function normalSurvival(value: number): number {
 }
 
 const ACKLAM_A = [
-  -39.69683028665376,
-  220.9460984245205,
-  -275.9285104469687,
-  138.357751867269,
-  -30.66479806614716,
+  -39.69683028665376, 220.9460984245205, -275.9285104469687, 138.357751867269, -30.66479806614716,
   2.506628277459239,
 ];
 const ACKLAM_B = [
-  -54.47609879822406,
-  161.5858368580409,
-  -155.6989798598866,
-  66.80131188771972,
-  -13.28068155288572,
+  -54.47609879822406, 161.5858368580409, -155.6989798598866, 66.80131188771972, -13.28068155288572,
 ];
 const ACKLAM_C = [
-  -0.007784894002430293,
-  -0.3223964580411365,
-  -2.400758277161838,
-  -2.549732539343734,
-  4.374664141464968,
-  2.938163982698783,
+  -0.007784894002430293, -0.3223964580411365, -2.400758277161838, -2.549732539343734,
+  4.374664141464968, 2.938163982698783,
 ];
-const ACKLAM_D = [
-  0.007784695709041462,
-  0.3224671290700398,
-  2.445134137142996,
-  3.754408661907416,
-];
+const ACKLAM_D = [0.007784695709041462, 0.3224671290700398, 2.445134137142996, 3.754408661907416];
 const ACKLAM_LOW = 0.02425;
 const ACKLAM_HIGH = 1 - ACKLAM_LOW;
 
-function rationalPolynomial(value: number, numerator: readonly number[], denominator: readonly number[]): number {
+function rationalPolynomial(
+  value: number,
+  numerator: readonly number[],
+  denominator: readonly number[],
+): number {
   return polevl(value, numerator) / (polevl(value, denominator) * value + 1);
 }
 
@@ -180,7 +139,8 @@ export function truncateCovariance(
     throw new RangeError("Selection quantile must be in [0.01, 0.99].");
   }
   const selectionIndex = context.indexById.get(rule.nodeId);
-  if (selectionIndex === undefined) throw new Error("Selection node is missing from the covariance.");
+  if (selectionIndex === undefined)
+    throw new Error("Selection node is missing from the covariance.");
   const selectionVariance = context.covariance[selectionIndex][selectionIndex];
   if (!Number.isFinite(selectionVariance) || selectionVariance <= 0) {
     throw new Error("Selection node has no positive marginal variance.");

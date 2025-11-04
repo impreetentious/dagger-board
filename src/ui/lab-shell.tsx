@@ -33,12 +33,23 @@ export function LabShell() {
     <main className="mx-auto flex w-full max-w-[96rem] flex-1 flex-col px-4 pb-10 pt-6 sm:px-8 lg:px-10">
       <header className="mb-4 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">WORKBENCH</p>
-          <h1 className="mt-1 text-3xl font-black tracking-[-0.06em] sm:text-4xl">One model, multiple checks.</h1>
+          <p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">
+            WORKBENCH
+          </p>
+          <h1 className="mt-1 text-3xl font-black tracking-[-0.06em] sm:text-4xl">
+            One model, multiple checks.
+          </h1>
         </div>
-        <p className="max-w-md text-sm leading-6 text-[var(--muted)]">Draw the causal claim once. Every rail reads the same graph, parameters, conditioning set, and selection rule.</p>
+        <p className="max-w-md text-sm leading-6 text-[var(--muted)]">
+          Draw the causal claim once. Every rail reads the same graph, parameters, conditioning set,
+          and selection rule.
+        </p>
       </header>
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Workbench surfaces">
+      <div
+        className="mb-4 flex gap-2 overflow-x-auto pb-1"
+        role="tablist"
+        aria-label="Workbench surfaces"
+      >
         {surfaces.map((surface) => (
           <button
             aria-selected={activeSurface === surface.id}

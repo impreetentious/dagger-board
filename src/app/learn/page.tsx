@@ -14,10 +14,7 @@ export default function LearnPage() {
           then reveals the path anatomy, the exact bias, and a one-click hand-off to the workbench.
         </p>
       </section>
-      <section
-        aria-label="Lessons"
-        className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-      >
+      <section aria-label="Lessons" className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {LEARN_SCENARIOS.map((scenario) => (
           <article
             className="flex flex-col rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-6"

@@ -36,18 +36,23 @@ export function enumerateMeasuredAdjustmentSets(
   outcomeId: string,
   measured: Readonly<Record<string, boolean>>,
 ): string[][] {
-  const candidates = adjustmentCandidateIds(graph, exposureId, outcomeId).filter((id) => measured[id]);
+  const candidates = adjustmentCandidateIds(graph, exposureId, outcomeId).filter(
+    (id) => measured[id],
+  );
   const minimal: string[][] = [];
   for (const subset of subsetsBySize(candidates)) {
     const set = new Set(subset);
     if (minimal.some((existing) => isSubset(new Set(existing), set))) continue;
-    if (checkAdjustmentSet(graph, exposureId, outcomeId, set).valid) minimal.push(sortedNodeIds(graph, subset));
+    if (checkAdjustmentSet(graph, exposureId, outcomeId, set).valid)
+      minimal.push(sortedNodeIds(graph, subset));
   }
   return minimal.sort((left, right) => compareNodeSets(graph, left, right));
 }
 
 function indexTuple(graph: Graph, ids: readonly string[]): number[] {
-  return ids.map((id) => graph.nodes.find((node) => node.id === id)?.idx ?? Number.MAX_SAFE_INTEGER);
+  return ids.map(
+    (id) => graph.nodes.find((node) => node.id === id)?.idx ?? Number.MAX_SAFE_INTEGER,
+  );
 }
 
 function comparator(graph: Graph) {
@@ -65,11 +70,16 @@ function comparator(graph: Graph) {
       return left.conditioningIds.length - right.conditioningIds.length;
     }
     const leftIds = [...left.conditioningIds, ...(left.instrumentId ? [left.instrumentId] : [])];
-    const rightIds = [...right.conditioningIds, ...(right.instrumentId ? [right.instrumentId] : [])];
+    const rightIds = [
+      ...right.conditioningIds,
+      ...(right.instrumentId ? [right.instrumentId] : []),
+    ];
     const leftTuple = indexTuple(graph, leftIds);
     const rightTuple = indexTuple(graph, rightIds);
     for (let index = 0; index < Math.max(leftTuple.length, rightTuple.length); index += 1) {
-      const difference = (leftTuple[index] ?? Number.MAX_SAFE_INTEGER) - (rightTuple[index] ?? Number.MAX_SAFE_INTEGER);
+      const difference =
+        (leftTuple[index] ?? Number.MAX_SAFE_INTEGER) -
+        (rightTuple[index] ?? Number.MAX_SAFE_INTEGER);
       if (difference !== 0) return difference;
     }
     return 0;
@@ -98,7 +108,9 @@ export function evaluateDesign(
     const estimate = olsEstimand(covariance, exposureId, outcomeId, ids, totalEffect);
     const identified = checkAdjustmentSet(graph, exposureId, outcomeId, new Set(ids)).valid;
     const smallSelectedSample = Boolean(truncation && effectiveN < 50);
-    const standardError = smallSelectedSample ? null : olsStandardError(covariance, exposureId, outcomeId, ids, effectiveN);
+    const standardError = smallSelectedSample
+      ? null
+      : olsStandardError(covariance, exposureId, outcomeId, ids, effectiveN);
     rows.push({
       id: `${kind}:${ids.join(",")}`,
       kind,
@@ -118,7 +130,14 @@ export function evaluateDesign(
     if (!measured[instrument.instrumentId]) continue;
     for (const conditionedIds of instrument.conditioningSets) {
       if (!conditionedIds.every((id) => measured[id])) continue;
-      const estimate = ivEstimand(covariance, instrument.instrumentId, exposureId, outcomeId, conditionedIds, totalEffect);
+      const estimate = ivEstimand(
+        covariance,
+        instrument.instrumentId,
+        exposureId,
+        outcomeId,
+        conditionedIds,
+        totalEffect,
+      );
       rows.push({
         id: `iv:${instrument.instrumentId}:${conditionedIds.join(",")}`,
         kind: "iv",
@@ -136,7 +155,10 @@ export function evaluateDesign(
   }
   rows.sort(comparator(graph));
   const first = rows[0];
-  const bestRowId = first && first.populationBias !== null && Math.abs(first.populationBias) <= 1e-9 ? first.id : null;
+  const bestRowId =
+    first && first.populationBias !== null && Math.abs(first.populationBias) <= 1e-9
+      ? first.id
+      : null;
   return {
     rows,
     totalEffect,

@@ -50,7 +50,8 @@ function uniqueName(rawName: string, seen: Set<string>, warnings: string[]): str
     name = `${base.slice(0, Math.max(1, 64 - String(suffix).length - 1))}_${suffix}`;
     suffix += 1;
   }
-  if (name !== rawName) warnings.push(`Renamed imported node ${quoted(rawName)} to ${quoted(name)}.`);
+  if (name !== rawName)
+    warnings.push(`Renamed imported node ${quoted(rawName)} to ${quoted(name)}.`);
   seen.add(name.toLocaleLowerCase());
   return name;
 }
@@ -68,7 +69,10 @@ interface ParsedEdge {
 
 function parseStatements(text: string): { nodes: ParsedNode[]; edges: ParsedEdge[] } {
   const body = text.replace(/^\s*(dag|digraph)\s*(?:[\w-]+)?\s*\{/iu, "").replace(/\}\s*$/u, "");
-  const statements = body.split(/[;\n]/u).map((statement) => statement.trim()).filter(Boolean);
+  const statements = body
+    .split(/[;\n]/u)
+    .map((statement) => statement.trim())
+    .filter(Boolean);
   const nodeMap = new Map<string, ParsedNode>();
   const edges: ParsedEdge[] = [];
   const nodeFor = (raw: string) => {
@@ -90,11 +94,22 @@ function parseStatements(text: string): { nodes: ParsedNode[]; edges: ParsedEdge
       edges.push({ from, to, operator: edge[2] as "->" | "<->" });
       continue;
     }
-    const declaration = statement.match(/^\s*("(?:\\.|[^"\\])*"|[^\s\[]+)\s*(?:\[([^\]]*)\])?\s*$/u);
+    const declaration = statement.match(
+      /^\s*("(?:\\.|[^"\\])*"|[^\s\[]+)\s*(?:\[([^\]]*)\])?\s*$/u,
+    );
     if (!declaration) continue;
     const node = nodeFor(declaration[1]);
     const attributes = declaration[2] ?? "";
-    for (const status of ["latent", "unobserved", "exposure", "source", "outcome", "target", "adjusted", "selected"]) {
+    for (const status of [
+      "latent",
+      "unobserved",
+      "exposure",
+      "source",
+      "outcome",
+      "target",
+      "adjusted",
+      "selected",
+    ]) {
       if (new RegExp(`(?:^|\\s|,)${status}(?:$|\\s|,)`, "iu").test(attributes)) {
         node.statuses.add(status.toLocaleLowerCase());
       }
@@ -118,18 +133,27 @@ export function importDagittyText(text: string): DagittyImportResult {
     const name = uniqueName(parsedNode.name, names, warnings);
     const id = `node-${idx}`;
     idByOriginalName.set(parsedNode.name, id);
-    return { id, idx, name, kind: nodeKind(parsedNode.statuses), position: { x: 100 + idx * 64, y: 160 } };
+    return {
+      id,
+      idx,
+      name,
+      kind: nodeKind(parsedNode.statuses),
+      position: { x: 100 + idx * 64, y: 160 },
+    };
   });
   const roles: Graph["roles"] = {};
   for (const parsedNode of parsed.nodes) {
     const id = idByOriginalName.get(parsedNode.name);
     if (!id) continue;
-    if (parsedNode.statuses.has("exposure") || parsedNode.statuses.has("source")) roles.exposureId = id;
-    if (parsedNode.statuses.has("outcome") || parsedNode.statuses.has("target")) roles.outcomeId = id;
+    if (parsedNode.statuses.has("exposure") || parsedNode.statuses.has("source"))
+      roles.exposureId = id;
+    if (parsedNode.statuses.has("outcome") || parsedNode.statuses.has("target"))
+      roles.outcomeId = id;
   }
   for (const node of nodes) {
     if (node.id === roles.exposureId || node.id === roles.outcomeId) {
-      if (node.kind !== "observed") warnings.push(`Role status wins over non-observed status for ${quoted(node.name)}.`);
+      if (node.kind !== "observed")
+        warnings.push(`Role status wins over non-observed status for ${quoted(node.name)}.`);
       node.kind = "observed";
     }
   }
@@ -144,7 +168,13 @@ export function importDagittyText(text: string): DagittyImportResult {
     }
     names.add(latentName.toLocaleLowerCase());
     const latentId = `node-${nodes.length}`;
-    nodes.push({ id: latentId, idx: nodes.length, name: latentName, kind: "latent", position: { x: 100, y: 100 } });
+    nodes.push({
+      id: latentId,
+      idx: nodes.length,
+      name: latentName,
+      kind: "latent",
+      position: { x: 100, y: 100 },
+    });
     edges.push({ from: latentId, to: left }, { from: latentId, to: right });
   };
   for (const edge of parsed.edges) {
@@ -154,7 +184,8 @@ export function importDagittyText(text: string): DagittyImportResult {
     if (edge.operator === "<->") addLatent(from, to);
     else edges.push({ from, to });
   }
-  if (nodes.length > 12 || edges.length > 24) throw new Error("Imported DAGitty graph exceeds the graph cap.");
+  if (nodes.length > 12 || edges.length > 24)
+    throw new Error("Imported DAGitty graph exceeds the graph cap.");
   const graph = validateGraph({ v: 1, nodes, edges, roles });
   const adjusted = parsed.nodes
     .filter((node) => node.statuses.has("adjusted"))
@@ -171,10 +202,14 @@ export function importDagittyText(text: string): DagittyImportResult {
     n: 10_000,
   });
   if (snapshot.conditioning.length !== adjusted.length) {
-    warnings.push("Role-marked or non-observed adjusted statuses were not added to the conditioning set.");
+    warnings.push(
+      "Role-marked or non-observed adjusted statuses were not added to the conditioning set.",
+    );
   }
   if (graph.nodes.some((node) => node.kind === "selection")) {
-    warnings.push("Selection kind imported; its active threshold/quantile is not representable in DAGitty text.");
+    warnings.push(
+      "Selection kind imported; its active threshold/quantile is not representable in DAGitty text.",
+    );
   }
   return { snapshot, warnings };
 }

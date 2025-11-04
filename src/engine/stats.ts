@@ -49,7 +49,9 @@ export function partialCovariance(
   );
   const sigmaLeftZ = [conditioned.map((id) => covarianceEntry(context, left, id))];
   const sigmaZRight = conditioned.map((id) => [covarianceEntry(context, id, right)]);
-  const correction = multiplyScalar(multiplyMatrix(multiplyMatrix(sigmaLeftZ, inverse(sigmaZZ)), sigmaZRight));
+  const correction = multiplyScalar(
+    multiplyMatrix(multiplyMatrix(sigmaLeftZ, inverse(sigmaZZ)), sigmaZRight),
+  );
   return covarianceEntry(context, left, right) - correction;
 }
 
@@ -147,7 +149,9 @@ export function frontdoorEstimand(
   mediatorId: string,
   outcomeId: string,
 ): number {
-  const firstStage = covarianceEntry(context, exposureId, mediatorId) / covarianceEntry(context, exposureId, exposureId);
+  const firstStage =
+    covarianceEntry(context, exposureId, mediatorId) /
+    covarianceEntry(context, exposureId, exposureId);
   const secondStage =
     partialCovariance(context, mediatorId, outcomeId, [exposureId]) /
     conditionalVariance(context, mediatorId, [exposureId]);
@@ -177,14 +181,7 @@ export function ivTestStandardError(
   conditionedIds: readonly string[],
   sampleSize: number,
 ): number | null {
-  const estimate = ivEstimand(
-    context,
-    instrumentId,
-    exposureId,
-    outcomeId,
-    conditionedIds,
-    0,
-  );
+  const estimate = ivEstimand(context, instrumentId, exposureId, outcomeId, conditionedIds, 0);
   if (estimate.estimand === null || sampleSize <= 0) return null;
   const beta = estimate.estimand;
   const sigmaU =

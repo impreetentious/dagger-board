@@ -90,8 +90,8 @@ export function classifyPaths(
     const hasCollider = nodeIds.some((_, index) => isCollider(graph, nodeIds, index));
     const selectionOpened = Boolean(
       selection &&
-      evaluation.isOpen &&
-      !evaluatePath(graph, nodeIds, conditioned, undefined).isOpen,
+        evaluation.isOpen &&
+        !evaluatePath(graph, nodeIds, conditioned, undefined).isOpen,
     );
     const colliderWitnesses = openedColliderLabels(
       graph,

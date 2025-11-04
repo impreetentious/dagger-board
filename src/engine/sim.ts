@@ -42,7 +42,13 @@ export interface SampleMoments extends CovarianceContext {
 }
 
 export type SimulationEstimatorRequest =
-  | { kind: "ols"; exposureId: string; outcomeId: string; conditionedIds: string[]; totalEffect: number }
+  | {
+      kind: "ols";
+      exposureId: string;
+      outcomeId: string;
+      conditionedIds: string[];
+      totalEffect: number;
+    }
   | {
       kind: "iv";
       exposureId: string;
@@ -65,7 +71,10 @@ export interface SimulationRun {
   truncation: TruncationResult | undefined;
 }
 
-function parentEntries(model: ScmModel, nodeId: string): Array<{ id: string; coefficient: number }> {
+function parentEntries(
+  model: ScmModel,
+  nodeId: string,
+): Array<{ id: string; coefficient: number }> {
   return parentsOf(model.graph, nodeId)
     .sort((left, right) => (model.indexById.get(left) ?? 0) - (model.indexById.get(right) ?? 0))
     .map((id) => ({ id, coefficient: edgeCoefficient(model.parameters, id, nodeId) }));
@@ -85,7 +94,8 @@ function fillNodeColumn(
     ...parent,
     column: columns.get(parent.id),
   }));
-  if (parents.some((parent) => !parent.column)) throw new Error("Parent simulation order is invalid.");
+  if (parents.some((parent) => !parent.column))
+    throw new Error("Parent simulation order is invalid.");
   const errorSd = model.parameters.errorSds[nodeId];
   for (let row = start; row < end; row += 2) {
     const pair = normalPair();
@@ -128,7 +138,10 @@ function selectedRowIndices(
 }
 
 /** Synchronous deterministic generation for tests and short product runs. */
-export function generateSimulationData(model: ScmModel, options: SimulationOptions): SimulationData {
+export function generateSimulationData(
+  model: ScmModel,
+  options: SimulationOptions,
+): SimulationData {
   const parsed = SimulationOptionsSchema.parse(options);
   const columns = createColumns(model, parsed.n);
   const normalPair = createNormalPairGenerator(parsed.seed);
@@ -179,7 +192,10 @@ export async function generateSimulationDataAsync(
 }
 
 /** Two-pass demeaning covariance. Prefixes are defined in generated-row order. */
-export function sampleMoments(data: SimulationData, generatedRows = data.generatedCount): SampleMoments {
+export function sampleMoments(
+  data: SimulationData,
+  generatedRows = data.generatedCount,
+): SampleMoments {
   const limit = Math.min(Math.max(0, generatedRows), data.generatedCount);
   const indices: number[] = [];
   for (const row of data.keptRowIndices) {
@@ -208,7 +224,8 @@ export function sampleMoments(data: SimulationData, generatedRows = data.generat
         const rightValues = data.columns.get(data.nodeIds[right]);
         if (!rightValues) throw new Error("Missing simulation column.");
         let sum = 0;
-        for (const row of indices) sum += (leftValues[row] - means[left]) * (rightValues[row] - means[right]);
+        for (const row of indices)
+          sum += (leftValues[row] - means[left]) * (rightValues[row] - means[right]);
         const value = sum / indices.length;
         covariance[left][right] = value;
         covariance[right][left] = value;
@@ -261,11 +278,7 @@ export function convergenceSeries(
     const moments = sampleMoments(data, generatedRows);
     const result = simulatedEstimate(request, moments);
     const estimate =
-      result === null
-        ? null
-        : "status" in result
-          ? result.estimand
-          : result.estimand;
+      result === null ? null : "status" in result ? result.estimand : result.estimand;
     return { generatedRows, keptRows: moments.sampleSize, estimate };
   });
 }

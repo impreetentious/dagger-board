@@ -45,7 +45,13 @@ export function trekCovarianceMatrix(
   const covariance = zeros(nodeIds.length);
   for (let row = 0; row < nodeIds.length; row += 1) {
     for (let column = row; column < nodeIds.length; column += 1) {
-      const value = trekCovariance(graph, nodeIds[row], nodeIds[column], coefficient, errorVariance);
+      const value = trekCovariance(
+        graph,
+        nodeIds[row],
+        nodeIds[column],
+        coefficient,
+        errorVariance,
+      );
       covariance[row][column] = value;
       covariance[column][row] = value;
     }

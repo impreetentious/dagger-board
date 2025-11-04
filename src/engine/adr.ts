@@ -84,7 +84,12 @@ export function buildAdrDocument(inputs: AdrInputs): AdrDocument {
     timestamp: inputs.timestamp,
     exposureId: graph.roles.exposureId ?? null,
     outcomeId: graph.roles.outcomeId ?? null,
-    nodes: graph.nodes.map((node) => ({ id: node.id, name: node.name, kind: node.kind, idx: node.idx })),
+    nodes: graph.nodes.map((node) => ({
+      id: node.id,
+      name: node.name,
+      kind: node.kind,
+      idx: node.idx,
+    })),
     edges: graph.edges.map((edge) => ({ from: edge.from, to: edge.to })),
     absentEdges: assumedAbsentEdges(graph),
     independentErrors: true,
@@ -92,11 +97,10 @@ export function buildAdrDocument(inputs: AdrInputs): AdrDocument {
     identificationVerdict: report.verdict,
     adjustmentSets: report.adjustment?.minimalSets ?? [],
     frontdoorMediatorIds: report.frontdoor?.mediatorIds ?? [],
-    instruments:
-      report.instruments.map((instrument) => ({
-        instrumentId: instrument.instrumentId,
-        conditioningSets: instrument.conditioningSets,
-      })),
+    instruments: report.instruments.map((instrument) => ({
+      instrumentId: instrument.instrumentId,
+      conditioningSets: instrument.conditioningSets,
+    })),
     implications: report.implications.map((implication) => ({
       leftId: implication.leftId,
       rightId: implication.rightId,
