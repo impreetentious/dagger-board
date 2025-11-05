@@ -1,0 +1,22 @@
+{
+  "v": 1,
+  "id": "iv-exact-cancellation",
+  "derivation": "Z -> X and Z -> A -> X can cancel under P3 coefficients, exercising the undefined-instrument guard without a graph change.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "z", "idx": 0, "name": "Z", "kind": "observed" },
+      { "id": "a", "idx": 1, "name": "A", "kind": "observed" },
+      { "id": "x", "idx": 2, "name": "X", "kind": "observed" },
+      { "id": "y", "idx": 3, "name": "Y", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "z", "to": "x" },
+      { "from": "z", "to": "a" },
+      { "from": "a", "to": "x" },
+      { "from": "x", "to": "y" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": { "dSeparation": [] }
+}

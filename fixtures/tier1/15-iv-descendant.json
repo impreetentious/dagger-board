@@ -1,0 +1,22 @@
+{
+  "v": 1,
+  "id": "iv-descendant-negative",
+  "derivation": "CX-A: Z is a child of X. The P3 oracle records beta_IV=1.2 while TE=0.7, so the P2 criterion rejects Z by non-descendance.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "u", "idx": 0, "name": "U", "kind": "latent" },
+      { "id": "x", "idx": 1, "name": "X", "kind": "observed" },
+      { "id": "y", "idx": 2, "name": "Y", "kind": "observed" },
+      { "id": "z", "idx": 3, "name": "Z", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "u", "to": "x" },
+      { "from": "u", "to": "y" },
+      { "from": "x", "to": "y" },
+      { "from": "x", "to": "z" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": { "dSeparation": [] }
+}

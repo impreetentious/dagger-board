@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "id": "no-adjustment",
+  "derivation": "Latent U confounds X and Y, and no observed non-forbidden covariate can block that fork.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "u", "idx": 0, "name": "U", "kind": "latent" },
+      { "id": "x", "idx": 1, "name": "X", "kind": "observed" },
+      { "id": "y", "idx": 2, "name": "Y", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "u", "to": "x" },
+      { "from": "u", "to": "y" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": { "paths": [{ "conditioned": [], "primaryLabels": ["confounding"] }] }
+}

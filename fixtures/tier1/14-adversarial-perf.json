@@ -1,0 +1,188 @@
+{
+  "v": 1,
+  "id": "adversarial-perf",
+  "derivation": "Frozen fixture14-layered-v1: a 12-node / 24-edge layered DAG for agreement and performance only.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      {
+        "id": "x",
+        "idx": 0,
+        "name": "X",
+        "kind": "observed"
+      },
+      {
+        "id": "a",
+        "idx": 1,
+        "name": "A",
+        "kind": "observed"
+      },
+      {
+        "id": "b",
+        "idx": 2,
+        "name": "B",
+        "kind": "observed"
+      },
+      {
+        "id": "c",
+        "idx": 3,
+        "name": "C",
+        "kind": "observed"
+      },
+      {
+        "id": "d",
+        "idx": 4,
+        "name": "D",
+        "kind": "observed"
+      },
+      {
+        "id": "e",
+        "idx": 5,
+        "name": "E",
+        "kind": "observed"
+      },
+      {
+        "id": "f",
+        "idx": 6,
+        "name": "F",
+        "kind": "observed"
+      },
+      {
+        "id": "g",
+        "idx": 7,
+        "name": "G",
+        "kind": "observed"
+      },
+      {
+        "id": "h",
+        "idx": 8,
+        "name": "H",
+        "kind": "observed"
+      },
+      {
+        "id": "i",
+        "idx": 9,
+        "name": "I",
+        "kind": "observed"
+      },
+      {
+        "id": "j",
+        "idx": 10,
+        "name": "J",
+        "kind": "observed"
+      },
+      {
+        "id": "y",
+        "idx": 11,
+        "name": "Y",
+        "kind": "observed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "x",
+        "to": "a"
+      },
+      {
+        "from": "x",
+        "to": "b"
+      },
+      {
+        "from": "x",
+        "to": "c"
+      },
+      {
+        "from": "a",
+        "to": "d"
+      },
+      {
+        "from": "a",
+        "to": "e"
+      },
+      {
+        "from": "b",
+        "to": "d"
+      },
+      {
+        "from": "b",
+        "to": "e"
+      },
+      {
+        "from": "c",
+        "to": "d"
+      },
+      {
+        "from": "c",
+        "to": "e"
+      },
+      {
+        "from": "d",
+        "to": "f"
+      },
+      {
+        "from": "d",
+        "to": "g"
+      },
+      {
+        "from": "d",
+        "to": "h"
+      },
+      {
+        "from": "e",
+        "to": "f"
+      },
+      {
+        "from": "e",
+        "to": "g"
+      },
+      {
+        "from": "e",
+        "to": "h"
+      },
+      {
+        "from": "f",
+        "to": "i"
+      },
+      {
+        "from": "f",
+        "to": "j"
+      },
+      {
+        "from": "g",
+        "to": "i"
+      },
+      {
+        "from": "g",
+        "to": "j"
+      },
+      {
+        "from": "h",
+        "to": "i"
+      },
+      {
+        "from": "h",
+        "to": "j"
+      },
+      {
+        "from": "i",
+        "to": "y"
+      },
+      {
+        "from": "j",
+        "to": "y"
+      },
+      {
+        "from": "x",
+        "to": "y"
+      }
+    ],
+    "roles": {
+      "exposureId": "x",
+      "outcomeId": "y"
+    }
+  },
+  "expectedP1": {
+    "dSeparation": [],
+    "paths": []
+  }
+}

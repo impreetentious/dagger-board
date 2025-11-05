@@ -1,0 +1,25 @@
+{
+  "v": 1,
+  "id": "multi-descendant-collider",
+  "derivation": "With Z={D1,D2}, the collider C has the full opening witness set {D1,D2}; removing both is required to close X -> C <- Y.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "x", "idx": 0, "name": "X", "kind": "observed" },
+      { "id": "c", "idx": 1, "name": "C", "kind": "observed" },
+      { "id": "y", "idx": 2, "name": "Y", "kind": "observed" },
+      { "id": "d1", "idx": 3, "name": "D1", "kind": "observed" },
+      { "id": "d2", "idx": 4, "name": "D2", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "x", "to": "c" },
+      { "from": "y", "to": "c" },
+      { "from": "c", "to": "d1" },
+      { "from": "c", "to": "d2" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": {
+    "paths": [{ "conditioned": ["d1", "d2"], "primaryLabels": ["collider-opened"] }]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "v": 1,
+  "id": "iv-descendant-repair-negative",
+  "derivation": "CX-B: moving relevance into the cut graph cannot repair a descendant instrument; P3 records beta_IV=0.95 while TE=0.7.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "u", "idx": 0, "name": "U", "kind": "latent" },
+      { "id": "u2", "idx": 1, "name": "U2", "kind": "latent" },
+      { "id": "x", "idx": 2, "name": "X", "kind": "observed" },
+      { "id": "z", "idx": 3, "name": "Z", "kind": "observed" },
+      { "id": "y", "idx": 4, "name": "Y", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "u", "to": "x" },
+      { "from": "u", "to": "z" },
+      { "from": "u2", "to": "x" },
+      { "from": "u2", "to": "y" },
+      { "from": "x", "to": "z" },
+      { "from": "x", "to": "y" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": { "dSeparation": [] }
+}
