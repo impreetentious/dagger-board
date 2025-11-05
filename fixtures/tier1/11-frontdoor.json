@@ -1,0 +1,22 @@
+{
+  "v": 1,
+  "id": "frontdoor",
+  "derivation": "The classic frontdoor structure has latent X--Y confounding while observed M intercepts the directed effect.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "u", "idx": 0, "name": "U", "kind": "latent" },
+      { "id": "x", "idx": 1, "name": "X", "kind": "observed" },
+      { "id": "m", "idx": 2, "name": "M", "kind": "observed" },
+      { "id": "y", "idx": 3, "name": "Y", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "u", "to": "x" },
+      { "from": "u", "to": "y" },
+      { "from": "x", "to": "m" },
+      { "from": "m", "to": "y" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": { "dSeparation": [] }
+}

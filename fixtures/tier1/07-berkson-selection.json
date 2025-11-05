@@ -1,0 +1,90 @@
+{
+  "v": 1,
+  "id": "berkson-selection",
+  "derivation": "Selection on S is modeled through a virtual child indicator, which opens X -> S <- Y without treating S as a blocking covariate. With all coefficients 0.5, all error SDs 1, and q=0.5, marginal Var(S)=1.5 and delta=2/pi; the truncated entries are Var(X)=0.8938967046054802, Cov(X,Y)=-0.1061032953945969, Var(S)=0.5450703414486279.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      {
+        "id": "x",
+        "idx": 0,
+        "name": "X",
+        "kind": "observed"
+      },
+      {
+        "id": "y",
+        "idx": 1,
+        "name": "Y",
+        "kind": "observed"
+      },
+      {
+        "id": "s",
+        "idx": 2,
+        "name": "S",
+        "kind": "selection"
+      }
+    ],
+    "edges": [
+      {
+        "from": "x",
+        "to": "s"
+      },
+      {
+        "from": "y",
+        "to": "s"
+      }
+    ],
+    "roles": {
+      "exposureId": "x",
+      "outcomeId": "y"
+    }
+  },
+  "expectedP1": {
+    "dSeparation": [
+      {
+        "from": "x",
+        "to": "y",
+        "conditioned": [],
+        "separated": true
+      },
+      {
+        "from": "x",
+        "to": "y",
+        "conditioned": [],
+        "selectionNodeId": "s",
+        "separated": false
+      }
+    ],
+    "paths": [
+      {
+        "conditioned": [],
+        "selectionNodeId": "s",
+        "primaryLabels": [
+          "selection-opened"
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "v": 1,
+    "edgeCoefficients": {
+      "x\u0000s": 0.5,
+      "y\u0000s": 0.5
+    },
+    "errorSds": {
+      "x": 1,
+      "y": 1,
+      "s": 1
+    }
+  },
+  "expectedP3": {
+    "selection": {
+      "nodeId": "s",
+      "quantile": 0.5,
+      "varS": 1.5,
+      "varX": 0.8938967046054802,
+      "covXY": -0.1061032953945969,
+      "varSSelected": 0.5450703414486279
+    }
+  }
+}

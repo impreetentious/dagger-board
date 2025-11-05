@@ -1,0 +1,22 @@
+{
+  "v": 1,
+  "id": "iv",
+  "derivation": "Z predicts X while latent U confounds X and Y; P2 verifies the conditional-IV criterion.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "u", "idx": 0, "name": "U", "kind": "latent" },
+      { "id": "z", "idx": 1, "name": "Z", "kind": "observed" },
+      { "id": "x", "idx": 2, "name": "X", "kind": "observed" },
+      { "id": "y", "idx": 3, "name": "Y", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "u", "to": "x" },
+      { "from": "u", "to": "y" },
+      { "from": "z", "to": "x" },
+      { "from": "x", "to": "y" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": { "dSeparation": [] }
+}

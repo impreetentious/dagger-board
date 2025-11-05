@@ -1,0 +1,22 @@
+{
+  "v": 1,
+  "id": "conditional-iv",
+  "derivation": "W blocks Z <- W -> Y, leaving Z conditionally exogenous while Z -> X remains relevant.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "w", "idx": 0, "name": "W", "kind": "observed" },
+      { "id": "z", "idx": 1, "name": "Z", "kind": "observed" },
+      { "id": "x", "idx": 2, "name": "X", "kind": "observed" },
+      { "id": "y", "idx": 3, "name": "Y", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "w", "to": "z" },
+      { "from": "w", "to": "y" },
+      { "from": "z", "to": "x" },
+      { "from": "x", "to": "y" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": { "dSeparation": [] }
+}

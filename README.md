@@ -2,7 +2,7 @@
 
 > Draw your assumptions. See your bias. Before the data.
 
-**Status:** v0.2.1 — P0 scaffold + foundations on `main`. Build continues.
+**Status:** v0.2.2 — P0 scaffold + foundations on `main`. Build continues.
 
 ---
 
@@ -64,4 +64,4 @@ This IST timestamp rule is permanent for all future workflows, commits, and AI a
 Follow this format for version control:
 
 * **Base Format Version:** 0.0.0 — the version of the version-block schema itself (the shape of these lines); it is bumped only when this block's structure changes, not on every commit.
-* **Product Version:** `v0.2.1_2025-11-05_01:07:20` (IST)
+* **Product Version:** `v0.2.2_2025-11-05_23:10:27` (IST)

@@ -1,0 +1,19 @@
+{
+  "v": 1,
+  "id": "measurement-error",
+  "derivation": "The observed proxy X shares a latent parent with Y; the structural total effect from the drawn X to Y is zero.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      { "id": "t", "idx": 0, "name": "T", "kind": "latent" },
+      { "id": "x", "idx": 1, "name": "X", "kind": "observed" },
+      { "id": "y", "idx": 2, "name": "Y", "kind": "observed" }
+    ],
+    "edges": [
+      { "from": "t", "to": "x" },
+      { "from": "t", "to": "y" }
+    ],
+    "roles": { "exposureId": "x", "outcomeId": "y" }
+  },
+  "expectedP1": { "paths": [{ "conditioned": [], "primaryLabels": ["confounding"] }] }
+}
