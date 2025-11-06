@@ -2,7 +2,7 @@
 
 > Draw your assumptions. See your bias. Before the data.
 
-**Status:** v0.2.4 — P0–P1 complete (graph core engine) on `main`. Build continues.
+**Status:** v0.3.0 — P0–P1 complete (graph core engine) on `main`. Build continues.
 
 ---
 
@@ -63,5 +63,5 @@ This IST timestamp rule is permanent for all future workflows, commits, and AI a
 
 Follow this format for version control:
 
-* **Base Format Version:** 0.0.0 — the version of the version-block schema itself (the shape of these lines); it is bumped only when this block's structure changes, not on every commit.
-* **Product Version:** `v0.2.4_2025-11-06_01:36:39` (IST)
+- **Base Format Version:** 0.0.0 — the version of the version-block schema itself (the shape of these lines); it is bumped only when this block's structure changes, not on every commit.
+- **Product Version:** `v0.3.0_2025-11-07_03:49:52` (IST)

@@ -59,9 +59,7 @@
       {
         "conditioned": [],
         "selectionNodeId": "s",
-        "primaryLabels": [
-          "selection-opened"
-        ]
+        "primaryLabels": ["selection-opened"]
       }
     ]
   },

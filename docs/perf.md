@@ -29,8 +29,8 @@ implication enumeration on fixture #14. The first implementation measured
 415.6494 ms, so it was fixed rather than waived: Bayes-Ball now caches immutable
 parent/child topology while retaining its independent traversal semantics.
 
-| Check | Five fixed runs (ms) | Median | Gate |
-| --- | --- | ---: | ---: |
+| Check               | Five fixed runs (ms)                             |   Median |  Gate |
+| ------------------- | ------------------------------------------------ | -------: | ----: |
 | Full Prove workload | 112.0315, 113.0495, 116.9335, 111.5758, 114.8482 | 113.0495 | < 250 |
 
 The corrected workload passes on the first post-fix round; no D-16 re-measure
@@ -43,8 +43,8 @@ chunked generator, then computes two-pass sample moments. It uses an edge
 coefficient of 0.25 for a numerically representative bounded SCM rather than
 turning the deliberately dense graph into an ill-conditioned demonstration.
 
-| Check | Five runs (ms) | Median | Gate |
-| --- | --- | ---: | ---: |
+| Check                                  | Five runs (ms)                                   |   Median |    Gate |
+| -------------------------------------- | ------------------------------------------------ | -------: | ------: |
 | Chunked 100k × 12 simulation + moments | 276.2940, 278.7618, 275.3286, 277.0392, 274.2752 | 276.2940 | < 1,500 |
 
 The gate passed on its first concurrent-load round. The implementation yields

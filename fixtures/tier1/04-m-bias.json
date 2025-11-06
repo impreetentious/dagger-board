@@ -70,20 +70,14 @@
       {
         "from": "x",
         "to": "y",
-        "conditioned": [
-          "m"
-        ],
+        "conditioned": ["m"],
         "separated": false
       }
     ],
     "paths": [
       {
-        "conditioned": [
-          "m"
-        ],
-        "primaryLabels": [
-          "collider-opened"
-        ]
+        "conditioned": ["m"],
+        "primaryLabels": ["collider-opened"]
       }
     ]
   },
