@@ -1,0 +1,3690 @@
+{
+  "v": 1,
+  "provenance": {
+    "source": "https://github.com/jtextor/dagitty",
+    "commit": "7a657776dc8f5e5ba4e323edb028e2c2aaf29327",
+    "license": "GPL-2.0-or-later",
+    "importPath": "fixtures/tools/dagitty/dagitty-node.js",
+    "generatedAt": "2026-07-19",
+    "scope": "Test-only oracle corpus; never bundled or imported by src/."
+  },
+  "entries": [
+    {
+      "id": "chain",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "x",
+            "idx": 0,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "m",
+            "idx": 1,
+            "name": "M",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 2,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "x",
+            "to": "m"
+          },
+          {
+            "from": "m",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { x [exposure]; m; y [outcome]; x -> m; m -> y }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "x",
+          "v": "y",
+          "sets": [
+            [
+              "m"
+            ]
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "fork",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "u",
+            "idx": 0,
+            "name": "U",
+            "kind": "observed"
+          },
+          {
+            "id": "x",
+            "idx": 1,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 2,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "u",
+            "to": "x"
+          },
+          {
+            "from": "u",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { u; x [exposure]; y [outcome]; u -> x; u -> y }",
+      "adjustmentSets": [
+        [
+          "u"
+        ]
+      ],
+      "implications": [
+        {
+          "u": "x",
+          "v": "y",
+          "sets": [
+            [
+              "u"
+            ]
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "collider",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "x",
+            "idx": 0,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "c",
+            "idx": 1,
+            "name": "C",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 2,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "x",
+            "to": "c"
+          },
+          {
+            "from": "y",
+            "to": "c"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { x [exposure]; c; y [outcome]; x -> c; y -> c }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "x",
+          "v": "y",
+          "sets": [
+            []
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "m-bias",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "u1",
+            "idx": 0,
+            "name": "U1",
+            "kind": "latent"
+          },
+          {
+            "id": "u2",
+            "idx": 1,
+            "name": "U2",
+            "kind": "latent"
+          },
+          {
+            "id": "x",
+            "idx": 2,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "m",
+            "idx": 3,
+            "name": "M",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 4,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "u1",
+            "to": "x"
+          },
+          {
+            "from": "u1",
+            "to": "m"
+          },
+          {
+            "from": "u2",
+            "to": "m"
+          },
+          {
+            "from": "u2",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { u1 [latent]; u2 [latent]; x [exposure]; m; y [outcome]; u1 -> x; u1 -> m; u2 -> m; u2 -> y }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "x",
+          "v": "y",
+          "sets": [
+            []
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "butterfly",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "u",
+            "idx": 0,
+            "name": "U",
+            "kind": "latent"
+          },
+          {
+            "id": "x",
+            "idx": 1,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 2,
+            "name": "Y",
+            "kind": "observed"
+          },
+          {
+            "id": "m",
+            "idx": 3,
+            "name": "M",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "u",
+            "to": "x"
+          },
+          {
+            "from": "u",
+            "to": "y"
+          },
+          {
+            "from": "x",
+            "to": "m"
+          },
+          {
+            "from": "y",
+            "to": "m"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { u [latent]; x [exposure]; y [outcome]; m; u -> x; u -> y; x -> m; y -> m }",
+      "adjustmentSets": [],
+      "implications": [],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "mediator-overcontrol",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "x",
+            "idx": 0,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "m",
+            "idx": 1,
+            "name": "M",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 2,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "x",
+            "to": "m"
+          },
+          {
+            "from": "m",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { x [exposure]; m; y [outcome]; x -> m; m -> y }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "x",
+          "v": "y",
+          "sets": [
+            [
+              "m"
+            ]
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "berkson-selection",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "x",
+            "idx": 0,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 1,
+            "name": "Y",
+            "kind": "observed"
+          },
+          {
+            "id": "s",
+            "idx": 2,
+            "name": "S",
+            "kind": "selection"
+          }
+        ],
+        "edges": [
+          {
+            "from": "x",
+            "to": "s"
+          },
+          {
+            "from": "y",
+            "to": "s"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { x [exposure]; y [outcome]; s [selected]; x -> s; y -> s }",
+      "adjustmentSets": [],
+      "implications": [],
+      "instruments": [],
+      "criterionDifferences": [
+        {
+          "kind": "adjustment",
+          "reason": "DAGitty treats selected status as a direct selection condition; v1 certifies adjustment on the selection-free graph and reports selected-sample bias separately."
+        }
+      ]
+    },
+    {
+      "id": "measurement-error",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "t",
+            "idx": 0,
+            "name": "T",
+            "kind": "latent"
+          },
+          {
+            "id": "x",
+            "idx": 1,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 2,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "t",
+            "to": "x"
+          },
+          {
+            "from": "t",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { t [latent]; x [exposure]; y [outcome]; t -> x; t -> y }",
+      "adjustmentSets": [],
+      "implications": [],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "iv",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "u",
+            "idx": 0,
+            "name": "U",
+            "kind": "latent"
+          },
+          {
+            "id": "z",
+            "idx": 1,
+            "name": "Z",
+            "kind": "observed"
+          },
+          {
+            "id": "x",
+            "idx": 2,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 3,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "u",
+            "to": "x"
+          },
+          {
+            "from": "u",
+            "to": "y"
+          },
+          {
+            "from": "z",
+            "to": "x"
+          },
+          {
+            "from": "x",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { u [latent]; z; x [exposure]; y [outcome]; u -> x; u -> y; z -> x; x -> y }",
+      "adjustmentSets": [],
+      "implications": [],
+      "instruments": [
+        {
+          "instrument": "z",
+          "conditioning": []
+        }
+      ],
+      "criterionDifferences": []
+    },
+    {
+      "id": "conditional-iv",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "w",
+            "idx": 0,
+            "name": "W",
+            "kind": "observed"
+          },
+          {
+            "id": "z",
+            "idx": 1,
+            "name": "Z",
+            "kind": "observed"
+          },
+          {
+            "id": "x",
+            "idx": 2,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 3,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "w",
+            "to": "z"
+          },
+          {
+            "from": "w",
+            "to": "y"
+          },
+          {
+            "from": "z",
+            "to": "x"
+          },
+          {
+            "from": "x",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { w; z; x [exposure]; y [outcome]; w -> z; w -> y; z -> x; x -> y }",
+      "adjustmentSets": [
+        [
+          "w"
+        ],
+        [
+          "z"
+        ]
+      ],
+      "implications": [
+        {
+          "u": "w",
+          "v": "x",
+          "sets": [
+            [
+              "z"
+            ]
+          ]
+        },
+        {
+          "u": "z",
+          "v": "y",
+          "sets": [
+            [
+              "w",
+              "x"
+            ]
+          ]
+        }
+      ],
+      "instruments": [
+        {
+          "instrument": "z",
+          "conditioning": [
+            "w"
+          ]
+        }
+      ],
+      "criterionDifferences": []
+    },
+    {
+      "id": "frontdoor",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "u",
+            "idx": 0,
+            "name": "U",
+            "kind": "latent"
+          },
+          {
+            "id": "x",
+            "idx": 1,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "m",
+            "idx": 2,
+            "name": "M",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 3,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "u",
+            "to": "x"
+          },
+          {
+            "from": "u",
+            "to": "y"
+          },
+          {
+            "from": "x",
+            "to": "m"
+          },
+          {
+            "from": "m",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { u [latent]; x [exposure]; m; y [outcome]; u -> x; u -> y; x -> m; m -> y }",
+      "adjustmentSets": [],
+      "implications": [],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "generalized-adjustment",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "x",
+            "idx": 0,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "d",
+            "idx": 1,
+            "name": "D",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 2,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "x",
+            "to": "y"
+          },
+          {
+            "from": "x",
+            "to": "d"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { x [exposure]; d; y [outcome]; x -> y; x -> d }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "d",
+          "v": "y",
+          "sets": [
+            [
+              "x"
+            ]
+          ]
+        }
+      ],
+      "instruments": [
+        {
+          "instrument": "d",
+          "conditioning": []
+        }
+      ],
+      "criterionDifferences": [
+        {
+          "kind": "instrument",
+          "instrument": "d",
+          "conditioning": [],
+          "reason": "DAGitty ancestral-instrument output is broader; v1 rejects exposure descendants in Z or W by §3.6's conservative non-descendance rule."
+        }
+      ]
+    },
+    {
+      "id": "no-adjustment",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "u",
+            "idx": 0,
+            "name": "U",
+            "kind": "latent"
+          },
+          {
+            "id": "x",
+            "idx": 1,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 2,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "u",
+            "to": "x"
+          },
+          {
+            "from": "u",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { u [latent]; x [exposure]; y [outcome]; u -> x; u -> y }",
+      "adjustmentSets": [],
+      "implications": [],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "adversarial-perf",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "x",
+            "idx": 0,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "a",
+            "idx": 1,
+            "name": "A",
+            "kind": "observed"
+          },
+          {
+            "id": "b",
+            "idx": 2,
+            "name": "B",
+            "kind": "observed"
+          },
+          {
+            "id": "c",
+            "idx": 3,
+            "name": "C",
+            "kind": "observed"
+          },
+          {
+            "id": "d",
+            "idx": 4,
+            "name": "D",
+            "kind": "observed"
+          },
+          {
+            "id": "e",
+            "idx": 5,
+            "name": "E",
+            "kind": "observed"
+          },
+          {
+            "id": "f",
+            "idx": 6,
+            "name": "F",
+            "kind": "observed"
+          },
+          {
+            "id": "g",
+            "idx": 7,
+            "name": "G",
+            "kind": "observed"
+          },
+          {
+            "id": "h",
+            "idx": 8,
+            "name": "H",
+            "kind": "observed"
+          },
+          {
+            "id": "i",
+            "idx": 9,
+            "name": "I",
+            "kind": "observed"
+          },
+          {
+            "id": "j",
+            "idx": 10,
+            "name": "J",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 11,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "x",
+            "to": "a"
+          },
+          {
+            "from": "x",
+            "to": "b"
+          },
+          {
+            "from": "x",
+            "to": "c"
+          },
+          {
+            "from": "a",
+            "to": "d"
+          },
+          {
+            "from": "a",
+            "to": "e"
+          },
+          {
+            "from": "b",
+            "to": "d"
+          },
+          {
+            "from": "b",
+            "to": "e"
+          },
+          {
+            "from": "c",
+            "to": "d"
+          },
+          {
+            "from": "c",
+            "to": "e"
+          },
+          {
+            "from": "d",
+            "to": "f"
+          },
+          {
+            "from": "d",
+            "to": "g"
+          },
+          {
+            "from": "d",
+            "to": "h"
+          },
+          {
+            "from": "e",
+            "to": "f"
+          },
+          {
+            "from": "e",
+            "to": "g"
+          },
+          {
+            "from": "e",
+            "to": "h"
+          },
+          {
+            "from": "f",
+            "to": "i"
+          },
+          {
+            "from": "f",
+            "to": "j"
+          },
+          {
+            "from": "g",
+            "to": "i"
+          },
+          {
+            "from": "g",
+            "to": "j"
+          },
+          {
+            "from": "h",
+            "to": "i"
+          },
+          {
+            "from": "h",
+            "to": "j"
+          },
+          {
+            "from": "i",
+            "to": "y"
+          },
+          {
+            "from": "j",
+            "to": "y"
+          },
+          {
+            "from": "x",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { x [exposure]; a; b; c; d; e; f; g; h; i; j; y [outcome]; x -> a; x -> b; x -> c; a -> d; a -> e; b -> d; b -> e; c -> d; c -> e; d -> f; d -> g; d -> h; e -> f; e -> g; e -> h; f -> i; f -> j; g -> i; g -> j; h -> i; h -> j; i -> y; j -> y; x -> y }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "x",
+          "v": "d",
+          "sets": [
+            [
+              "a",
+              "b",
+              "c"
+            ]
+          ]
+        },
+        {
+          "u": "x",
+          "v": "e",
+          "sets": [
+            [
+              "a",
+              "b",
+              "c"
+            ]
+          ]
+        },
+        {
+          "u": "x",
+          "v": "f",
+          "sets": [
+            [
+              "d",
+              "e"
+            ],
+            [
+              "a",
+              "b",
+              "c"
+            ]
+          ]
+        },
+        {
+          "u": "x",
+          "v": "g",
+          "sets": [
+            [
+              "d",
+              "e"
+            ],
+            [
+              "a",
+              "b",
+              "c"
+            ]
+          ]
+        },
+        {
+          "u": "x",
+          "v": "h",
+          "sets": [
+            [
+              "d",
+              "e"
+            ],
+            [
+              "a",
+              "b",
+              "c"
+            ]
+          ]
+        },
+        {
+          "u": "x",
+          "v": "i",
+          "sets": [
+            [
+              "d",
+              "e"
+            ],
+            [
+              "a",
+              "b",
+              "c"
+            ],
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "x",
+          "v": "j",
+          "sets": [
+            [
+              "d",
+              "e"
+            ],
+            [
+              "a",
+              "b",
+              "c"
+            ],
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "a",
+          "v": "b",
+          "sets": [
+            [
+              "x"
+            ]
+          ]
+        },
+        {
+          "u": "a",
+          "v": "c",
+          "sets": [
+            [
+              "x"
+            ]
+          ]
+        },
+        {
+          "u": "a",
+          "v": "f",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "a",
+          "v": "g",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "a",
+          "v": "h",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "a",
+          "v": "i",
+          "sets": [
+            [
+              "d",
+              "e"
+            ],
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "a",
+          "v": "j",
+          "sets": [
+            [
+              "d",
+              "e"
+            ],
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "a",
+          "v": "y",
+          "sets": [
+            [
+              "d",
+              "e",
+              "x"
+            ],
+            [
+              "i",
+              "j",
+              "x"
+            ],
+            [
+              "f",
+              "g",
+              "h",
+              "x"
+            ]
+          ]
+        },
+        {
+          "u": "b",
+          "v": "c",
+          "sets": [
+            [
+              "x"
+            ]
+          ]
+        },
+        {
+          "u": "b",
+          "v": "f",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "b",
+          "v": "g",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "b",
+          "v": "h",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "b",
+          "v": "i",
+          "sets": [
+            [
+              "d",
+              "e"
+            ],
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "b",
+          "v": "j",
+          "sets": [
+            [
+              "d",
+              "e"
+            ],
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "b",
+          "v": "y",
+          "sets": [
+            [
+              "d",
+              "e",
+              "x"
+            ],
+            [
+              "i",
+              "j",
+              "x"
+            ],
+            [
+              "f",
+              "g",
+              "h",
+              "x"
+            ]
+          ]
+        },
+        {
+          "u": "c",
+          "v": "f",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "c",
+          "v": "g",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "c",
+          "v": "h",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "c",
+          "v": "i",
+          "sets": [
+            [
+              "d",
+              "e"
+            ],
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "c",
+          "v": "j",
+          "sets": [
+            [
+              "d",
+              "e"
+            ],
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "c",
+          "v": "y",
+          "sets": [
+            [
+              "d",
+              "e",
+              "x"
+            ],
+            [
+              "i",
+              "j",
+              "x"
+            ],
+            [
+              "f",
+              "g",
+              "h",
+              "x"
+            ]
+          ]
+        },
+        {
+          "u": "d",
+          "v": "e",
+          "sets": [
+            [
+              "a",
+              "b",
+              "c"
+            ]
+          ]
+        },
+        {
+          "u": "d",
+          "v": "i",
+          "sets": [
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "d",
+          "v": "j",
+          "sets": [
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "d",
+          "v": "y",
+          "sets": [
+            [
+              "i",
+              "j",
+              "x"
+            ],
+            [
+              "f",
+              "g",
+              "h",
+              "x"
+            ],
+            [
+              "a",
+              "b",
+              "c",
+              "i",
+              "j"
+            ],
+            [
+              "a",
+              "b",
+              "c",
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "e",
+          "v": "i",
+          "sets": [
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "e",
+          "v": "j",
+          "sets": [
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "e",
+          "v": "y",
+          "sets": [
+            [
+              "i",
+              "j",
+              "x"
+            ],
+            [
+              "f",
+              "g",
+              "h",
+              "x"
+            ],
+            [
+              "a",
+              "b",
+              "c",
+              "i",
+              "j"
+            ],
+            [
+              "a",
+              "b",
+              "c",
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        },
+        {
+          "u": "f",
+          "v": "g",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "f",
+          "v": "h",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "f",
+          "v": "y",
+          "sets": [
+            [
+              "i",
+              "j",
+              "x"
+            ],
+            [
+              "d",
+              "e",
+              "i",
+              "j"
+            ],
+            [
+              "a",
+              "b",
+              "c",
+              "i",
+              "j"
+            ]
+          ]
+        },
+        {
+          "u": "g",
+          "v": "h",
+          "sets": [
+            [
+              "d",
+              "e"
+            ]
+          ]
+        },
+        {
+          "u": "g",
+          "v": "y",
+          "sets": [
+            [
+              "i",
+              "j",
+              "x"
+            ],
+            [
+              "d",
+              "e",
+              "i",
+              "j"
+            ],
+            [
+              "a",
+              "b",
+              "c",
+              "i",
+              "j"
+            ]
+          ]
+        },
+        {
+          "u": "h",
+          "v": "y",
+          "sets": [
+            [
+              "i",
+              "j",
+              "x"
+            ],
+            [
+              "d",
+              "e",
+              "i",
+              "j"
+            ],
+            [
+              "a",
+              "b",
+              "c",
+              "i",
+              "j"
+            ]
+          ]
+        },
+        {
+          "u": "i",
+          "v": "j",
+          "sets": [
+            [
+              "f",
+              "g",
+              "h"
+            ]
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "iv-descendant-negative",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "u",
+            "idx": 0,
+            "name": "U",
+            "kind": "latent"
+          },
+          {
+            "id": "x",
+            "idx": 1,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 2,
+            "name": "Y",
+            "kind": "observed"
+          },
+          {
+            "id": "z",
+            "idx": 3,
+            "name": "Z",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "u",
+            "to": "x"
+          },
+          {
+            "from": "u",
+            "to": "y"
+          },
+          {
+            "from": "x",
+            "to": "y"
+          },
+          {
+            "from": "x",
+            "to": "z"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { u [latent]; x [exposure]; y [outcome]; z; u -> x; u -> y; x -> y; x -> z }",
+      "adjustmentSets": [],
+      "implications": [
+        {
+          "u": "y",
+          "v": "z",
+          "sets": [
+            [
+              "x"
+            ]
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "iv-descendant-repair-negative",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "u",
+            "idx": 0,
+            "name": "U",
+            "kind": "latent"
+          },
+          {
+            "id": "u2",
+            "idx": 1,
+            "name": "U2",
+            "kind": "latent"
+          },
+          {
+            "id": "x",
+            "idx": 2,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "z",
+            "idx": 3,
+            "name": "Z",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 4,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "u",
+            "to": "x"
+          },
+          {
+            "from": "u",
+            "to": "z"
+          },
+          {
+            "from": "u2",
+            "to": "x"
+          },
+          {
+            "from": "u2",
+            "to": "y"
+          },
+          {
+            "from": "x",
+            "to": "z"
+          },
+          {
+            "from": "x",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { u [latent]; u2 [latent]; x [exposure]; z; y [outcome]; u -> x; u -> z; u2 -> x; u2 -> y; x -> z; x -> y }",
+      "adjustmentSets": [],
+      "implications": [],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "iv-exact-cancellation",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "z",
+            "idx": 0,
+            "name": "Z",
+            "kind": "observed"
+          },
+          {
+            "id": "a",
+            "idx": 1,
+            "name": "A",
+            "kind": "observed"
+          },
+          {
+            "id": "x",
+            "idx": 2,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 3,
+            "name": "Y",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "z",
+            "to": "x"
+          },
+          {
+            "from": "z",
+            "to": "a"
+          },
+          {
+            "from": "a",
+            "to": "x"
+          },
+          {
+            "from": "x",
+            "to": "y"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { z; a; x [exposure]; y [outcome]; z -> x; z -> a; a -> x; x -> y }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "z",
+          "v": "y",
+          "sets": [
+            [
+              "x"
+            ]
+          ]
+        },
+        {
+          "u": "a",
+          "v": "y",
+          "sets": [
+            [
+              "x"
+            ]
+          ]
+        }
+      ],
+      "instruments": [
+        {
+          "instrument": "a",
+          "conditioning": []
+        },
+        {
+          "instrument": "z",
+          "conditioning": []
+        }
+      ],
+      "criterionDifferences": []
+    },
+    {
+      "id": "multi-descendant-collider",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "x",
+            "idx": 0,
+            "name": "X",
+            "kind": "observed"
+          },
+          {
+            "id": "c",
+            "idx": 1,
+            "name": "C",
+            "kind": "observed"
+          },
+          {
+            "id": "y",
+            "idx": 2,
+            "name": "Y",
+            "kind": "observed"
+          },
+          {
+            "id": "d1",
+            "idx": 3,
+            "name": "D1",
+            "kind": "observed"
+          },
+          {
+            "id": "d2",
+            "idx": 4,
+            "name": "D2",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "x",
+            "to": "c"
+          },
+          {
+            "from": "y",
+            "to": "c"
+          },
+          {
+            "from": "c",
+            "to": "d1"
+          },
+          {
+            "from": "c",
+            "to": "d2"
+          }
+        ],
+        "roles": {
+          "exposureId": "x",
+          "outcomeId": "y"
+        }
+      },
+      "model": "dag { x [exposure]; c; y [outcome]; d1; d2; x -> c; y -> c; c -> d1; c -> d2 }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "x",
+          "v": "y",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "x",
+          "v": "d1",
+          "sets": [
+            [
+              "c"
+            ]
+          ]
+        },
+        {
+          "u": "x",
+          "v": "d2",
+          "sets": [
+            [
+              "c"
+            ]
+          ]
+        },
+        {
+          "u": "y",
+          "v": "d1",
+          "sets": [
+            [
+              "c"
+            ]
+          ]
+        },
+        {
+          "u": "y",
+          "v": "d2",
+          "sets": [
+            [
+              "c"
+            ]
+          ]
+        },
+        {
+          "u": "d1",
+          "v": "d2",
+          "sets": [
+            [
+              "c"
+            ]
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "random-a11ce",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "r0",
+            "idx": 0,
+            "name": "R0",
+            "kind": "observed"
+          },
+          {
+            "id": "r1",
+            "idx": 1,
+            "name": "R1",
+            "kind": "observed"
+          },
+          {
+            "id": "r2",
+            "idx": 2,
+            "name": "R2",
+            "kind": "observed"
+          },
+          {
+            "id": "r3",
+            "idx": 3,
+            "name": "R3",
+            "kind": "observed"
+          },
+          {
+            "id": "r4",
+            "idx": 4,
+            "name": "R4",
+            "kind": "observed"
+          },
+          {
+            "id": "r5",
+            "idx": 5,
+            "name": "R5",
+            "kind": "observed"
+          },
+          {
+            "id": "r6",
+            "idx": 6,
+            "name": "R6",
+            "kind": "latent"
+          },
+          {
+            "id": "r7",
+            "idx": 7,
+            "name": "R7",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "r0",
+            "to": "r1"
+          },
+          {
+            "from": "r0",
+            "to": "r2"
+          },
+          {
+            "from": "r1",
+            "to": "r2"
+          },
+          {
+            "from": "r1",
+            "to": "r4"
+          },
+          {
+            "from": "r2",
+            "to": "r3"
+          },
+          {
+            "from": "r2",
+            "to": "r5"
+          },
+          {
+            "from": "r3",
+            "to": "r4"
+          },
+          {
+            "from": "r4",
+            "to": "r6"
+          },
+          {
+            "from": "r4",
+            "to": "r7"
+          },
+          {
+            "from": "r5",
+            "to": "r7"
+          }
+        ],
+        "roles": {
+          "exposureId": "r0",
+          "outcomeId": "r7"
+        }
+      },
+      "model": "dag { r0 [exposure]; r1; r2; r3; r4; r5; r6 [latent]; r7 [outcome]; r0 -> r1; r0 -> r2; r1 -> r2; r1 -> r4; r2 -> r3; r2 -> r5; r3 -> r4; r4 -> r6; r4 -> r7; r5 -> r7 }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "r0",
+          "v": "r3",
+          "sets": [
+            [
+              "r2"
+            ]
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r4",
+          "sets": [
+            [
+              "r1",
+              "r2"
+            ],
+            [
+              "r1",
+              "r3"
+            ]
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r5",
+          "sets": [
+            [
+              "r2"
+            ]
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r7",
+          "sets": [
+            [
+              "r1",
+              "r2"
+            ],
+            [
+              "r2",
+              "r4"
+            ],
+            [
+              "r4",
+              "r5"
+            ],
+            [
+              "r1",
+              "r3",
+              "r5"
+            ]
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r3",
+          "sets": [
+            [
+              "r2"
+            ]
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r5",
+          "sets": [
+            [
+              "r2"
+            ]
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r7",
+          "sets": [
+            [
+              "r2",
+              "r4"
+            ],
+            [
+              "r4",
+              "r5"
+            ]
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r4",
+          "sets": [
+            [
+              "r1",
+              "r3"
+            ]
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r7",
+          "sets": [
+            [
+              "r4",
+              "r5"
+            ],
+            [
+              "r1",
+              "r3",
+              "r5"
+            ]
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r5",
+          "sets": [
+            [
+              "r2"
+            ]
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r7",
+          "sets": [
+            [
+              "r2",
+              "r4"
+            ],
+            [
+              "r4",
+              "r5"
+            ]
+          ]
+        },
+        {
+          "u": "r4",
+          "v": "r5",
+          "sets": [
+            [
+              "r2"
+            ],
+            [
+              "r1",
+              "r3"
+            ]
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "random-1d3a5e",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "r0",
+            "idx": 0,
+            "name": "R0",
+            "kind": "observed"
+          },
+          {
+            "id": "r1",
+            "idx": 1,
+            "name": "R1",
+            "kind": "observed"
+          },
+          {
+            "id": "r2",
+            "idx": 2,
+            "name": "R2",
+            "kind": "observed"
+          },
+          {
+            "id": "r3",
+            "idx": 3,
+            "name": "R3",
+            "kind": "observed"
+          },
+          {
+            "id": "r4",
+            "idx": 4,
+            "name": "R4",
+            "kind": "observed"
+          },
+          {
+            "id": "r5",
+            "idx": 5,
+            "name": "R5",
+            "kind": "observed"
+          },
+          {
+            "id": "r6",
+            "idx": 6,
+            "name": "R6",
+            "kind": "observed"
+          },
+          {
+            "id": "r7",
+            "idx": 7,
+            "name": "R7",
+            "kind": "latent"
+          },
+          {
+            "id": "r8",
+            "idx": 8,
+            "name": "R8",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "r0",
+            "to": "r7"
+          },
+          {
+            "from": "r1",
+            "to": "r4"
+          },
+          {
+            "from": "r1",
+            "to": "r7"
+          },
+          {
+            "from": "r3",
+            "to": "r7"
+          },
+          {
+            "from": "r6",
+            "to": "r8"
+          }
+        ],
+        "roles": {
+          "exposureId": "r0",
+          "outcomeId": "r8"
+        }
+      },
+      "model": "dag { r0 [exposure]; r1; r2; r3; r4; r5; r6; r7 [latent]; r8 [outcome]; r0 -> r7; r1 -> r4; r1 -> r7; r3 -> r7; r6 -> r8 }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "r0",
+          "v": "r1",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r2",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r3",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r5",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r8",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r2",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r3",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r5",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r8",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r3",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r5",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r8",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r5",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r8",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r4",
+          "v": "r5",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r4",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r4",
+          "v": "r8",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r5",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r5",
+          "v": "r8",
+          "sets": [
+            []
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "random-51a7",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "r0",
+            "idx": 0,
+            "name": "R0",
+            "kind": "observed"
+          },
+          {
+            "id": "r1",
+            "idx": 1,
+            "name": "R1",
+            "kind": "observed"
+          },
+          {
+            "id": "r2",
+            "idx": 2,
+            "name": "R2",
+            "kind": "observed"
+          },
+          {
+            "id": "r3",
+            "idx": 3,
+            "name": "R3",
+            "kind": "observed"
+          },
+          {
+            "id": "r4",
+            "idx": 4,
+            "name": "R4",
+            "kind": "observed"
+          },
+          {
+            "id": "r5",
+            "idx": 5,
+            "name": "R5",
+            "kind": "observed"
+          },
+          {
+            "id": "r6",
+            "idx": 6,
+            "name": "R6",
+            "kind": "observed"
+          },
+          {
+            "id": "r7",
+            "idx": 7,
+            "name": "R7",
+            "kind": "observed"
+          },
+          {
+            "id": "r8",
+            "idx": 8,
+            "name": "R8",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "r0",
+            "to": "r6"
+          },
+          {
+            "from": "r0",
+            "to": "r8"
+          },
+          {
+            "from": "r1",
+            "to": "r3"
+          },
+          {
+            "from": "r2",
+            "to": "r4"
+          },
+          {
+            "from": "r2",
+            "to": "r6"
+          },
+          {
+            "from": "r2",
+            "to": "r7"
+          },
+          {
+            "from": "r3",
+            "to": "r4"
+          },
+          {
+            "from": "r4",
+            "to": "r5"
+          },
+          {
+            "from": "r4",
+            "to": "r7"
+          },
+          {
+            "from": "r6",
+            "to": "r8"
+          },
+          {
+            "from": "r7",
+            "to": "r8"
+          }
+        ],
+        "roles": {
+          "exposureId": "r0",
+          "outcomeId": "r8"
+        }
+      },
+      "model": "dag { r0 [exposure]; r1; r2; r3; r4; r5; r6; r7; r8 [outcome]; r0 -> r6; r0 -> r8; r1 -> r3; r2 -> r4; r2 -> r6; r2 -> r7; r3 -> r4; r4 -> r5; r4 -> r7; r6 -> r8; r7 -> r8 }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "r0",
+          "v": "r1",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r2",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r3",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r5",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r7",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r2",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r4",
+          "sets": [
+            [
+              "r3"
+            ]
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r5",
+          "sets": [
+            [
+              "r3"
+            ],
+            [
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r7",
+          "sets": [
+            [
+              "r3"
+            ],
+            [
+              "r2",
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r8",
+          "sets": [
+            [
+              "r3"
+            ],
+            [
+              "r2",
+              "r4"
+            ],
+            [
+              "r2",
+              "r7"
+            ],
+            [
+              "r0",
+              "r6",
+              "r7"
+            ]
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r3",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r5",
+          "sets": [
+            [
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r8",
+          "sets": [
+            [
+              "r0",
+              "r6",
+              "r7"
+            ]
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r5",
+          "sets": [
+            [
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r7",
+          "sets": [
+            [
+              "r2",
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r8",
+          "sets": [
+            [
+              "r2",
+              "r4"
+            ],
+            [
+              "r2",
+              "r7"
+            ],
+            [
+              "r0",
+              "r6",
+              "r7"
+            ]
+          ]
+        },
+        {
+          "u": "r4",
+          "v": "r6",
+          "sets": [
+            [
+              "r2"
+            ]
+          ]
+        },
+        {
+          "u": "r4",
+          "v": "r8",
+          "sets": [
+            [
+              "r2",
+              "r7"
+            ],
+            [
+              "r0",
+              "r6",
+              "r7"
+            ]
+          ]
+        },
+        {
+          "u": "r5",
+          "v": "r6",
+          "sets": [
+            [
+              "r2"
+            ],
+            [
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r5",
+          "v": "r7",
+          "sets": [
+            [
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r5",
+          "v": "r8",
+          "sets": [
+            [
+              "r4"
+            ],
+            [
+              "r2",
+              "r7"
+            ],
+            [
+              "r0",
+              "r6",
+              "r7"
+            ]
+          ]
+        },
+        {
+          "u": "r6",
+          "v": "r7",
+          "sets": [
+            [
+              "r2"
+            ]
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "random-5eed",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "r0",
+            "idx": 0,
+            "name": "R0",
+            "kind": "observed"
+          },
+          {
+            "id": "r1",
+            "idx": 1,
+            "name": "R1",
+            "kind": "observed"
+          },
+          {
+            "id": "r2",
+            "idx": 2,
+            "name": "R2",
+            "kind": "observed"
+          },
+          {
+            "id": "r3",
+            "idx": 3,
+            "name": "R3",
+            "kind": "latent"
+          },
+          {
+            "id": "r4",
+            "idx": 4,
+            "name": "R4",
+            "kind": "observed"
+          },
+          {
+            "id": "r5",
+            "idx": 5,
+            "name": "R5",
+            "kind": "observed"
+          },
+          {
+            "id": "r6",
+            "idx": 6,
+            "name": "R6",
+            "kind": "observed"
+          },
+          {
+            "id": "r7",
+            "idx": 7,
+            "name": "R7",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "r1",
+            "to": "r6"
+          },
+          {
+            "from": "r1",
+            "to": "r7"
+          },
+          {
+            "from": "r2",
+            "to": "r5"
+          },
+          {
+            "from": "r2",
+            "to": "r7"
+          },
+          {
+            "from": "r4",
+            "to": "r5"
+          },
+          {
+            "from": "r4",
+            "to": "r7"
+          }
+        ],
+        "roles": {
+          "exposureId": "r0",
+          "outcomeId": "r7"
+        }
+      },
+      "model": "dag { r0 [exposure]; r1; r2; r3 [latent]; r4; r5; r6; r7 [outcome]; r1 -> r6; r1 -> r7; r2 -> r5; r2 -> r7; r4 -> r5; r4 -> r7 }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "r0",
+          "v": "r1",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r2",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r5",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r7",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r2",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r5",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r4",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r5",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r5",
+          "v": "r7",
+          "sets": [
+            [
+              "r2",
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r6",
+          "v": "r7",
+          "sets": [
+            [
+              "r1"
+            ]
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "random-c0ffee",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "r0",
+            "idx": 0,
+            "name": "R0",
+            "kind": "observed"
+          },
+          {
+            "id": "r1",
+            "idx": 1,
+            "name": "R1",
+            "kind": "observed"
+          },
+          {
+            "id": "r2",
+            "idx": 2,
+            "name": "R2",
+            "kind": "observed"
+          },
+          {
+            "id": "r3",
+            "idx": 3,
+            "name": "R3",
+            "kind": "observed"
+          },
+          {
+            "id": "r4",
+            "idx": 4,
+            "name": "R4",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "r0",
+            "to": "r1"
+          },
+          {
+            "from": "r0",
+            "to": "r3"
+          },
+          {
+            "from": "r2",
+            "to": "r3"
+          }
+        ],
+        "roles": {
+          "exposureId": "r0",
+          "outcomeId": "r4"
+        }
+      },
+      "model": "dag { r0 [exposure]; r1; r2; r3; r4 [outcome]; r0 -> r1; r0 -> r3; r2 -> r3 }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "r0",
+          "v": "r2",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r2",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r3",
+          "sets": [
+            [
+              "r0"
+            ]
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        }
+      ],
+      "instruments": [
+        {
+          "instrument": "r1",
+          "conditioning": []
+        },
+        {
+          "instrument": "r3",
+          "conditioning": []
+        }
+      ],
+      "criterionDifferences": [
+        {
+          "kind": "instrument",
+          "instrument": "r1",
+          "conditioning": [],
+          "reason": "DAGitty ancestral-instrument output is broader; v1 rejects exposure descendants in Z or W by §3.6's conservative non-descendance rule."
+        },
+        {
+          "kind": "instrument",
+          "instrument": "r3",
+          "conditioning": [],
+          "reason": "DAGitty ancestral-instrument output is broader; v1 rejects exposure descendants in Z or W by §3.6's conservative non-descendance rule."
+        }
+      ]
+    },
+    {
+      "id": "random-decafbad",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "r0",
+            "idx": 0,
+            "name": "R0",
+            "kind": "observed"
+          },
+          {
+            "id": "r1",
+            "idx": 1,
+            "name": "R1",
+            "kind": "observed"
+          },
+          {
+            "id": "r2",
+            "idx": 2,
+            "name": "R2",
+            "kind": "latent"
+          },
+          {
+            "id": "r3",
+            "idx": 3,
+            "name": "R3",
+            "kind": "latent"
+          },
+          {
+            "id": "r4",
+            "idx": 4,
+            "name": "R4",
+            "kind": "observed"
+          },
+          {
+            "id": "r5",
+            "idx": 5,
+            "name": "R5",
+            "kind": "latent"
+          },
+          {
+            "id": "r6",
+            "idx": 6,
+            "name": "R6",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "r0",
+            "to": "r4"
+          },
+          {
+            "from": "r1",
+            "to": "r2"
+          },
+          {
+            "from": "r2",
+            "to": "r5"
+          }
+        ],
+        "roles": {
+          "exposureId": "r0",
+          "outcomeId": "r6"
+        }
+      },
+      "model": "dag { r0 [exposure]; r1; r2 [latent]; r3 [latent]; r4; r5 [latent]; r6 [outcome]; r0 -> r4; r1 -> r2; r2 -> r5 }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "r0",
+          "v": "r1",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r4",
+          "v": "r6",
+          "sets": [
+            []
+          ]
+        }
+      ],
+      "instruments": [
+        {
+          "instrument": "r4",
+          "conditioning": []
+        }
+      ],
+      "criterionDifferences": [
+        {
+          "kind": "instrument",
+          "instrument": "r4",
+          "conditioning": [],
+          "reason": "DAGitty ancestral-instrument output is broader; v1 rejects exposure descendants in Z or W by §3.6's conservative non-descendance rule."
+        }
+      ]
+    },
+    {
+      "id": "random-12345678",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "r0",
+            "idx": 0,
+            "name": "R0",
+            "kind": "observed"
+          },
+          {
+            "id": "r1",
+            "idx": 1,
+            "name": "R1",
+            "kind": "observed"
+          },
+          {
+            "id": "r2",
+            "idx": 2,
+            "name": "R2",
+            "kind": "observed"
+          },
+          {
+            "id": "r3",
+            "idx": 3,
+            "name": "R3",
+            "kind": "observed"
+          },
+          {
+            "id": "r4",
+            "idx": 4,
+            "name": "R4",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "r1",
+            "to": "r2"
+          }
+        ],
+        "roles": {
+          "exposureId": "r0",
+          "outcomeId": "r4"
+        }
+      },
+      "model": "dag { r0 [exposure]; r1; r2; r3; r4 [outcome]; r1 -> r2 }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "r0",
+          "v": "r1",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r2",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r3",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r3",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r3",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r3",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    },
+    {
+      "id": "random-8badf00d",
+      "graph": {
+        "v": 1,
+        "nodes": [
+          {
+            "id": "r0",
+            "idx": 0,
+            "name": "R0",
+            "kind": "observed"
+          },
+          {
+            "id": "r1",
+            "idx": 1,
+            "name": "R1",
+            "kind": "observed"
+          },
+          {
+            "id": "r2",
+            "idx": 2,
+            "name": "R2",
+            "kind": "observed"
+          },
+          {
+            "id": "r3",
+            "idx": 3,
+            "name": "R3",
+            "kind": "latent"
+          },
+          {
+            "id": "r4",
+            "idx": 4,
+            "name": "R4",
+            "kind": "observed"
+          },
+          {
+            "id": "r5",
+            "idx": 5,
+            "name": "R5",
+            "kind": "observed"
+          },
+          {
+            "id": "r6",
+            "idx": 6,
+            "name": "R6",
+            "kind": "observed"
+          },
+          {
+            "id": "r7",
+            "idx": 7,
+            "name": "R7",
+            "kind": "latent"
+          },
+          {
+            "id": "r8",
+            "idx": 8,
+            "name": "R8",
+            "kind": "observed"
+          }
+        ],
+        "edges": [
+          {
+            "from": "r0",
+            "to": "r2"
+          },
+          {
+            "from": "r0",
+            "to": "r8"
+          },
+          {
+            "from": "r1",
+            "to": "r3"
+          },
+          {
+            "from": "r1",
+            "to": "r6"
+          },
+          {
+            "from": "r1",
+            "to": "r8"
+          },
+          {
+            "from": "r2",
+            "to": "r4"
+          },
+          {
+            "from": "r2",
+            "to": "r6"
+          },
+          {
+            "from": "r3",
+            "to": "r7"
+          },
+          {
+            "from": "r3",
+            "to": "r8"
+          },
+          {
+            "from": "r4",
+            "to": "r5"
+          },
+          {
+            "from": "r4",
+            "to": "r8"
+          }
+        ],
+        "roles": {
+          "exposureId": "r0",
+          "outcomeId": "r8"
+        }
+      },
+      "model": "dag { r0 [exposure]; r1; r2; r3 [latent]; r4; r5; r6; r7 [latent]; r8 [outcome]; r0 -> r2; r0 -> r8; r1 -> r3; r1 -> r6; r1 -> r8; r2 -> r4; r2 -> r6; r3 -> r7; r3 -> r8; r4 -> r5; r4 -> r8 }",
+      "adjustmentSets": [
+        []
+      ],
+      "implications": [
+        {
+          "u": "r0",
+          "v": "r1",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r4",
+          "sets": [
+            [
+              "r2"
+            ]
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r5",
+          "sets": [
+            [
+              "r2"
+            ],
+            [
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r0",
+          "v": "r6",
+          "sets": [
+            [
+              "r2"
+            ]
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r2",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r4",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r1",
+          "v": "r5",
+          "sets": [
+            []
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r5",
+          "sets": [
+            [
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r2",
+          "v": "r8",
+          "sets": [
+            [
+              "r0",
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r4",
+          "v": "r6",
+          "sets": [
+            [
+              "r2"
+            ]
+          ]
+        },
+        {
+          "u": "r5",
+          "v": "r6",
+          "sets": [
+            [
+              "r2"
+            ],
+            [
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r5",
+          "v": "r8",
+          "sets": [
+            [
+              "r4"
+            ]
+          ]
+        },
+        {
+          "u": "r6",
+          "v": "r8",
+          "sets": [
+            [
+              "r1",
+              "r2"
+            ],
+            [
+              "r0",
+              "r1",
+              "r4"
+            ]
+          ]
+        }
+      ],
+      "instruments": [],
+      "criterionDifferences": []
+    }
+  ]
+}

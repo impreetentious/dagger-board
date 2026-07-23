@@ -3,8 +3,8 @@
 ## Reference environment
 
 - Host: MacBook Pro (Mac16,5), Apple M4 Max, 14 CPU cores, 36 GB memory.
-- Runtime: Node 20.19.5.
-- Browser harness: Playwright with repo-local Chrome for Testing.
+- Runtime: Node 20.20.2.
+- Browser harness: Playwright 1.61.1 with repo-local Chrome for Testing 149.0.7827.55.
 - Isolation: development port 3004; static serving and browser checks port 4004; other local builds were active on the host, so this record reflects the concurrent-load context required by D-16.
 
 ## P1 graph-core gate
