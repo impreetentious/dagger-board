@@ -1,7 +1,12 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { buildScmModel, defaultScmParameters, matrixTotalEffect, type SCMParameters } from "@/engine/scm";
+import {
+  buildScmModel,
+  defaultScmParameters,
+  matrixTotalEffect,
+  type SCMParameters,
+} from "@/engine/scm";
 import {
   convergenceSeries,
   generateSimulationData,
@@ -21,7 +26,9 @@ interface GoldenCase {
   firstCovarianceRow: number[];
 }
 
-const goldenPath = fileURLToPath(new URL("../../fixtures/tier1/goldens/scm-goldens.json", import.meta.url));
+const goldenPath = fileURLToPath(
+  new URL("../../fixtures/tier1/goldens/scm-goldens.json", import.meta.url),
+);
 const goldens = JSON.parse(readFileSync(goldenPath, "utf8")) as { cases: GoldenCase[] };
 
 function fixture(file: string) {
@@ -31,7 +38,8 @@ function fixture(file: string) {
 
 function halfParameters(graph: ReturnType<typeof fixture>["graph"]): SCMParameters {
   const parameters = defaultScmParameters(graph);
-  for (const key of Object.keys(parameters.edgeCoefficients)) parameters.edgeCoefficients[key] = 0.5;
+  for (const key of Object.keys(parameters.edgeCoefficients))
+    parameters.edgeCoefficients[key] = 0.5;
   return parameters;
 }
 
@@ -43,7 +51,10 @@ describe("WU-3.5–3.6 deterministic simulation", () => {
       for (const key of Object.keys(parameters.edgeCoefficients)) {
         parameters.edgeCoefficients[key] = golden.edgeCoefficient;
       }
-      const data = generateSimulationData(buildScmModel(graph, parameters), { seed: golden.seed, n: 100 });
+      const data = generateSimulationData(buildScmModel(graph, parameters), {
+        seed: golden.seed,
+        n: 100,
+      });
       const moments = sampleMoments(data);
       expect([...data.columns.get(data.nodeIds[0])!.slice(0, 4)], golden.fixture).toEqual(
         golden.firstNodeValues,
@@ -68,7 +79,11 @@ describe("WU-3.5–3.6 deterministic simulation", () => {
   it("records log-spaced checkpoints and marks insufficient selected samples", () => {
     const graph = fixture("07-berkson-selection.json").graph;
     const model = buildScmModel(graph, halfParameters(graph));
-    const data = generateSimulationData(model, { seed: 7, n: 100, selection: { nodeId: "s", quantile: 0.99 } });
+    const data = generateSimulationData(model, {
+      seed: 7,
+      n: 100,
+      selection: { nodeId: "s", quantile: 0.99 },
+    });
     const series = convergenceSeries(data, {
       kind: "ols",
       exposureId: "x",

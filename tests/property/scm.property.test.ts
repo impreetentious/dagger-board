@@ -3,7 +3,12 @@ import { describe, expect, it } from "vitest";
 import { enumerateAdjustmentSets } from "@/engine/adjust";
 import { enumerateConditionalInstruments } from "@/engine/iv";
 import { validateGraph, type Graph, type GraphNode } from "@/engine/graph";
-import { auditScmIntegrity, buildScmModel, defaultScmParameters, matrixTotalEffect } from "@/engine/scm";
+import {
+  auditScmIntegrity,
+  buildScmModel,
+  defaultScmParameters,
+  matrixTotalEffect,
+} from "@/engine/scm";
 import { ivMultiplicativeIdentity, olsEstimand } from "@/engine/stats";
 
 function seededUniform(seed: number): () => number {
@@ -42,7 +47,8 @@ function graphFromSeed(seed: number): Graph {
 
 function moderateParameters(graph: Graph) {
   const parameters = defaultScmParameters(graph);
-  for (const key of Object.keys(parameters.edgeCoefficients)) parameters.edgeCoefficients[key] = 0.35;
+  for (const key of Object.keys(parameters.edgeCoefficients))
+    parameters.edgeCoefficients[key] = 0.35;
   return parameters;
 }
 
@@ -67,8 +73,11 @@ describe("PROP-4 through PROP-6", () => {
         const graph = graphFromSeed(seed);
         const model = buildScmModel(graph, moderateParameters(graph));
         const totalEffect = matrixTotalEffect(model, "n0", `n${graph.nodes.length - 1}`);
-        for (const set of enumerateAdjustmentSets(graph, "n0", `n${graph.nodes.length - 1}`).minimalSets) {
-          expect(olsEstimand(model, "n0", `n${graph.nodes.length - 1}`, set, totalEffect).populationBias).toBeCloseTo(0, 8);
+        for (const set of enumerateAdjustmentSets(graph, "n0", `n${graph.nodes.length - 1}`)
+          .minimalSets) {
+          expect(
+            olsEstimand(model, "n0", `n${graph.nodes.length - 1}`, set, totalEffect).populationBias,
+          ).toBeCloseTo(0, 8);
         }
       }),
       { seed: 0x305, numRuns: 100 },
@@ -81,7 +90,11 @@ describe("PROP-4 through PROP-6", () => {
         const graph = graphFromSeed(seed);
         const model = buildScmModel(graph, moderateParameters(graph));
         const totalEffect = matrixTotalEffect(model, "n0", `n${graph.nodes.length - 1}`);
-        for (const instrument of enumerateConditionalInstruments(graph, "n0", `n${graph.nodes.length - 1}`)) {
+        for (const instrument of enumerateConditionalInstruments(
+          graph,
+          "n0",
+          `n${graph.nodes.length - 1}`,
+        )) {
           for (const conditionedIds of instrument.conditioningSets) {
             expect(
               ivMultiplicativeIdentity(

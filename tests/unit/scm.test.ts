@@ -24,7 +24,9 @@ import { Tier1FixtureSchema, type Tier1Fixture } from "../../fixtures/tier1/sche
 const fixtureDirectory = fileURLToPath(new URL("../../fixtures/tier1/", import.meta.url));
 const fixtures = readdirSync(fixtureDirectory)
   .filter((file) => file.endsWith(".json"))
-  .map((file) => Tier1FixtureSchema.parse(JSON.parse(readFileSync(`${fixtureDirectory}/${file}`, "utf8")))) as Tier1Fixture[];
+  .map((file) =>
+    Tier1FixtureSchema.parse(JSON.parse(readFileSync(`${fixtureDirectory}/${file}`, "utf8"))),
+  ) as Tier1Fixture[];
 
 function fixture(id: string): Tier1Fixture {
   const value = fixtures.find((candidate) => candidate.id === id);
@@ -34,7 +36,8 @@ function fixture(id: string): Tier1Fixture {
 
 function parametersFor(graph: Tier1Fixture["graph"], coefficient = 0.5): SCMParameters {
   const result = defaultScmParameters(graph);
-  for (const key of Object.keys(result.edgeCoefficients)) result.edgeCoefficients[key] = coefficient;
+  for (const key of Object.keys(result.edgeCoefficients))
+    result.edgeCoefficients[key] = coefficient;
   return result;
 }
 
@@ -116,7 +119,9 @@ describe("WU-3.2–3.4 exact SCM", () => {
     expect(truncated.marginalSd ** 2).toBeCloseTo(1.5, 12);
     expect(truncated.delta).toBeGreaterThan(0);
     expect(truncated.delta).toBeLessThan(1);
-    expect(truncated.covariance[model.indexById.get("x") ?? 0][model.indexById.get("y") ?? 0]).toBeLessThan(0);
+    expect(
+      truncated.covariance[model.indexById.get("x") ?? 0][model.indexById.get("y") ?? 0],
+    ).toBeLessThan(0);
   });
 
   it("pins Acklam vectors and a high-precision round trip", () => {
