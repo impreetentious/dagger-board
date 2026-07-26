@@ -1,0 +1,28 @@
+{
+  "v": 1,
+  "runtime": "Node 20.20.2",
+  "note": "Golden values are bit-identical only on the pinned Node/V8 runtime; cross-engine checks use numeric tolerances.",
+  "cases": [
+    {
+      "fixture": "01-chain.json",
+      "seed": 101,
+      "edgeCoefficient": 0.5,
+      "firstNodeValues": [0.1856316031456478, -1.9902077637881466, -0.6906494045738493, -0.867827142057943],
+      "firstCovarianceRow": [1.1016243510419068, 0.4225559427519523, 0.24866978699703243]
+    },
+    {
+      "fixture": "04-m-bias.json",
+      "seed": 202,
+      "edgeCoefficient": 0.5,
+      "firstNodeValues": [1.9714363806612738, -0.4618773014524007, -1.7422638042563925, 0.05633332870749703],
+      "firstCovarianceRow": [0.9340868237795241, 0.03410084828589201, 0.40403695760375485]
+    },
+    {
+      "fixture": "07-berkson-selection.json",
+      "seed": 303,
+      "edgeCoefficient": 0.5,
+      "firstNodeValues": [0.12436509220331295, -0.3551265535737884, -1.451146797965037, -0.10345490827205503],
+      "firstCovarianceRow": [0.9645146161564299, 0.01931679327345758, 0.6630870009177997]
+    }
+  ]
+}
