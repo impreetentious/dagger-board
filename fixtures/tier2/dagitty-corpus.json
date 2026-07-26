@@ -49,18 +49,12 @@
         }
       },
       "model": "dag { x [exposure]; m; y [outcome]; x -> m; m -> y }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "x",
           "v": "y",
-          "sets": [
-            [
-              "m"
-            ]
-          ]
+          "sets": [["m"]]
         }
       ],
       "instruments": [],
@@ -106,20 +100,12 @@
         }
       },
       "model": "dag { u; x [exposure]; y [outcome]; u -> x; u -> y }",
-      "adjustmentSets": [
-        [
-          "u"
-        ]
-      ],
+      "adjustmentSets": [["u"]],
       "implications": [
         {
           "u": "x",
           "v": "y",
-          "sets": [
-            [
-              "u"
-            ]
-          ]
+          "sets": [["u"]]
         }
       ],
       "instruments": [],
@@ -165,16 +151,12 @@
         }
       },
       "model": "dag { x [exposure]; c; y [outcome]; x -> c; y -> c }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "x",
           "v": "y",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         }
       ],
       "instruments": [],
@@ -240,16 +222,12 @@
         }
       },
       "model": "dag { u1 [latent]; u2 [latent]; x [exposure]; m; y [outcome]; u1 -> x; u1 -> m; u2 -> m; u2 -> y }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "x",
           "v": "y",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         }
       ],
       "instruments": [],
@@ -354,18 +332,12 @@
         }
       },
       "model": "dag { x [exposure]; m; y [outcome]; x -> m; m -> y }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "x",
           "v": "y",
-          "sets": [
-            [
-              "m"
-            ]
-          ]
+          "sets": [["m"]]
         }
       ],
       "instruments": [],
@@ -584,41 +556,23 @@
         }
       },
       "model": "dag { w; z; x [exposure]; y [outcome]; w -> z; w -> y; z -> x; x -> y }",
-      "adjustmentSets": [
-        [
-          "w"
-        ],
-        [
-          "z"
-        ]
-      ],
+      "adjustmentSets": [["w"], ["z"]],
       "implications": [
         {
           "u": "w",
           "v": "x",
-          "sets": [
-            [
-              "z"
-            ]
-          ]
+          "sets": [["z"]]
         },
         {
           "u": "z",
           "v": "y",
-          "sets": [
-            [
-              "w",
-              "x"
-            ]
-          ]
+          "sets": [["w", "x"]]
         }
       ],
       "instruments": [
         {
           "instrument": "z",
-          "conditioning": [
-            "w"
-          ]
+          "conditioning": ["w"]
         }
       ],
       "criterionDifferences": []
@@ -722,18 +676,12 @@
         }
       },
       "model": "dag { x [exposure]; d; y [outcome]; x -> y; x -> d }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "d",
           "v": "y",
-          "sets": [
-            [
-              "x"
-            ]
-          ]
+          "sets": [["x"]]
         }
       ],
       "instruments": [
@@ -978,621 +926,286 @@
         }
       },
       "model": "dag { x [exposure]; a; b; c; d; e; f; g; h; i; j; y [outcome]; x -> a; x -> b; x -> c; a -> d; a -> e; b -> d; b -> e; c -> d; c -> e; d -> f; d -> g; d -> h; e -> f; e -> g; e -> h; f -> i; f -> j; g -> i; g -> j; h -> i; h -> j; i -> y; j -> y; x -> y }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "x",
           "v": "d",
-          "sets": [
-            [
-              "a",
-              "b",
-              "c"
-            ]
-          ]
+          "sets": [["a", "b", "c"]]
         },
         {
           "u": "x",
           "v": "e",
-          "sets": [
-            [
-              "a",
-              "b",
-              "c"
-            ]
-          ]
+          "sets": [["a", "b", "c"]]
         },
         {
           "u": "x",
           "v": "f",
           "sets": [
-            [
-              "d",
-              "e"
-            ],
-            [
-              "a",
-              "b",
-              "c"
-            ]
+            ["d", "e"],
+            ["a", "b", "c"]
           ]
         },
         {
           "u": "x",
           "v": "g",
           "sets": [
-            [
-              "d",
-              "e"
-            ],
-            [
-              "a",
-              "b",
-              "c"
-            ]
+            ["d", "e"],
+            ["a", "b", "c"]
           ]
         },
         {
           "u": "x",
           "v": "h",
           "sets": [
-            [
-              "d",
-              "e"
-            ],
-            [
-              "a",
-              "b",
-              "c"
-            ]
+            ["d", "e"],
+            ["a", "b", "c"]
           ]
         },
         {
           "u": "x",
           "v": "i",
           "sets": [
-            [
-              "d",
-              "e"
-            ],
-            [
-              "a",
-              "b",
-              "c"
-            ],
-            [
-              "f",
-              "g",
-              "h"
-            ]
+            ["d", "e"],
+            ["a", "b", "c"],
+            ["f", "g", "h"]
           ]
         },
         {
           "u": "x",
           "v": "j",
           "sets": [
-            [
-              "d",
-              "e"
-            ],
-            [
-              "a",
-              "b",
-              "c"
-            ],
-            [
-              "f",
-              "g",
-              "h"
-            ]
+            ["d", "e"],
+            ["a", "b", "c"],
+            ["f", "g", "h"]
           ]
         },
         {
           "u": "a",
           "v": "b",
-          "sets": [
-            [
-              "x"
-            ]
-          ]
+          "sets": [["x"]]
         },
         {
           "u": "a",
           "v": "c",
-          "sets": [
-            [
-              "x"
-            ]
-          ]
+          "sets": [["x"]]
         },
         {
           "u": "a",
           "v": "f",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "a",
           "v": "g",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "a",
           "v": "h",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "a",
           "v": "i",
           "sets": [
-            [
-              "d",
-              "e"
-            ],
-            [
-              "f",
-              "g",
-              "h"
-            ]
+            ["d", "e"],
+            ["f", "g", "h"]
           ]
         },
         {
           "u": "a",
           "v": "j",
           "sets": [
-            [
-              "d",
-              "e"
-            ],
-            [
-              "f",
-              "g",
-              "h"
-            ]
+            ["d", "e"],
+            ["f", "g", "h"]
           ]
         },
         {
           "u": "a",
           "v": "y",
           "sets": [
-            [
-              "d",
-              "e",
-              "x"
-            ],
-            [
-              "i",
-              "j",
-              "x"
-            ],
-            [
-              "f",
-              "g",
-              "h",
-              "x"
-            ]
+            ["d", "e", "x"],
+            ["i", "j", "x"],
+            ["f", "g", "h", "x"]
           ]
         },
         {
           "u": "b",
           "v": "c",
-          "sets": [
-            [
-              "x"
-            ]
-          ]
+          "sets": [["x"]]
         },
         {
           "u": "b",
           "v": "f",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "b",
           "v": "g",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "b",
           "v": "h",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "b",
           "v": "i",
           "sets": [
-            [
-              "d",
-              "e"
-            ],
-            [
-              "f",
-              "g",
-              "h"
-            ]
+            ["d", "e"],
+            ["f", "g", "h"]
           ]
         },
         {
           "u": "b",
           "v": "j",
           "sets": [
-            [
-              "d",
-              "e"
-            ],
-            [
-              "f",
-              "g",
-              "h"
-            ]
+            ["d", "e"],
+            ["f", "g", "h"]
           ]
         },
         {
           "u": "b",
           "v": "y",
           "sets": [
-            [
-              "d",
-              "e",
-              "x"
-            ],
-            [
-              "i",
-              "j",
-              "x"
-            ],
-            [
-              "f",
-              "g",
-              "h",
-              "x"
-            ]
+            ["d", "e", "x"],
+            ["i", "j", "x"],
+            ["f", "g", "h", "x"]
           ]
         },
         {
           "u": "c",
           "v": "f",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "c",
           "v": "g",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "c",
           "v": "h",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "c",
           "v": "i",
           "sets": [
-            [
-              "d",
-              "e"
-            ],
-            [
-              "f",
-              "g",
-              "h"
-            ]
+            ["d", "e"],
+            ["f", "g", "h"]
           ]
         },
         {
           "u": "c",
           "v": "j",
           "sets": [
-            [
-              "d",
-              "e"
-            ],
-            [
-              "f",
-              "g",
-              "h"
-            ]
+            ["d", "e"],
+            ["f", "g", "h"]
           ]
         },
         {
           "u": "c",
           "v": "y",
           "sets": [
-            [
-              "d",
-              "e",
-              "x"
-            ],
-            [
-              "i",
-              "j",
-              "x"
-            ],
-            [
-              "f",
-              "g",
-              "h",
-              "x"
-            ]
+            ["d", "e", "x"],
+            ["i", "j", "x"],
+            ["f", "g", "h", "x"]
           ]
         },
         {
           "u": "d",
           "v": "e",
-          "sets": [
-            [
-              "a",
-              "b",
-              "c"
-            ]
-          ]
+          "sets": [["a", "b", "c"]]
         },
         {
           "u": "d",
           "v": "i",
-          "sets": [
-            [
-              "f",
-              "g",
-              "h"
-            ]
-          ]
+          "sets": [["f", "g", "h"]]
         },
         {
           "u": "d",
           "v": "j",
-          "sets": [
-            [
-              "f",
-              "g",
-              "h"
-            ]
-          ]
+          "sets": [["f", "g", "h"]]
         },
         {
           "u": "d",
           "v": "y",
           "sets": [
-            [
-              "i",
-              "j",
-              "x"
-            ],
-            [
-              "f",
-              "g",
-              "h",
-              "x"
-            ],
-            [
-              "a",
-              "b",
-              "c",
-              "i",
-              "j"
-            ],
-            [
-              "a",
-              "b",
-              "c",
-              "f",
-              "g",
-              "h"
-            ]
+            ["i", "j", "x"],
+            ["f", "g", "h", "x"],
+            ["a", "b", "c", "i", "j"],
+            ["a", "b", "c", "f", "g", "h"]
           ]
         },
         {
           "u": "e",
           "v": "i",
-          "sets": [
-            [
-              "f",
-              "g",
-              "h"
-            ]
-          ]
+          "sets": [["f", "g", "h"]]
         },
         {
           "u": "e",
           "v": "j",
-          "sets": [
-            [
-              "f",
-              "g",
-              "h"
-            ]
-          ]
+          "sets": [["f", "g", "h"]]
         },
         {
           "u": "e",
           "v": "y",
           "sets": [
-            [
-              "i",
-              "j",
-              "x"
-            ],
-            [
-              "f",
-              "g",
-              "h",
-              "x"
-            ],
-            [
-              "a",
-              "b",
-              "c",
-              "i",
-              "j"
-            ],
-            [
-              "a",
-              "b",
-              "c",
-              "f",
-              "g",
-              "h"
-            ]
+            ["i", "j", "x"],
+            ["f", "g", "h", "x"],
+            ["a", "b", "c", "i", "j"],
+            ["a", "b", "c", "f", "g", "h"]
           ]
         },
         {
           "u": "f",
           "v": "g",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "f",
           "v": "h",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "f",
           "v": "y",
           "sets": [
-            [
-              "i",
-              "j",
-              "x"
-            ],
-            [
-              "d",
-              "e",
-              "i",
-              "j"
-            ],
-            [
-              "a",
-              "b",
-              "c",
-              "i",
-              "j"
-            ]
+            ["i", "j", "x"],
+            ["d", "e", "i", "j"],
+            ["a", "b", "c", "i", "j"]
           ]
         },
         {
           "u": "g",
           "v": "h",
-          "sets": [
-            [
-              "d",
-              "e"
-            ]
-          ]
+          "sets": [["d", "e"]]
         },
         {
           "u": "g",
           "v": "y",
           "sets": [
-            [
-              "i",
-              "j",
-              "x"
-            ],
-            [
-              "d",
-              "e",
-              "i",
-              "j"
-            ],
-            [
-              "a",
-              "b",
-              "c",
-              "i",
-              "j"
-            ]
+            ["i", "j", "x"],
+            ["d", "e", "i", "j"],
+            ["a", "b", "c", "i", "j"]
           ]
         },
         {
           "u": "h",
           "v": "y",
           "sets": [
-            [
-              "i",
-              "j",
-              "x"
-            ],
-            [
-              "d",
-              "e",
-              "i",
-              "j"
-            ],
-            [
-              "a",
-              "b",
-              "c",
-              "i",
-              "j"
-            ]
+            ["i", "j", "x"],
+            ["d", "e", "i", "j"],
+            ["a", "b", "c", "i", "j"]
           ]
         },
         {
           "u": "i",
           "v": "j",
-          "sets": [
-            [
-              "f",
-              "g",
-              "h"
-            ]
-          ]
+          "sets": [["f", "g", "h"]]
         }
       ],
       "instruments": [],
@@ -1657,11 +1270,7 @@
         {
           "u": "y",
           "v": "z",
-          "sets": [
-            [
-              "x"
-            ]
-          ]
+          "sets": [["x"]]
         }
       ],
       "instruments": [],
@@ -1794,27 +1403,17 @@
         }
       },
       "model": "dag { z; a; x [exposure]; y [outcome]; z -> x; z -> a; a -> x; x -> y }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "z",
           "v": "y",
-          "sets": [
-            [
-              "x"
-            ]
-          ]
+          "sets": [["x"]]
         },
         {
           "u": "a",
           "v": "y",
-          "sets": [
-            [
-              "x"
-            ]
-          ]
+          "sets": [["x"]]
         }
       ],
       "instruments": [
@@ -1889,61 +1488,37 @@
         }
       },
       "model": "dag { x [exposure]; c; y [outcome]; d1; d2; x -> c; y -> c; c -> d1; c -> d2 }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "x",
           "v": "y",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "x",
           "v": "d1",
-          "sets": [
-            [
-              "c"
-            ]
-          ]
+          "sets": [["c"]]
         },
         {
           "u": "x",
           "v": "d2",
-          "sets": [
-            [
-              "c"
-            ]
-          ]
+          "sets": [["c"]]
         },
         {
           "u": "y",
           "v": "d1",
-          "sets": [
-            [
-              "c"
-            ]
-          ]
+          "sets": [["c"]]
         },
         {
           "u": "y",
           "v": "d2",
-          "sets": [
-            [
-              "c"
-            ]
-          ]
+          "sets": [["c"]]
         },
         {
           "u": "d1",
           "v": "d2",
-          "sets": [
-            [
-              "c"
-            ]
-          ]
+          "sets": [["c"]]
         }
       ],
       "instruments": [],
@@ -2051,157 +1626,84 @@
         }
       },
       "model": "dag { r0 [exposure]; r1; r2; r3; r4; r5; r6 [latent]; r7 [outcome]; r0 -> r1; r0 -> r2; r1 -> r2; r1 -> r4; r2 -> r3; r2 -> r5; r3 -> r4; r4 -> r6; r4 -> r7; r5 -> r7 }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "r0",
           "v": "r3",
-          "sets": [
-            [
-              "r2"
-            ]
-          ]
+          "sets": [["r2"]]
         },
         {
           "u": "r0",
           "v": "r4",
           "sets": [
-            [
-              "r1",
-              "r2"
-            ],
-            [
-              "r1",
-              "r3"
-            ]
+            ["r1", "r2"],
+            ["r1", "r3"]
           ]
         },
         {
           "u": "r0",
           "v": "r5",
-          "sets": [
-            [
-              "r2"
-            ]
-          ]
+          "sets": [["r2"]]
         },
         {
           "u": "r0",
           "v": "r7",
           "sets": [
-            [
-              "r1",
-              "r2"
-            ],
-            [
-              "r2",
-              "r4"
-            ],
-            [
-              "r4",
-              "r5"
-            ],
-            [
-              "r1",
-              "r3",
-              "r5"
-            ]
+            ["r1", "r2"],
+            ["r2", "r4"],
+            ["r4", "r5"],
+            ["r1", "r3", "r5"]
           ]
         },
         {
           "u": "r1",
           "v": "r3",
-          "sets": [
-            [
-              "r2"
-            ]
-          ]
+          "sets": [["r2"]]
         },
         {
           "u": "r1",
           "v": "r5",
-          "sets": [
-            [
-              "r2"
-            ]
-          ]
+          "sets": [["r2"]]
         },
         {
           "u": "r1",
           "v": "r7",
           "sets": [
-            [
-              "r2",
-              "r4"
-            ],
-            [
-              "r4",
-              "r5"
-            ]
+            ["r2", "r4"],
+            ["r4", "r5"]
           ]
         },
         {
           "u": "r2",
           "v": "r4",
-          "sets": [
-            [
-              "r1",
-              "r3"
-            ]
-          ]
+          "sets": [["r1", "r3"]]
         },
         {
           "u": "r2",
           "v": "r7",
           "sets": [
-            [
-              "r4",
-              "r5"
-            ],
-            [
-              "r1",
-              "r3",
-              "r5"
-            ]
+            ["r4", "r5"],
+            ["r1", "r3", "r5"]
           ]
         },
         {
           "u": "r3",
           "v": "r5",
-          "sets": [
-            [
-              "r2"
-            ]
-          ]
+          "sets": [["r2"]]
         },
         {
           "u": "r3",
           "v": "r7",
           "sets": [
-            [
-              "r2",
-              "r4"
-            ],
-            [
-              "r4",
-              "r5"
-            ]
+            ["r2", "r4"],
+            ["r4", "r5"]
           ]
         },
         {
           "u": "r4",
           "v": "r5",
-          "sets": [
-            [
-              "r2"
-            ],
-            [
-              "r1",
-              "r3"
-            ]
-          ]
+          "sets": [["r2"], ["r1", "r3"]]
         }
       ],
       "instruments": [],
@@ -2295,191 +1797,137 @@
         }
       },
       "model": "dag { r0 [exposure]; r1; r2; r3; r4; r5; r6; r7 [latent]; r8 [outcome]; r0 -> r7; r1 -> r4; r1 -> r7; r3 -> r7; r6 -> r8 }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "r0",
           "v": "r1",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r2",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r3",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r5",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r8",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r2",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r3",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r5",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r8",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r3",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r5",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r8",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r3",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r3",
           "v": "r5",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r3",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r3",
           "v": "r8",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r4",
           "v": "r5",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r4",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r4",
           "v": "r8",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r5",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r5",
           "v": "r8",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         }
       ],
       "instruments": [],
@@ -2597,265 +2045,139 @@
         }
       },
       "model": "dag { r0 [exposure]; r1; r2; r3; r4; r5; r6; r7; r8 [outcome]; r0 -> r6; r0 -> r8; r1 -> r3; r2 -> r4; r2 -> r6; r2 -> r7; r3 -> r4; r4 -> r5; r4 -> r7; r6 -> r8; r7 -> r8 }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "r0",
           "v": "r1",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r2",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r3",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r5",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r7",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r2",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r4",
-          "sets": [
-            [
-              "r3"
-            ]
-          ]
+          "sets": [["r3"]]
         },
         {
           "u": "r1",
           "v": "r5",
-          "sets": [
-            [
-              "r3"
-            ],
-            [
-              "r4"
-            ]
-          ]
+          "sets": [["r3"], ["r4"]]
         },
         {
           "u": "r1",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r7",
-          "sets": [
-            [
-              "r3"
-            ],
-            [
-              "r2",
-              "r4"
-            ]
-          ]
+          "sets": [["r3"], ["r2", "r4"]]
         },
         {
           "u": "r1",
           "v": "r8",
-          "sets": [
-            [
-              "r3"
-            ],
-            [
-              "r2",
-              "r4"
-            ],
-            [
-              "r2",
-              "r7"
-            ],
-            [
-              "r0",
-              "r6",
-              "r7"
-            ]
-          ]
+          "sets": [["r3"], ["r2", "r4"], ["r2", "r7"], ["r0", "r6", "r7"]]
         },
         {
           "u": "r2",
           "v": "r3",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r5",
-          "sets": [
-            [
-              "r4"
-            ]
-          ]
+          "sets": [["r4"]]
         },
         {
           "u": "r2",
           "v": "r8",
-          "sets": [
-            [
-              "r0",
-              "r6",
-              "r7"
-            ]
-          ]
+          "sets": [["r0", "r6", "r7"]]
         },
         {
           "u": "r3",
           "v": "r5",
-          "sets": [
-            [
-              "r4"
-            ]
-          ]
+          "sets": [["r4"]]
         },
         {
           "u": "r3",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r3",
           "v": "r7",
-          "sets": [
-            [
-              "r2",
-              "r4"
-            ]
-          ]
+          "sets": [["r2", "r4"]]
         },
         {
           "u": "r3",
           "v": "r8",
           "sets": [
-            [
-              "r2",
-              "r4"
-            ],
-            [
-              "r2",
-              "r7"
-            ],
-            [
-              "r0",
-              "r6",
-              "r7"
-            ]
+            ["r2", "r4"],
+            ["r2", "r7"],
+            ["r0", "r6", "r7"]
           ]
         },
         {
           "u": "r4",
           "v": "r6",
-          "sets": [
-            [
-              "r2"
-            ]
-          ]
+          "sets": [["r2"]]
         },
         {
           "u": "r4",
           "v": "r8",
           "sets": [
-            [
-              "r2",
-              "r7"
-            ],
-            [
-              "r0",
-              "r6",
-              "r7"
-            ]
+            ["r2", "r7"],
+            ["r0", "r6", "r7"]
           ]
         },
         {
           "u": "r5",
           "v": "r6",
-          "sets": [
-            [
-              "r2"
-            ],
-            [
-              "r4"
-            ]
-          ]
+          "sets": [["r2"], ["r4"]]
         },
         {
           "u": "r5",
           "v": "r7",
-          "sets": [
-            [
-              "r4"
-            ]
-          ]
+          "sets": [["r4"]]
         },
         {
           "u": "r5",
           "v": "r8",
-          "sets": [
-            [
-              "r4"
-            ],
-            [
-              "r2",
-              "r7"
-            ],
-            [
-              "r0",
-              "r6",
-              "r7"
-            ]
-          ]
+          "sets": [["r4"], ["r2", "r7"], ["r0", "r6", "r7"]]
         },
         {
           "u": "r6",
           "v": "r7",
-          "sets": [
-            [
-              "r2"
-            ]
-          ]
+          "sets": [["r2"]]
         }
       ],
       "instruments": [],
@@ -2947,119 +2269,82 @@
         }
       },
       "model": "dag { r0 [exposure]; r1; r2; r3 [latent]; r4; r5; r6; r7 [outcome]; r1 -> r6; r1 -> r7; r2 -> r5; r2 -> r7; r4 -> r5; r4 -> r7 }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "r0",
           "v": "r1",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r2",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r5",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r7",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r2",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r5",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r4",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r5",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r5",
           "v": "r7",
-          "sets": [
-            [
-              "r2",
-              "r4"
-            ]
-          ]
+          "sets": [["r2", "r4"]]
         },
         {
           "u": "r6",
           "v": "r7",
-          "sets": [
-            [
-              "r1"
-            ]
-          ]
+          "sets": [["r1"]]
         }
       ],
       "instruments": [],
@@ -3121,60 +2406,42 @@
         }
       },
       "model": "dag { r0 [exposure]; r1; r2; r3; r4 [outcome]; r0 -> r1; r0 -> r3; r2 -> r3 }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "r0",
           "v": "r2",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r2",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r3",
-          "sets": [
-            [
-              "r0"
-            ]
-          ]
+          "sets": [["r0"]]
         },
         {
           "u": "r1",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r3",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         }
       ],
       "instruments": [
@@ -3270,44 +2537,32 @@
         }
       },
       "model": "dag { r0 [exposure]; r1; r2 [latent]; r3 [latent]; r4; r5 [latent]; r6 [outcome]; r0 -> r4; r1 -> r2; r2 -> r5 }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "r0",
           "v": "r1",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r4",
           "v": "r6",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         }
       ],
       "instruments": [
@@ -3373,72 +2628,52 @@
         }
       },
       "model": "dag { r0 [exposure]; r1; r2; r3; r4 [outcome]; r1 -> r2 }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "r0",
           "v": "r1",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r2",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r3",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r3",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r3",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r3",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         }
       ],
       "instruments": [],
@@ -3556,130 +2791,74 @@
         }
       },
       "model": "dag { r0 [exposure]; r1; r2; r3 [latent]; r4; r5; r6; r7 [latent]; r8 [outcome]; r0 -> r2; r0 -> r8; r1 -> r3; r1 -> r6; r1 -> r8; r2 -> r4; r2 -> r6; r3 -> r7; r3 -> r8; r4 -> r5; r4 -> r8 }",
-      "adjustmentSets": [
-        []
-      ],
+      "adjustmentSets": [[]],
       "implications": [
         {
           "u": "r0",
           "v": "r1",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r0",
           "v": "r4",
-          "sets": [
-            [
-              "r2"
-            ]
-          ]
+          "sets": [["r2"]]
         },
         {
           "u": "r0",
           "v": "r5",
-          "sets": [
-            [
-              "r2"
-            ],
-            [
-              "r4"
-            ]
-          ]
+          "sets": [["r2"], ["r4"]]
         },
         {
           "u": "r0",
           "v": "r6",
-          "sets": [
-            [
-              "r2"
-            ]
-          ]
+          "sets": [["r2"]]
         },
         {
           "u": "r1",
           "v": "r2",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r4",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r1",
           "v": "r5",
-          "sets": [
-            []
-          ]
+          "sets": [[]]
         },
         {
           "u": "r2",
           "v": "r5",
-          "sets": [
-            [
-              "r4"
-            ]
-          ]
+          "sets": [["r4"]]
         },
         {
           "u": "r2",
           "v": "r8",
-          "sets": [
-            [
-              "r0",
-              "r4"
-            ]
-          ]
+          "sets": [["r0", "r4"]]
         },
         {
           "u": "r4",
           "v": "r6",
-          "sets": [
-            [
-              "r2"
-            ]
-          ]
+          "sets": [["r2"]]
         },
         {
           "u": "r5",
           "v": "r6",
-          "sets": [
-            [
-              "r2"
-            ],
-            [
-              "r4"
-            ]
-          ]
+          "sets": [["r2"], ["r4"]]
         },
         {
           "u": "r5",
           "v": "r8",
-          "sets": [
-            [
-              "r4"
-            ]
-          ]
+          "sets": [["r4"]]
         },
         {
           "u": "r6",
           "v": "r8",
           "sets": [
-            [
-              "r1",
-              "r2"
-            ],
-            [
-              "r0",
-              "r1",
-              "r4"
-            ]
+            ["r1", "r2"],
+            ["r0", "r1", "r4"]
           ]
         }
       ],
