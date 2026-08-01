@@ -1,6 +1,6 @@
 {
   "name": "daggerboard",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "engines": {
     "node": ">=20.19.5 <21",
@@ -24,12 +24,12 @@
     "next": "15.5.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "zod": "^4.1.11",
+    "zod": "^4.1.12",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
-    "@playwright/test": "^1.55.1",
+    "@playwright/test": "^1.56.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
