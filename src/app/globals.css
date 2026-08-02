@@ -9,6 +9,9 @@
   --line: #d5d9d1;
   --signal: #b14e2d;
   --signal-soft: #f5ded4;
+  /* darker rust for the active-tab number badge: --signal on --signal-soft is
+     only 4.07:1, below WCAG AA; this clears it at 5.03:1 while staying rust. */
+  --signal-strong: #9d4225;
   --moss: #476452;
   --moss-soft: #dde8df;
   --shadow: 0 18px 50px rgb(24 33 29 / 0.08);
@@ -23,6 +26,8 @@
   --line: #36423a;
   --signal: #e68a68;
   --signal-soft: #47281f;
+  /* on the dark active-tab bg (#47281f), --signal already clears AA (5.15:1). */
+  --signal-strong: #e68a68;
   --moss: #a6c8ae;
   --moss-soft: #263b2e;
   --shadow: 0 18px 50px rgb(0 0 0 / 0.25);
@@ -129,6 +134,10 @@ a {
 .surface-tab-active {
   border-color: var(--signal);
   background: var(--signal-soft);
+}
+
+.surface-tab-active span {
+  color: var(--signal-strong);
 }
 
 .field-input {

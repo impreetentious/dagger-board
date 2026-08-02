@@ -133,7 +133,8 @@ export const useLabStore = create<LabStore>((set, get) => {
     past: [],
     future: [],
     setActiveSurface: (activeSurface) => set({ activeSurface }),
-    selectNode: (selectedNodeId) => set({ selectedNodeId, edgeStartId: null }),
+    selectNode: (selectedNodeId) =>
+      set(selectedNodeId === null ? { selectedNodeId, edgeStartId: null } : { selectedNodeId }),
     clearNotice: () => set({ notice: null }),
     setNotice: (notice) => set({ notice }),
     addNode: (kind = "observed") =>

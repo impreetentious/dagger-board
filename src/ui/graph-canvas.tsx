@@ -299,7 +299,6 @@ export function GraphCanvas() {
               data-node-id={node.id}
               key={node.id}
               onFocus={() => selectNode(node.id)}
-              onKeyDown={handleKey}
               onPointerDown={(event) => onNodePointerDown(event, node.id)}
               role="graphics-symbol img"
               tabIndex={isSelected || (!selectedNodeId && node.idx === ordered[0]?.idx) ? 0 : -1}
