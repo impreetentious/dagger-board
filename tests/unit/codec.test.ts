@@ -22,17 +22,33 @@ describe("WU-4.6 codec and interop", () => {
     expect(jsonRoundTrip.graph).toEqual(original.graph);
     expect(decoded.graph.nodes.map((node) => node.idx)).toEqual([0, 1, 2, 3, 4]);
 
-    const first = generateSimulationData(buildScmModel(original.graph, original.parameters), { seed: 88, n: 100 });
-    const second = generateSimulationData(buildScmModel(decoded.graph, decoded.parameters), { seed: 88, n: 100 });
-    for (const id of first.nodeIds) expect([...first.columns.get(id)!]).toEqual([...second.columns.get(id)!]);
+    const first = generateSimulationData(buildScmModel(original.graph, original.parameters), {
+      seed: 88,
+      n: 100,
+    });
+    const second = generateSimulationData(buildScmModel(decoded.graph, decoded.parameters), {
+      seed: 88,
+      n: 100,
+    });
+    for (const id of first.nodeIds)
+      expect([...first.columns.get(id)!]).toEqual([...second.columns.get(id)!]);
   });
 
   it("canonicalizes an input edge permutation before deterministic simulation", () => {
     const original = EXAMPLE_SNAPSHOTS["m-bias"];
-    const permuted = pruneLabSnapshot({ ...original, graph: { ...original.graph, edges: [...original.graph.edges].reverse() } });
+    const permuted = pruneLabSnapshot({
+      ...original,
+      graph: { ...original.graph, edges: [...original.graph.edges].reverse() },
+    });
     expect(permuted.graph.edges).toEqual(original.graph.edges);
-    const first = generateSimulationData(buildScmModel(original.graph, original.parameters), { seed: 89, n: 100 });
-    const second = generateSimulationData(buildScmModel(permuted.graph, permuted.parameters), { seed: 89, n: 100 });
+    const first = generateSimulationData(buildScmModel(original.graph, original.parameters), {
+      seed: 89,
+      n: 100,
+    });
+    const second = generateSimulationData(buildScmModel(permuted.graph, permuted.parameters), {
+      seed: 89,
+      n: 100,
+    });
     expect([...first.columns.get("x")!]).toEqual([...second.columns.get("x")!]);
   });
 

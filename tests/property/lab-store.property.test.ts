@@ -71,7 +71,8 @@ describe("PROP-11: shared-lab mutation integrity", () => {
           for (const operation of operations) {
             const state = useLabStore.getState();
             const nodes = state.graph.nodes;
-            if (operation === "add" && nodes.length < 12) state.addNode(nodes.length % 3 === 2 ? "selection" : "observed");
+            if (operation === "add" && nodes.length < 12)
+              state.addNode(nodes.length % 3 === 2 ? "selection" : "observed");
             if (operation === "condition") {
               const node = nodes.find((candidate) => candidate.kind === "observed");
               if (node) state.setConditioning([node.id]);
@@ -86,11 +87,15 @@ describe("PROP-11: shared-lab mutation integrity", () => {
             }
             if (operation === "kind") {
               const node = nodes.find(
-                (candidate) => candidate.kind === "observed" && candidate.id !== state.graph.roles.exposureId && candidate.id !== state.graph.roles.outcomeId,
+                (candidate) =>
+                  candidate.kind === "observed" &&
+                  candidate.id !== state.graph.roles.exposureId &&
+                  candidate.id !== state.graph.roles.outcomeId,
               );
               if (node) state.setNodeKind(node.id, "latent");
             }
-            if (operation === "delete" && nodes.length > 0) state.deleteNode(nodes[nodes.length - 1].id);
+            if (operation === "delete" && nodes.length > 0)
+              state.deleteNode(nodes[nodes.length - 1].id);
             assertIntegrity();
           }
         },
