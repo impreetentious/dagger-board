@@ -133,9 +133,11 @@ async function streamBytes(
   const writer = stream.writable.getWriter();
   const copy = new Uint8Array(bytes.byteLength);
   copy.set(bytes);
-  await writer.write(copy as unknown as BufferSource);
-  await writer.close();
-  return new Uint8Array(await new Response(stream.readable).arrayBuffer());
+  const [, output] = await Promise.all([
+    writer.write(copy as unknown as BufferSource).then(() => writer.close()),
+    new Response(stream.readable).arrayBuffer(),
+  ]);
+  return new Uint8Array(output);
 }
 
 export async function encodeGraphFragment(snapshot: LabSnapshot): Promise<string> {
