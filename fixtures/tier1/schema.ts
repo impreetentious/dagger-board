@@ -21,7 +21,7 @@ export const Tier1FixtureSchema = z.object({
   id: z.string(),
   derivation: z.string(),
   graph: GraphSchema,
-  parameters: z.optional(SCMParametersSchema),
+  parameters: SCMParametersSchema.optional(),
   expectedP3: z.unknown().optional(),
   expectedP1: z
     .object({

@@ -2,7 +2,7 @@
 
 > Draw your assumptions. See your bias. Before the data.
 
-**Status:** v0.9.0 — P0–P7 complete (learn curriculum) on `main`. Build continues.
+**Status:** v0.10.0 — P0–P8 complete (communicate + polish) on `main`. Build continues.
 
 ---
 
@@ -64,4 +64,4 @@ This IST timestamp rule is permanent for all future workflows, commits, and AI a
 Follow this format for version control:
 
 - **Base Format Version:** 0.0.0 — the version of the version-block schema itself (the shape of these lines); it is bumped only when this block's structure changes, not on every commit.
-- **Product Version:** `v0.9.0_2026-08-22_02:19:22` (IST)
+- **Product Version:** `v0.10.0_2026-08-22_09:53:03` (IST)
