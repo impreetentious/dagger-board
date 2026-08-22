@@ -2,7 +2,7 @@
 
 > Draw your assumptions. See your bias. Before the data.
 
-**Status:** v0.10.0 — P0–P8 complete (communicate + polish) on `main`. Build continues.
+**Status:** v0.11.0 — P0 → P9 implementation is on `main` (graph editor, identification, simulation, design surfaces, curriculum, analysis design record). Static export; v1.0.0 tagging and public deploy remain separate release steps.
 
 ---
 
@@ -33,35 +33,42 @@ This project is a pre-data instrument for stress-testing causal claims and study
 
 **DAGitty** is the authoritative academic tool for graphical identification and serves as this project's independent oracle, not its competitor. **Tetrad** does causal discovery from data; **CausalWizard** does estimation from uploaded data. The open space this product occupies: a product-grade _design_ instrument with bias-quantifying simulation and built-in pedagogy, aimed at people who make decisions with analyses rather than publish them.
 
-## Status & what lives in this repository
+## Stack
 
-Planning is complete and ratified; implementation has not started. This repository is the permanent home for the product — all future code lands here.
+Next.js App Router (static export) · React · TypeScript strict · Tailwind CSS · Zustand · Zod · Vitest + fast-check · Playwright. Hand-rolled SVG for visualizations.
 
-- `README.md` — this file: the public story.
+## Run locally
 
-## Engineering principles (v1)
+Requires Node `20.20.x` (see `.nvmrc` / `package.json` engines).
 
-- Next.js App Router (static export), React, TypeScript strict, Tailwind CSS, Zustand, Zod.
-- Hand-rolled SVG for every visualization — no chart libraries.
-- Correctness is sacred: normative math contract before engine code; fixture corpus + property-based tests (Vitest + fast-check); Playwright end-to-end; a global consistency identity checked on every simulation run.
-- Every random element is seeded and replayable.
-- Light + dark themes; WCAG 2.1 AA intent with a recorded audit; keyboard interaction as a first-class design item.
+```bash
+npm ci
+npm run dev
+```
 
-## Roadmap at a glance
+Dev server defaults to port `3004`.
 
-Engine before interface: scaffold → graph core → identification engine → structural-model & simulation engine → editor → analysis surfaces → design surface → curriculum → record export & polish → v1.0.
+## Verify
+
+```bash
+npm run typecheck
+npm run lint
+npm run test
+npm run build
+npm run test:e2e
+```
+
+Or `npm run test:full` for the combined local gate.
+
+## Third-party notice
+
+Test-only DAGitty fixtures under `fixtures/tools/dagitty/` are GPL-2.0-or-later. Application code under `src/` does not import that fixture tooling. See [NOTICE](NOTICE).
+
+## Docs
+
+- `docs/a11y-audit.md` — accessibility audit notes
+- `docs/notes/` — design and engine notes for contributors
 
 ## License
 
-MIT © Sidakpreet Singh
-
-## AI Agent Instructions
-
-Before making any new commits, update the **Product Version** string below in this file with the current IST time of commit (`Asia/Kolkata`). Keep the same numeric release version in `package.json` and the root package entries of `package-lock.json` (once `package.json` exists — from P0 on).
-
-This IST timestamp rule is permanent for all future workflows, commits, and AI agents working in this repository.
-
-Follow this format for version control:
-
-- **Base Format Version:** 0.0.0 — the version of the version-block schema itself (the shape of these lines); it is bumped only when this block's structure changes, not on every commit.
-- **Product Version:** `v0.10.0_2026-08-22_09:53:03` (IST)
+MIT © Sidakpreet Singh — see [LICENSE](LICENSE). Application code is MIT; see [NOTICE](NOTICE) for GPL fixture tooling.

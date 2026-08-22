@@ -1,0 +1,19 @@
+Third-Party Notices
+==================
+
+This repository’s application code under `src/` is licensed under the MIT
+License (see LICENSE).
+
+The following material is included for test and oracle purposes only and is
+not part of the MIT-licensed application runtime:
+
+- Path: `fixtures/tools/dagitty/dagitty-node.js`
+- Upstream: https://github.com/jtextor/dagitty
+- Upstream commit: 7a657776dc8f5e5ba4e323edb028e2c2aaf29327
+- Upstream path: `jslib/dagitty-node.js`
+- License: GNU General Public License version 2 or later
+
+Boundary: fixture / parity tooling only. Modules under `src/` must not import
+this file. Generating or refreshing DAGitty fixtures is done via
+`fixtures/tools/generate-dagitty.mjs` for local/CI verification, not as a
+shipped product dependency.
