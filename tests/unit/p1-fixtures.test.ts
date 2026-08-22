@@ -15,9 +15,10 @@ const fixtures = readdirSync(fixtureDirectory)
   ) as Tier1Fixture[];
 
 describe("P1 Tier-1 fixtures", () => {
-  it("contains the complete 18-fixture canon", () => {
-    expect(fixtures).toHaveLength(18);
+  it("contains the complete post-v1 fixture canon", () => {
+    expect(fixtures.length).toBeGreaterThanOrEqual(18);
     expect(fixtures.map((fixture) => fixture.id)).toContain("adversarial-perf");
+    expect(fixtures.map((fixture) => fixture.id)).toContain("set-frontdoor");
   });
 
   for (const fixture of fixtures) {

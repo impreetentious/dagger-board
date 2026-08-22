@@ -2,7 +2,7 @@
 
 > Draw your assumptions. See your bias. Before the data.
 
-**Status:** v0.11.0 — P0 → P9 implementation is on `main` (graph editor, identification, simulation, design surfaces, curriculum, analysis design record). Static export; v1.0.0 tagging and public deploy remain separate release steps.
+**Status:** v0.11.1 — P0 → P9 implementation is on `main` (graph editor, identification, simulation, design surfaces, curriculum, analysis design record). Static export; v1.0.0 tagging and public deploy remain separate release steps.
 
 ---
 
@@ -72,3 +72,14 @@ Test-only DAGitty fixtures under `fixtures/tools/dagitty/` are GPL-2.0-or-later.
 ## License
 
 MIT © Sidakpreet Singh — see [LICENSE](LICENSE). Application code is MIT; see [NOTICE](NOTICE) for GPL fixture tooling.
+
+## AI Agent Instructions
+
+Before making any new commits, update the **Product Version** string below in this file with the current IST time of commit (`Asia/Kolkata`). Keep the same numeric release version in `package.json` and the root package entries of `package-lock.json` (once `package.json` exists — from P0 on).
+
+This IST timestamp rule is permanent for all future workflows, commits, and AI agents working in this repository.
+
+Follow this format for version control:
+
+* **Base Format Version:** 0.0.0 — the version of the version-block schema itself (the shape of these lines); it is bumped only when this block's structure changes, not on every commit.
+* **Product Version:** `v0.11.1_2026-08-22_23:31:12` (IST)

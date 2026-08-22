@@ -2,7 +2,11 @@ import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { checkAdjustmentSet, enumerateAdjustmentSets, properBackdoorGraph } from "@/engine/adjust";
-import { enumerateFrontdoorMediators } from "@/engine/frontdoor";
+import {
+  checkFrontdoorSet,
+  enumerateFrontdoorMediators,
+  enumerateFrontdoorSets,
+} from "@/engine/frontdoor";
 import { enumerateImpliedConditionalIndependencies } from "@/engine/implications";
 import { checkConditionalInstrument, enumerateConditionalInstruments } from "@/engine/iv";
 import { hasEdge } from "@/engine/graph";
@@ -50,6 +54,28 @@ describe("frontdoor and conditional IV", () => {
       mediatorIds: ["m"],
       reason: "identified",
     });
+  });
+
+  it("finds a set-valued frontdoor when no singleton intercepts every directed path", () => {
+    const graph = fixture("set-frontdoor").graph;
+    expect(enumerateFrontdoorMediators(graph, "x", "y")).toEqual({
+      mediatorIds: [],
+      reason: "no-singleton-frontdoor",
+    });
+    const setResult = enumerateFrontdoorSets(graph, "x", "y");
+    expect(setResult.reason).toBe("identified");
+    expect(setResult.minimalSets).toEqual([{ mediatorIds: ["m1", "m2"] }]);
+    expect(setResult.singletonMediatorIds).toEqual([]);
+    expect(checkFrontdoorSet(graph, "x", "y", new Set(["m1", "m2"]))).toBe(true);
+    expect(checkFrontdoorSet(graph, "x", "y", new Set(["m1"]))).toBe(false);
+  });
+
+  it("carries the singleton case through to the set enumeration for parity", () => {
+    const graph = fixture("frontdoor").graph;
+    const setResult = enumerateFrontdoorSets(graph, "x", "y");
+    expect(setResult.reason).toBe("identified");
+    expect(setResult.minimalSets).toEqual([{ mediatorIds: ["m"] }]);
+    expect(setResult.singletonMediatorIds).toEqual(["m"]);
   });
 
   it("finds classic and conditional instruments while rejecting descendants", () => {

@@ -1,0 +1,110 @@
+{
+  "v": 1,
+  "id": "set-frontdoor",
+  "derivation": "Twin-mediator set-valued frontdoor: latent U confounds X-Y; X splits into two disjoint mediators M1 and M2 which each carry one directed X->Y path. Neither singleton intercepts every directed path so no singleton frontdoor exists, but Z = {M1, M2} does. At coefficients a = 0.5 on every edge and unit disturbance variances, the closed-form (I - B^T)^-1 propagation matrix gives TE(X->Y) = 2a^2 = 0.5. Sigma_XX = 1 + a^2 = 1.25, Sigma_XY = 3a^2 + 2a^4 = 0.875, so the naive OLS slope beta(empty) = 0.7 (bias +0.2). The set-valued frontdoor first stage is beta_ZX = [a, a] = [0.5, 0.5]; Sigma_{ZZ|X} collapses to I after the Schur cancellation, Sigma_{ZY|X} = [a, a]^T = [0.5, 0.5]^T, giving beta_YZX = [0.5, 0.5] and beta_FD = 0.5*0.5 + 0.5*0.5 = 0.5, which matches TE exactly. Verifies Pearl 2009 Thm. 3.3.4 for a set-valued mediator.",
+  "graph": {
+    "v": 1,
+    "nodes": [
+      {
+        "id": "u",
+        "idx": 0,
+        "name": "U",
+        "kind": "latent"
+      },
+      {
+        "id": "x",
+        "idx": 1,
+        "name": "X",
+        "kind": "observed"
+      },
+      {
+        "id": "m1",
+        "idx": 2,
+        "name": "M1",
+        "kind": "observed"
+      },
+      {
+        "id": "m2",
+        "idx": 3,
+        "name": "M2",
+        "kind": "observed"
+      },
+      {
+        "id": "y",
+        "idx": 4,
+        "name": "Y",
+        "kind": "observed"
+      }
+    ],
+    "edges": [
+      {
+        "from": "u",
+        "to": "x"
+      },
+      {
+        "from": "u",
+        "to": "y"
+      },
+      {
+        "from": "x",
+        "to": "m1"
+      },
+      {
+        "from": "x",
+        "to": "m2"
+      },
+      {
+        "from": "m1",
+        "to": "y"
+      },
+      {
+        "from": "m2",
+        "to": "y"
+      }
+    ],
+    "roles": {
+      "exposureId": "x",
+      "outcomeId": "y"
+    }
+  },
+  "parameters": {
+    "v": 1,
+    "edgeCoefficients": {
+      "u\u0000x": 0.5,
+      "u\u0000y": 0.5,
+      "x\u0000m1": 0.5,
+      "x\u0000m2": 0.5,
+      "m1\u0000y": 0.5,
+      "m2\u0000y": 0.5
+    },
+    "errorSds": {
+      "u": 1,
+      "x": 1,
+      "m1": 1,
+      "m2": 1,
+      "y": 1
+    }
+  },
+  "expectedP1": {
+    "dSeparation": []
+  },
+  "expectedP3": {
+    "totalEffect": 0.5,
+    "covariance": {
+      "x,x": 1.25,
+      "x,y": 0.875,
+      "x,m1": 0.625,
+      "m1,y": 0.9375,
+      "m1,m1": 1.3125,
+      "m1,m2": 0.3125
+    },
+    "olsNaive": 0.7,
+    "frontdoorSet": {
+      "mediatorIds": [
+        "m1",
+        "m2"
+      ],
+      "estimand": 0.5
+    }
+  }
+}

@@ -56,3 +56,58 @@ Resolved against the official DAGitty manual and pinned source.
 Primary sources: [official DAGitty manual, §5.6](https://dagitty.net/manual-3.x.pdf)
 and `jslib/graph/GraphAnalyzer.js` at pinned commit
 `7a657776dc8f5e5ba4e323edb028e2c2aaf29327`.
+
+## V-08 — Set-valued frontdoor
+
+Resolved against Pearl (2009), _Causality: Models, Reasoning, and Inference_,
+2nd ed., §3.3.2, and the vendored DAGitty source at the pinned commit.
+
+Pearl's **Definition 3.3.3 (front-door)** applies to a **set** Z (not a single
+node) and reads verbatim: a set of variables Z is said to satisfy the
+front-door criterion relative to an ordered pair (X, Y) if
+1. Z intercepts all directed paths from X to Y;
+2. there is no back-door path from X to Z; and
+3. all back-door paths from Z to Y are blocked by X.
+
+For a set Z, conditions 2 and 3 are read set-wise — no back-door from X to any
+element of Z, and every back-door from any element of Z to Y is blocked by X.
+
+Pearl's **Theorem 3.3.4 (front-door adjustment)** gives the identifying
+formula when Z satisfies the criterion and P(x, z) > 0:
+`P(y | do(x)) = Σ_z P(z | x) Σ_{x'} P(y | x', z) P(x')`.
+
+**Linear-Gaussian specialization used by the engine.** For jointly-Gaussian
+(X, Z, Y) satisfying the criterion, with X scalar, Z a k-vector of mediators,
+and Y scalar, the total-effect slope reduces to
+`β_FD = β_{Y ~ Z · X}ᵀ · β_{Z ~ X}`,
+where `β_{Z ~ X}` is the k-vector of OLS slopes of each `Z_i` on X (each
+component `Σ_{X Z_i} / Σ_{X X}`) and `β_{Y ~ Z · X}` is the k-vector of OLS
+coefficients on Z from the joint regression `Y ~ X + Z`, computed via a Schur
+complement: `β_{Y ~ Z · X} = Σ_{ZZ · X}⁻¹ · Σ_{ZY · X}`. When k = 1 this
+collapses to §3.9's singleton `β_FD = β_{M ~ X} · β_{Y ~ M | X}` exactly.
+
+**Derivation.** Under linear-Gaussian, `E[Z | X = x] = β_{Z ~ X} · x` and
+`E[Y | X = x', Z = z] = β_{Y ~ X · Z} · x' + β_{Y ~ Z · X}ᵀ · z`. Integrating
+Pearl's formula over Z given x and marginalizing x' out (means zero):
+`E[Y | do(x)] = β_{Y ~ Z · X}ᵀ · β_{Z ~ X} · x`, giving the stated slope.
+
+**DAGitty parity.** The vendored source at pinned commit
+`7a657776dc8f5e5ba4e323edb028e2c2aaf29327` does not expose a public
+frontdoor-set enumeration — `fixtures/tools/dagitty/dagitty-node.js` mentions
+"front-door" only in `activeBiasGraph` comments (lines 4728 and 5038), never
+as a first-class output. The Tier-2 corpus therefore cannot import a DAGitty
+frontdoor list; instead, every set Z the engine emits is cross-checked in the
+existing d-separation oracle against §3.4's back-door graph on the auxiliary
+`(X → Z)` and `(Z → Y | X)` queries — the same primitives Tier-2 already
+uses for adjustment parity.
+
+**Enumeration and minimality.** v1.x enumerates every subset Z of observed
+non-role nodes within the graph bound (§3.1), applies conditions 1–3, keeps
+inclusion-minimal witnesses, and orders results by (size ascending,
+lexicographic idx). Singletons stay in the output — the singleton case is a
+minimal-Z case whenever it applies.
+
+Primary sources: Pearl, J. (2009). _Causality: Models, Reasoning, and
+Inference_ (2nd ed.). Cambridge University Press, §3.3.2, Definition 3.3.3
+and Theorem 3.3.4; vendored `dagitty-node.js` at commit
+`7a657776dc8f5e5ba4e323edb028e2c2aaf29327` under `fixtures/tools/dagitty/`.

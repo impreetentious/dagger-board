@@ -1,10 +1,12 @@
 import { enumerateAdjustmentSets, type AdjustmentResult } from "@/engine/adjust";
 import { classifyPaths, type PathClassificationResult } from "@/engine/classify";
-import { enumerateFrontdoorMediators, type FrontdoorResult } from "@/engine/frontdoor";
 import {
-  enumerateImpliedConditionalIndependencies,
-  type ConditionalIndependence,
-} from "@/engine/implications";
+  enumerateFrontdoorMediators,
+  enumerateFrontdoorSets,
+  type FrontdoorResult,
+  type FrontdoorSetResult,
+} from "@/engine/frontdoor";
+import { enumerateImpliedConditionalIndependencies, type ConditionalIndependence } from "@/engine/implications";
 import { enumerateConditionalInstruments, type ConditionalInstrument } from "@/engine/iv";
 import { enumerateDirectedPaths, enumerateSimplePaths } from "@/engine/paths";
 import type { Graph } from "@/engine/graph";
@@ -23,6 +25,7 @@ export interface ProveReport {
   adjustment: AdjustmentResult | null;
   paths: PathClassificationResult | null;
   frontdoor: FrontdoorResult | null;
+  frontdoorSets: FrontdoorSetResult | null;
   instruments: ConditionalInstrument[];
   implications: ConditionalIndependence[];
   directedPathCount: number;
@@ -42,6 +45,7 @@ export function proveGraph(
       adjustment: null,
       paths: null,
       frontdoor: null,
+      frontdoorSets: null,
       instruments: [],
       implications: [],
       directedPathCount: 0,
@@ -56,15 +60,17 @@ export function proveGraph(
   ).length;
   const adjustment = enumerateAdjustmentSets(graph, exposureId, outcomeId);
   const frontdoor = enumerateFrontdoorMediators(graph, exposureId, outcomeId);
+  const frontdoorSets = enumerateFrontdoorSets(graph, exposureId, outcomeId);
   const instruments = enumerateConditionalInstruments(graph, exposureId, outcomeId);
   const paths = classifyPaths(graph, exposureId, outcomeId, conditioned, selection);
   const implications = enumerateImpliedConditionalIndependencies(graph, selection);
+  const frontdoorAvailable = frontdoor.mediatorIds.length > 0 || frontdoorSets.minimalSets.length > 0;
   const verdict: IdentificationVerdict =
     directedPathCount === 0
       ? "zero-total-effect"
       : adjustment.minimalSets.length > 0
         ? "adjustment"
-        : frontdoor.mediatorIds.length > 0
+        : frontdoorAvailable
           ? "frontdoor"
           : instruments.length > 0
             ? "instrument"
@@ -74,6 +80,7 @@ export function proveGraph(
     adjustment,
     paths,
     frontdoor,
+    frontdoorSets,
     instruments,
     implications,
     directedPathCount,
