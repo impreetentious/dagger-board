@@ -4,11 +4,26 @@ import { useMemo, useState } from "react";
 import { proveGraph } from "@/engine/prove";
 import { auditScmIntegrity, edgeParameterKey, matrixTotalEffect } from "@/engine/scm";
 import { convergenceSeries, runSimulationAsync, type SimulationRun } from "@/engine/sim";
-import { ivEstimand, olsEstimand } from "@/engine/stats";
+import { frontdoorSetEstimand, ivEstimand, olsEstimand } from "@/engine/stats";
 import { useLabStore } from "@/store/lab-store";
 
 function number(value: number | null | undefined): string {
   return value === null || value === undefined || !Number.isFinite(value) ? "—" : value.toFixed(4);
+}
+
+function safeFrontdoor(
+  context: Parameters<typeof frontdoorSetEstimand>[0],
+  exposureId: string,
+  mediatorIds: readonly string[],
+  outcomeId: string,
+  totalEffect: number,
+): { estimand: number; populationBias: number } | null {
+  try {
+    const estimand = frontdoorSetEstimand(context, exposureId, mediatorIds, outcomeId);
+    return { estimand, populationBias: estimand - totalEffect };
+  } catch {
+    return null;
+  }
 }
 
 function Sparkline({ values }: { values: Array<number | null> }) {
@@ -77,6 +92,10 @@ export function SimulatePanel() {
         : null,
     [report.instruments],
   );
+  const selectedFrontdoor = useMemo(
+    () => report.frontdoorSets?.minimalSets[0]?.mediatorIds ?? null,
+    [report.frontdoorSets],
+  );
 
   const readout = useMemo(() => {
     if (!run || !exposureId || !outcomeId) return null;
@@ -98,17 +117,12 @@ export function SimulatePanel() {
             totalEffect,
           )
         : null;
-      const sampleIv =
-        selectedInstrument && run.sample.sampleSize >= 50
-          ? ivEstimand(
-              run.sample,
-              selectedInstrument.instrumentId,
-              exposureId,
-              outcomeId,
-              selectedInstrument.conditioningIds,
-              totalEffect,
-            )
-          : null;
+      const exactFrontdoor = selectedFrontdoor
+        ? safeFrontdoor(exactContext, exposureId, selectedFrontdoor, outcomeId, totalEffect)
+        : null;
+      const sampleFrontdoor = selectedFrontdoor && run.sample.sampleSize >= 50
+        ? safeFrontdoor(run.sample, exposureId, selectedFrontdoor, outcomeId, totalEffect)
+        : null;
       const series = convergenceSeries(run.data, {
         kind: "ols",
         exposureId,
@@ -116,6 +130,15 @@ export function SimulatePanel() {
         conditionedIds: conditioning,
         totalEffect,
       });
+      const frontdoorSeries = selectedFrontdoor
+        ? convergenceSeries(run.data, {
+            kind: "frontdoor",
+            exposureId,
+            outcomeId,
+            mediatorIds: selectedFrontdoor,
+            totalEffect,
+          })
+        : null;
       return {
         audit: auditScmIntegrity(run.model, exposureId, outcomeId),
         totalEffect,
@@ -123,12 +146,15 @@ export function SimulatePanel() {
         sampleOls,
         exactIv,
         sampleIv,
+        exactFrontdoor,
+        sampleFrontdoor,
         series,
+        frontdoorSeries,
       };
     } catch (cause) {
       return { error: cause instanceof Error ? cause.message : "Simulation readout failed." };
     }
-  }, [conditioning, exposureId, outcomeId, run, selectedInstrument]);
+  }, [conditioning, exposureId, outcomeId, run, selectedFrontdoor, selectedInstrument]);
 
   const launch = async () => {
     if (!exposureId || !outcomeId) {
@@ -285,18 +311,15 @@ export function SimulatePanel() {
               </p>
             </article>
           ) : null}
-          {selection ? (
-            <p className="text-xs leading-5 text-[var(--muted)]">
-              Selected sample: {run?.sample.sampleSize ?? 0} kept rows. Exact references use the
-              truncated covariance; under 50 kept rows, estimator readouts stay insufficient.
-            </p>
+          {selectedFrontdoor ? (
+            <article className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4">
+              <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">FRONT-DOOR · {selectedFrontdoor.map(name).join(", ")}</p>
+              <p className="mt-2 text-2xl font-black">{number(readout.sampleFrontdoor?.estimand)}</p>
+              <p className="mt-2 text-xs leading-5 text-[var(--muted)]">Exact estimand {number(readout.exactFrontdoor?.estimand)} · population bias {number(readout.exactFrontdoor?.populationBias)}{selectedFrontdoor.length > 1 ? " · set-valued via Pearl Thm. 3.3.4" : ""}</p>
+              <div className="mt-3"><Sparkline values={(readout.frontdoorSeries ?? []).map((point) => point.estimate)} /></div>
+            </article>
           ) : null}
-          {report.frontdoor?.mediatorIds.length ? (
-            <p className="text-xs leading-5 text-[var(--muted)]">
-              Front-door identifies through {report.frontdoor.mediatorIds.map(name).join(", ")}; its
-              sampling estimator is planned for v1.1.
-            </p>
-          ) : null}
+          {selection ? <p className="text-xs leading-5 text-[var(--muted)]">Selected sample: {run?.sample.sampleSize ?? 0} kept rows. Exact references use the truncated covariance; under 50 kept rows, estimator readouts stay insufficient.</p> : null}
         </>
       ) : null}
     </section>

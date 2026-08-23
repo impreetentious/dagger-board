@@ -8,6 +8,7 @@ import {
   type ScmModel,
 } from "@/engine/scm";
 import {
+  frontdoorSetEstimand,
   ivEstimand,
   olsEstimand,
   type CovarianceContext,
@@ -56,7 +57,19 @@ export type SimulationEstimatorRequest =
       instrumentId: string;
       conditionedIds: string[];
       totalEffect: number;
+    }
+  | {
+      kind: "frontdoor";
+      exposureId: string;
+      outcomeId: string;
+      mediatorIds: string[];
+      totalEffect: number;
     };
+
+export interface FrontdoorSampleEstimate {
+  estimand: number;
+  populationBias: number;
+}
 
 export interface ConvergencePoint {
   generatedRows: number;
@@ -249,7 +262,7 @@ export function logSpacedCheckpoints(generatedCount: number): number[] {
 function simulatedEstimate(
   request: SimulationEstimatorRequest,
   moments: SampleMoments,
-): OlsEstimate | IvEstimate | null {
+): OlsEstimate | IvEstimate | FrontdoorSampleEstimate | null {
   if (moments.sampleSize < 50) return null;
   if (request.kind === "ols") {
     return olsEstimand(
@@ -260,14 +273,27 @@ function simulatedEstimate(
       request.totalEffect,
     );
   }
-  return ivEstimand(
-    moments,
-    request.instrumentId,
-    request.exposureId,
-    request.outcomeId,
-    request.conditionedIds,
-    request.totalEffect,
-  );
+  if (request.kind === "iv") {
+    return ivEstimand(
+      moments,
+      request.instrumentId,
+      request.exposureId,
+      request.outcomeId,
+      request.conditionedIds,
+      request.totalEffect,
+    );
+  }
+  try {
+    const estimand = frontdoorSetEstimand(
+      moments,
+      request.exposureId,
+      request.mediatorIds,
+      request.outcomeId,
+    );
+    return { estimand, populationBias: estimand - request.totalEffect };
+  } catch {
+    return null;
+  }
 }
 
 export function convergenceSeries(
@@ -277,8 +303,7 @@ export function convergenceSeries(
   return logSpacedCheckpoints(data.generatedCount).map((generatedRows) => {
     const moments = sampleMoments(data, generatedRows);
     const result = simulatedEstimate(request, moments);
-    const estimate =
-      result === null ? null : "status" in result ? result.estimand : result.estimand;
+    const estimate = result === null ? null : (result.estimand ?? null);
     return { generatedRows, keptRows: moments.sampleSize, estimate };
   });
 }

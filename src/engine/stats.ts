@@ -158,6 +158,44 @@ export function frontdoorEstimand(
   return firstStage * secondStage;
 }
 
+/**
+ * Set-valued frontdoor estimand (Pearl 2009, Thm. 3.3.4) under the
+ * linear-Gaussian specialization: `β_FD = β_{Y ~ Z · X}ᵀ · β_{Z ~ X}`,
+ * with `β_{Z ~ X}` the OLS slopes of each Z_i on X alone and
+ * `β_{Y ~ Z · X} = Σ_{ZZ · X}⁻¹ · Σ_{ZY · X}` the OLS coefficients on Z in
+ * the joint regression `Y ~ X + Z`. Collapses to the singleton form when
+ * |Z| = 1. See docs/notes/identification.md §V-08 for the derivation.
+ */
+export function frontdoorSetEstimand(
+  context: CovarianceContext,
+  exposureId: string,
+  mediatorIds: readonly string[],
+  outcomeId: string,
+): number {
+  if (mediatorIds.length === 0) {
+    throw new Error("frontdoorSetEstimand requires a nonempty mediator set.");
+  }
+  const uniqueMediators = [...new Set(mediatorIds)];
+  const sigmaXX = covarianceEntry(context, exposureId, exposureId);
+  if (!Number.isFinite(sigmaXX) || sigmaXX <= 0) {
+    throw new Error("frontdoorSetEstimand requires a positive exposure variance.");
+  }
+  const firstStage = uniqueMediators.map(
+    (mediatorId) => covarianceEntry(context, exposureId, mediatorId) / sigmaXX,
+  );
+  const sigmaZZgivenX: Matrix = uniqueMediators.map((rowId) =>
+    uniqueMediators.map((columnId) => partialCovariance(context, rowId, columnId, [exposureId])),
+  );
+  const sigmaZYgivenX = uniqueMediators.map(
+    (id) => partialCovariance(context, id, outcomeId, [exposureId]),
+  );
+  const inverseSigmaZZgivenX = inverse(sigmaZZgivenX);
+  const secondStage = inverseSigmaZZgivenX.map((row) =>
+    row.reduce((sum, entry, columnIndex) => sum + entry * sigmaZYgivenX[columnIndex], 0),
+  );
+  return secondStage.reduce((sum, coefficient, index) => sum + coefficient * firstStage[index], 0);
+}
+
 export function olsStandardError(
   context: CovarianceContext,
   exposureId: string,

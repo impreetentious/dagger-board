@@ -1,15 +1,11 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { enumerateAdjustmentSets } from "@/engine/adjust";
+import { enumerateFrontdoorSets } from "@/engine/frontdoor";
 import { enumerateConditionalInstruments } from "@/engine/iv";
 import { validateGraph, type Graph, type GraphNode } from "@/engine/graph";
-import {
-  auditScmIntegrity,
-  buildScmModel,
-  defaultScmParameters,
-  matrixTotalEffect,
-} from "@/engine/scm";
-import { ivMultiplicativeIdentity, olsEstimand } from "@/engine/stats";
+import { auditScmIntegrity, buildScmModel, defaultScmParameters, matrixTotalEffect } from "@/engine/scm";
+import { frontdoorSetEstimand, ivMultiplicativeIdentity, olsEstimand } from "@/engine/stats";
 
 function seededUniform(seed: number): () => number {
   let state = seed >>> 0;
@@ -81,6 +77,32 @@ describe("PROP-4 through PROP-6", () => {
         }
       }),
       { seed: 0x305, numRuns: 100 },
+    );
+  });
+
+  it("gives every set-valued frontdoor witness zero population bias", () => {
+    fc.assert(
+      fc.property(fc.integer(), (seed) => {
+        const graph = graphFromSeed(seed);
+        const outcomeId = `n${graph.nodes.length - 1}`;
+        const model = buildScmModel(graph, moderateParameters(graph));
+        if (model.illConditioned) return;
+        const totalEffect = matrixTotalEffect(model, "n0", outcomeId);
+        const witnesses = enumerateFrontdoorSets(graph, "n0", outcomeId).minimalSets;
+        for (const witness of witnesses) {
+          try {
+            expect(
+              frontdoorSetEstimand(model, "n0", witness.mediatorIds, outcomeId) - totalEffect,
+            ).toBeCloseTo(0, 8);
+          } catch (error) {
+            if (error instanceof Error && /singular|degenerate|positive/i.test(error.message)) {
+              return;
+            }
+            throw error;
+          }
+        }
+      }),
+      { seed: 0x307, numRuns: 100 },
     );
   });
 

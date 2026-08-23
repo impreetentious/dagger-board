@@ -13,6 +13,7 @@ import {
 } from "@/engine/scm";
 import {
   frontdoorEstimand,
+  frontdoorSetEstimand,
   ivEstimand,
   ivMultiplicativeIdentity,
   olsEstimand,
@@ -92,6 +93,7 @@ describe("WU-3.2–3.4 exact SCM", () => {
     const frontdoorModel = buildScmModel(frontdoorGraph, parametersFor(frontdoorGraph));
     const totalEffect = matrixTotalEffect(frontdoorModel, "x", "y");
     expect(frontdoorEstimand(frontdoorModel, "x", "m", "y")).toBeCloseTo(totalEffect, 12);
+    expect(frontdoorSetEstimand(frontdoorModel, "x", ["m"], "y")).toBeCloseTo(totalEffect, 12);
 
     const ivGraph = fixture("iv").graph;
     const ivModel = buildScmModel(ivGraph, parametersFor(ivGraph));
@@ -100,6 +102,22 @@ describe("WU-3.2–3.4 exact SCM", () => {
     expect(estimate.status).toBe("defined");
     expect(estimate.populationBias).toBeCloseTo(0, 12);
     expect(ivMultiplicativeIdentity(ivModel, "z", "x", "y", [], ivTotalEffect)).toBeCloseTo(0, 12);
+  });
+
+  it("reproduces the hand-derived set-valued frontdoor closed form", () => {
+    const graph = fixture("set-frontdoor").graph;
+    const model = buildScmModel(graph, parametersFor(graph));
+    const totalEffect = matrixTotalEffect(model, "x", "y");
+    expect(totalEffect).toBeCloseTo(0.5, 12);
+    expect(covarianceAt(model, "x", "x")).toBeCloseTo(1.25, 12);
+    expect(covarianceAt(model, "x", "y")).toBeCloseTo(0.875, 12);
+    expect(covarianceAt(model, "m1", "y")).toBeCloseTo(0.9375, 12);
+    expect(covarianceAt(model, "m1", "m1")).toBeCloseTo(1.3125, 12);
+    expect(covarianceAt(model, "m1", "m2")).toBeCloseTo(0.3125, 12);
+    const naive = olsEstimand(model, "x", "y", [], totalEffect);
+    expect(naive.estimand).toBeCloseTo(0.7, 12);
+    expect(naive.populationBias).toBeCloseTo(0.2, 12);
+    expect(frontdoorSetEstimand(model, "x", ["m1", "m2"], "y")).toBeCloseTo(0.5, 12);
   });
 
   it("uses the undefined rather than numeric state for exact first-stage cancellation", () => {

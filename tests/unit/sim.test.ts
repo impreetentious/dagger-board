@@ -14,7 +14,7 @@ import {
   runSimulation,
   sampleMoments,
 } from "@/engine/sim";
-import { olsEstimand, olsStandardError } from "@/engine/stats";
+import { frontdoorSetEstimand, olsEstimand, olsStandardError } from "@/engine/stats";
 import { truncateCovariance } from "@/engine/truncation";
 import { Tier1FixtureSchema } from "../../fixtures/tier1/schema";
 
@@ -94,6 +94,26 @@ describe("WU-3.5–3.6 deterministic simulation", () => {
     expect(series.at(-1)?.generatedRows).toBe(100);
     expect(series.at(-1)?.keptRows).toBeLessThan(50);
     expect(series.at(-1)?.estimate).toBeNull();
+  });
+
+  it("converges the sample frontdoor estimator on its exact set-valued plim", () => {
+    const graph = fixture("19-set-frontdoor.json").graph;
+    const parameters = halfParameters(graph);
+    const options = { seed: 0x907, n: 200_000 };
+    const run = runSimulation(graph, parameters, "x", "y", options);
+    const totalEffect = matrixTotalEffect(run.model, "x", "y");
+    expect(totalEffect).toBeCloseTo(0.5, 12);
+    const exact = frontdoorSetEstimand(run.model, "x", ["m1", "m2"], "y");
+    const sample = frontdoorSetEstimand(run.sample, "x", ["m1", "m2"], "y");
+    expect(sample).toBeCloseTo(exact, 2);
+    const series = convergenceSeries(run.data, {
+      kind: "frontdoor",
+      exposureId: "x",
+      outcomeId: "y",
+      mediatorIds: ["m1", "m2"],
+      totalEffect,
+    });
+    expect(series.at(-1)?.estimate).toBeCloseTo(exact, 2);
   });
 
   it("matches the selection closed form within the realized 4·SE demonstration tolerance", () => {
