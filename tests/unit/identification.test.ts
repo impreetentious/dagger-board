@@ -85,11 +85,12 @@ describe("frontdoor and conditional IV", () => {
     const repairedDescendant = fixture("iv-descendant-repair-negative").graph;
 
     expect(enumerateConditionalInstruments(classic, "x", "y")).toEqual([
-      { instrumentId: "z", conditioningSets: [[]] },
+      { instrumentId: "z", conditioningSets: [[]], criterion: "conservative" },
     ]);
     expect(enumerateConditionalInstruments(conditional, "x", "y")).toContainEqual({
       instrumentId: "z",
       conditioningSets: [["w"]],
+      criterion: "conservative",
     });
     expect(checkConditionalInstrument(descendant, "x", "y", "z", new Set()).nonDescendant).toBe(
       false,
@@ -97,6 +98,17 @@ describe("frontdoor and conditional IV", () => {
     expect(checkConditionalInstrument(repairedDescendant, "x", "y", "z", new Set()).valid).toBe(
       false,
     );
+  });
+
+  it("relaxes the conservative De(X) barrier to De(Y) under the literature criterion", () => {
+    const descendant = fixture("iv-descendant-negative").graph;
+    const repairedDescendant = fixture("iv-descendant-repair-negative").graph;
+    for (const graph of [descendant, repairedDescendant]) {
+      const conservative = enumerateConditionalInstruments(graph, "x", "y", "conservative");
+      const literature = enumerateConditionalInstruments(graph, "x", "y", "literature");
+      expect(conservative.every((entry) => entry.instrumentId !== "z")).toBe(true);
+      expect(literature.every((entry) => entry.instrumentId !== "z")).toBe(true);
+    }
   });
 });
 

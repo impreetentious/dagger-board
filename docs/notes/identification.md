@@ -39,6 +39,26 @@ manual/source.
 Primary sources: [Brito & Pearl (2002)](https://escholarship.org/uc/item/0gj1b2nx)
 and [official DAGitty manual, §5.5.2](https://dagitty.net/manual-3.x.pdf).
 
+**v1.x relaxation note (finding: unsafe as a drop-in).** Item 10 of §2.6
+asked to widen v1's conservative `Z, W ∉ De(X)` toward Brito & Pearl's
+ancestral-instrument family. A prototype in `src/engine/iv.ts` (kept in the
+git history) moved the non-descendance barrier to `De(Y)` and evaluated
+relevance in `G_out(X)`. Property testing against random DAGs, and direct
+computation on the existing negative fixture #16, showed the multiplicative
+identity `Σ_{ZY·W} − TE · Σ_{ZX·W} = 0` failing under the relaxed rule: with
+`Z ∈ De(X)` and `U` confounding `X` and `Y`, the observed `Cov(Z, Y)` picks
+up a back-door term proportional to the confounding coefficient that the
+mutilated-graph d-separation does not compensate for.
+
+The correct literature relaxation (ancestral instruments) uses a different
+mutilation — the "Z↦X→Y" arrow-cut graph in van der Zander, Textor &
+Liśkiewicz — plus an ancestral restriction on `W`. Encoding this soundly is a
+whole verification task on its own (call it V-11); the engine therefore
+exposes an `IvCriterion` parameter surface today whose `"literature"` value
+is a no-op relative to `"conservative"`. When V-11 is completed the same
+parameter surface will pick up the correctly implemented enumeration without
+a call-site change. The Owner review list carries the deferred pull-through.
+
 ## V-04 — Implied-CI parity semantics
 
 Resolved against the official DAGitty manual and pinned source.

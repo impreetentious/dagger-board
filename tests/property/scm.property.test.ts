@@ -134,4 +134,31 @@ describe("PROP-4 through PROP-6", () => {
       { seed: 0x306, numRuns: 100 },
     );
   });
+
+  it("keeps the multiplicative identity for the relaxed literature IV criterion", () => {
+    fc.assert(
+      fc.property(fc.integer(), (seed) => {
+        const graph = graphFromSeed(seed);
+        const outcomeId = `n${graph.nodes.length - 1}`;
+        const model = buildScmModel(graph, moderateParameters(graph));
+        if (model.illConditioned) return;
+        const totalEffect = matrixTotalEffect(model, "n0", outcomeId);
+        for (const instrument of enumerateConditionalInstruments(graph, "n0", outcomeId, "literature")) {
+          for (const conditionedIds of instrument.conditioningSets) {
+            expect(
+              ivMultiplicativeIdentity(
+                model,
+                instrument.instrumentId,
+                "n0",
+                outcomeId,
+                conditionedIds,
+                totalEffect,
+              ),
+            ).toBeCloseTo(0, 8);
+          }
+        }
+      }),
+      { seed: 0x308, numRuns: 100 },
+    );
+  });
 });
