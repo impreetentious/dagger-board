@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
-import { evaluateDesign } from "@/engine/design";
+import { useMemo, useState } from "react";
+import { diffDesignReports, evaluateDesign, type DesignReport } from "@/engine/design";
 import { useLabStore } from "@/store/lab-store";
 
 function value(number: number | null): string {
@@ -29,6 +29,8 @@ export function DesignPanel() {
       return error instanceof Error ? error : new Error("Design table unavailable.");
     }
   }, [graph, measured, n, parameters, selection]);
+  const [pinned, setPinned] = useState<DesignReport | null>(null);
+  const diff = pinned && !(report instanceof Error) ? diffDesignReports(pinned, report) : [];
 
   if (report instanceof Error) {
     return (
@@ -193,59 +195,62 @@ export function DesignPanel() {
             </tr>
           </thead>
           <tbody>
-            {report.rows.map((row) => (
-              <tr
-                className={
-                  row.id === report.bestRowId
-                    ? "bg-[var(--signal-soft)]"
-                    : "border-t border-[var(--line)]"
-                }
-                key={row.id}
-              >
-                <td className="p-2 font-bold">
-                  {row.kind === "iv"
-                    ? `IV ${name(row.instrumentId ?? "")}${row.conditioningIds.length ? ` | ${row.conditioningIds.map(name).join(", ")}` : ""}`
+            {report.rows.map((row) => {
+              const label =
+                row.kind === "iv"
+                  ? `IV ${name(row.instrumentId ?? "")}${row.conditioningIds.length ? ` | ${row.conditioningIds.map(name).join(", ")}` : ""}`
+                  : row.kind === "frontdoor"
+                    ? `Front-door | ${(row.mediatorIds ?? []).map(name).join(", ")}`
                     : row.kind === "naive"
                       ? "Naive (∅)"
-                      : `Adjust | ${row.conditioningIds.map(name).join(", ")}`}
-                </td>
-                <td className="p-2">{row.identified ? "Yes" : "No"}</td>
-                <td className="p-2">
-                  {value(row.populationBias)}
-                  {row.ivStatus === "weak" ? " · weak" : ""}
-                  {row.ivStatus === "undefined" ? " · undefined" : ""}
-                </td>
-                <td className="p-2">
-                  {row.smallSelectedSample
-                    ? "Insufficient selected sample"
-                    : row.kind === "iv"
-                      ? "v1.1 preview"
-                      : `${value(row.standardError)} / ${row.power === null ? "—" : `${(row.power * 100).toFixed(0)}%`}`}
-                </td>
-              </tr>
-            ))}
+                      : `Adjust | ${row.conditioningIds.map(name).join(", ")}`;
+              const seCell = row.smallSelectedSample
+                ? "Insufficient selected sample"
+                : row.standardError === null
+                  ? row.kind === "frontdoor"
+                    ? "SE closed form pending"
+                    : "—"
+                  : `${value(row.standardError)} / ${row.power === null ? "—" : `${(row.power * 100).toFixed(0)}%`}`;
+              return (
+                <tr className={row.id === report.bestRowId ? "bg-[var(--signal-soft)]" : "border-t border-[var(--line)]"} key={row.id}>
+                  <td className="p-2 font-bold">{label}</td>
+                  <td className="p-2">{row.identified ? "Yes" : "No"}</td>
+                  <td className="p-2">{value(row.populationBias)}{row.ivStatus === "weak" ? " · weak" : ""}{row.ivStatus === "undefined" ? " · undefined" : ""}</td>
+                  <td className="p-2">{seCell}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
-      {report.frontdoorMediatorIds.length ? (
-        <p className="rounded-xl border border-[var(--line)] p-3 text-xs leading-5">
-          Front-door identifies through {report.frontdoorMediatorIds.map(name).join(", ")};
-          estimator preview is v1.1.
-        </p>
+      {report.frontdoorSets.length ? (
+        <p className="rounded-xl border border-[var(--line)] p-3 text-xs leading-5">Front-door identifies through {report.frontdoorSets.map((set) => set.map(name).join(" + ")).join("; ")}.</p>
       ) : null}
-      {selection && (
-        <button
-          className="text-left text-xs text-[var(--signal)] underline"
-          onClick={() =>
-            setNotice(
-              "Selection certification remains out of scope; the table reports exact selected-sample bias.",
-            )
-          }
-          type="button"
-        >
-          Why do the identification and bias columns differ?
-        </button>
-      )}
+      <div className="flex items-center gap-3 text-xs">
+        <button className="rounded-lg border border-[var(--line)] px-3 py-2 font-bold" onClick={() => setPinned(report)} type="button">Pin as A</button>
+        {pinned ? <button className="rounded-lg border border-[var(--line)] px-3 py-2 font-bold" onClick={() => setPinned(null)} type="button">Clear A</button> : <span className="text-[var(--muted)]">Pin the current design as A, then edit measurability / selection / n to see B alongside it.</span>}
+      </div>
+      {pinned ? (
+        <div className="overflow-x-auto rounded-2xl border border-[var(--line)]">
+          <table className="w-full min-w-[35rem] border-collapse text-left text-xs">
+            <caption className="p-2 text-left text-xs font-bold">A vs B — bias and SE deltas</caption>
+            <thead className="bg-[var(--moss-soft)]"><tr><th className="p-2">Row</th><th className="p-2">Presence</th><th className="p-2">A bias</th><th className="p-2">B bias</th><th className="p-2">Δ bias</th><th className="p-2">Δ SE</th></tr></thead>
+            <tbody>
+              {diff.map((entry) => (
+                <tr className="border-t border-[var(--line)]" key={entry.id}>
+                  <td className="p-2 font-mono">{entry.id}</td>
+                  <td className="p-2">{entry.side}</td>
+                  <td className="p-2">{value(entry.leftBias)}</td>
+                  <td className="p-2">{value(entry.rightBias)}</td>
+                  <td className="p-2">{value(entry.biasDelta)}</td>
+                  <td className="p-2">{value(entry.standardErrorDelta)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+      {selection && <button className="text-left text-xs text-[var(--signal)] underline" onClick={() => setNotice("Selection certification remains out of scope; the table reports exact selected-sample bias.")} type="button">Why do the identification and bias columns differ?</button>}
     </section>
   );
 }

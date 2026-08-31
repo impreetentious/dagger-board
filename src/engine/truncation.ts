@@ -131,6 +131,63 @@ export interface TruncationResult extends CovarianceContext {
   eigenvalues: number[];
 }
 
+export interface SequentialTruncationResult extends CovarianceContext {
+  steps: TruncationResult[];
+  effectiveFraction: number;
+  approximation: "exact" | "sequential-gaussian";
+}
+
+/**
+ * Multiple simultaneous selection filters (item 6 of §2.6). The exact joint
+ * truncation for k > 1 correlated selection axes requires multivariate normal
+ * orthant moments (Tallis 1961) — beyond v1.x's pure-arithmetic contract.
+ * This function applies each rule sequentially: each filter runs the §3.10
+ * closed form on the previously-truncated covariance, taking the *marginal*
+ * SD of the selection axis in the running truncated moments (§3.10's
+ * `s_S = √Σ_SS` reading, preserved after each step). The result is exact when
+ * the axes are jointly independent (each filter acts on a separate Gaussian
+ * component); otherwise it is a Gaussian-refit approximation of the true
+ * non-Gaussian truncated law and is labeled as such. The engine gates PSD
+ * after every step; a failure aborts before it can render a spurious number.
+ */
+export function truncateCovarianceSequential(
+  context: CovarianceContext,
+  rules: readonly SelectionRule[],
+): SequentialTruncationResult {
+  if (rules.length === 0) {
+    return {
+      covariance: context.covariance.map((row) => [...row]),
+      indexById: new Map(context.indexById),
+      steps: [],
+      effectiveFraction: 1,
+      approximation: "exact",
+    };
+  }
+  const seen = new Set<string>();
+  for (const rule of rules) {
+    if (seen.has(rule.nodeId)) {
+      throw new Error(`Duplicate selection filter on ${rule.nodeId}; multiple thresholds per node are not supported.`);
+    }
+    seen.add(rule.nodeId);
+  }
+  const steps: TruncationResult[] = [];
+  let running: CovarianceContext = context;
+  let effectiveFraction = 1;
+  for (const rule of rules) {
+    const step = truncateCovariance(running, rule);
+    steps.push(step);
+    running = step;
+    effectiveFraction *= step.effectiveFraction;
+  }
+  return {
+    covariance: running.covariance,
+    indexById: new Map(context.indexById),
+    steps,
+    effectiveFraction,
+    approximation: rules.length === 1 ? "exact" : "sequential-gaussian",
+  };
+}
+
 export function truncateCovariance(
   context: CovarianceContext,
   rule: SelectionRule,
