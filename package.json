@@ -1,6 +1,6 @@
 {
   "name": "daggerboard",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "private": true,
   "engines": {
     "node": ">=20.19.5 <21",
@@ -21,7 +21,7 @@
     "test:full": "npm run typecheck && npm run lint && npm run test && npm run test:e2e"
   },
   "dependencies": {
-    "next": "15.5.4",
+    "next": "15.5.5",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "zod": "^4.1.12",
@@ -35,7 +35,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.5.4",
+    "eslint-config-next": "15.5.5",
     "fast-check": "^4.3.0",
     "prettier": "^3.6.2",
     "serve": "^14.2.5",

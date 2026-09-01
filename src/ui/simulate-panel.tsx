@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 import { proveGraph } from "@/engine/prove";
 import { auditScmIntegrity, edgeParameterKey, matrixTotalEffect } from "@/engine/scm";
-import { convergenceSeries, runSimulationAsync, type SimulationRun } from "@/engine/sim";
+import { convergenceSeries, type SimulationRun } from "@/engine/sim";
 import { frontdoorSetEstimand, ivEstimand, olsEstimand } from "@/engine/stats";
+import { runSimulationInWorker } from "@/lib/sim-worker-client";
 import { useLabStore } from "@/store/lab-store";
 
 function number(value: number | null | undefined): string {
@@ -164,13 +165,7 @@ export function SimulatePanel() {
     setBusy(true);
     setError(null);
     try {
-      setRun(
-        await runSimulationAsync(graph, parameters, exposureId, outcomeId, {
-          seed,
-          n,
-          selection: selection ?? undefined,
-        }),
-      );
+      setRun(await runSimulationInWorker(graph, parameters, exposureId, outcomeId, { seed, n, selection: selection ?? undefined }));
     } catch (cause) {
       setRun(null);
       setError(cause instanceof Error ? cause.message : "Simulation could not run.");
