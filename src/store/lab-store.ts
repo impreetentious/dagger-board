@@ -87,17 +87,11 @@ function nextName(graph: Graph): string {
   return candidate;
 }
 
-function statePatch(
-  snapshot: LabSnapshot,
-  current: LabStore,
-  recordHistory: boolean,
-  notice?: string,
-) {
+function statePatch(snapshot: LabSnapshot, current: LabStore, recordHistory: boolean, notice?: string) {
   return {
     ...snapshot,
     selectedNodeId:
-      current.selectedNodeId &&
-      snapshot.graph.nodes.some((node) => node.id === current.selectedNodeId)
+      current.selectedNodeId && snapshot.graph.nodes.some((node) => node.id === current.selectedNodeId)
         ? current.selectedNodeId
         : null,
     edgeStartId:
@@ -133,8 +127,15 @@ export const useLabStore = create<LabStore>((set, get) => {
     past: [],
     future: [],
     setActiveSurface: (activeSurface) => set({ activeSurface }),
+    // Moving focus/selection between nodes must NOT cancel an in-progress edge:
+    // the "E → navigate → Enter" workflow depends on edgeStartId surviving the
+    // arrow-key navigation (and the node's onFocus) to the target. Only an
+    // explicit deselect (id === null, e.g. a background click) cancels it.
     selectNode: (selectedNodeId) =>
-      set(selectedNodeId === null ? { selectedNodeId, edgeStartId: null } : { selectedNodeId }),
+      set((current) => ({
+        selectedNodeId,
+        edgeStartId: selectedNodeId === null ? null : current.edgeStartId,
+      })),
     clearNotice: () => set({ notice: null }),
     setNotice: (notice) => set({ notice }),
     addNode: (kind = "observed") =>
@@ -187,23 +188,14 @@ export const useLabStore = create<LabStore>((set, get) => {
       attempt(() => {
         const current = get();
         const graph = setRoles(current.graph, { [role]: id });
-        apply(
-          { ...snapshotOf(current), graph },
-          true,
-          `${role === "exposureId" ? "Exposure" : "Outcome"} set.`,
-        );
+        apply({ ...snapshotOf(current), graph }, true, `${role === "exposureId" ? "Exposure" : "Outcome"} set.`);
       }),
     deleteNode: (id) =>
       attempt(() => {
         const current = get();
-        apply(
-          { ...snapshotOf(current), graph: removeNode(current.graph, id) },
-          true,
-          "Node deleted.",
-        );
+        apply({ ...snapshotOf(current), graph: removeNode(current.graph, id) }, true, "Node deleted.");
       }),
-    startEdge: (id) =>
-      set({ edgeStartId: id, selectedNodeId: id, notice: "Choose an edge target." }),
+    startEdge: (id) => set({ edgeStartId: id, selectedNodeId: id, notice: "Choose an edge target." }),
     completeEdge: (id) =>
       attempt(() => {
         const current = get();
@@ -226,11 +218,7 @@ export const useLabStore = create<LabStore>((set, get) => {
     setMeasured: (id, measured) => {
       const current = get();
       const node = current.graph.nodes.find((candidate) => candidate.id === id);
-      if (
-        !node ||
-        node.id === current.graph.roles.exposureId ||
-        node.id === current.graph.roles.outcomeId
-      ) {
+      if (!node || node.id === current.graph.roles.exposureId || node.id === current.graph.roles.outcomeId) {
         set({ notice: "The design must measure its exposure and outcome." });
         return;
       }
@@ -241,10 +229,7 @@ export const useLabStore = create<LabStore>((set, get) => {
         const current = get();
         const parameters = normalizeScmParameters(current.graph, {
           ...current.parameters,
-          edgeCoefficients: {
-            ...current.parameters.edgeCoefficients,
-            [edgeParameterKey(from, to)]: value,
-          },
+          edgeCoefficients: { ...current.parameters.edgeCoefficients, [edgeParameterKey(from, to)]: value },
         });
         apply({ ...snapshotOf(current), parameters }, false);
       }),
@@ -269,11 +254,7 @@ export const useLabStore = create<LabStore>((set, get) => {
     loadExample: (slug) => apply(EXAMPLE_SNAPSHOTS[slug], true, "Example loaded."),
     applyLayoutAssist: () => {
       const current = get();
-      apply(
-        { ...snapshotOf(current), graph: assistedLayout(current.graph) },
-        true,
-        "Layout assist applied.",
-      );
+      apply({ ...snapshotOf(current), graph: assistedLayout(current.graph) }, true, "Layout assist applied.");
     },
     undo: () => {
       const current = get();

@@ -85,12 +85,11 @@ describe("frontdoor and conditional IV", () => {
     const repairedDescendant = fixture("iv-descendant-repair-negative").graph;
 
     expect(enumerateConditionalInstruments(classic, "x", "y")).toEqual([
-      { instrumentId: "z", conditioningSets: [[]], criterion: "conservative" },
+      { instrumentId: "z", conditioningSets: [[]] },
     ]);
     expect(enumerateConditionalInstruments(conditional, "x", "y")).toContainEqual({
       instrumentId: "z",
       conditioningSets: [["w"]],
-      criterion: "conservative",
     });
     expect(checkConditionalInstrument(descendant, "x", "y", "z", new Set()).nonDescendant).toBe(
       false,
@@ -100,14 +99,17 @@ describe("frontdoor and conditional IV", () => {
     );
   });
 
-  it("relaxes the conservative De(X) barrier to De(Y) under the literature criterion", () => {
+  it("keeps the De(X) barrier: descendant instrument Z is excluded on both negative fixtures (V-11)", () => {
+    // Admitting a descendant of X breaks the total-effect Wald identity — see
+    // tests/unit/iv-soundness.test.ts (β_IV = 0.95 ≠ TE = 0.7 on fixture #16).
+    // There is no sound relaxation for the total effect, so the single criterion
+    // (§3.6) correctly keeps Z out of the instrument set in both cases.
     const descendant = fixture("iv-descendant-negative").graph;
     const repairedDescendant = fixture("iv-descendant-repair-negative").graph;
     for (const graph of [descendant, repairedDescendant]) {
-      const conservative = enumerateConditionalInstruments(graph, "x", "y", "conservative");
-      const literature = enumerateConditionalInstruments(graph, "x", "y", "literature");
-      expect(conservative.every((entry) => entry.instrumentId !== "z")).toBe(true);
-      expect(literature.every((entry) => entry.instrumentId !== "z")).toBe(true);
+      expect(
+        enumerateConditionalInstruments(graph, "x", "y").every((entry) => entry.instrumentId !== "z"),
+      ).toBe(true);
     }
   });
 });

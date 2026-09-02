@@ -52,12 +52,26 @@ mutilated-graph d-separation does not compensate for.
 
 The correct literature relaxation (ancestral instruments) uses a different
 mutilation — the "Z↦X→Y" arrow-cut graph in van der Zander, Textor &
-Liśkiewicz — plus an ancestral restriction on `W`. Encoding this soundly is a
-whole verification task on its own (call it V-11); the engine therefore
-exposes an `IvCriterion` parameter surface today whose `"literature"` value
-is a no-op relative to `"conservative"`. When V-11 is completed the same
-parameter surface will pick up the correctly implemented enumeration without
-a call-site change. The Owner review list carries the deferred pull-through.
+Liśkiewicz — plus an ancestral restriction on `W`. Crucially, that mutilation
+identifies the **direct** effect of X on Y, not the total effect this engine
+targets.
+
+**V-11 — resolved (S-017) as a finding, not a relaxed criterion.**
+For the total effect, the Wald identity `Σ_{ZY·W} = TE · Σ_{ZX·W}` is validated
+by a d-separation in `G_out(X)` (all edges out of X removed). That check is a
+faithful proxy for the required covariance `Cov(Z, Y − TE·X | W) = 0` *only*
+when cutting X's outgoing edges leaves the joint law of `{Z} ∪ W` unchanged —
+i.e. exactly when `({Z} ∪ W) ∩ De(X) = ∅`. So the conservative barrier is not
+merely conservative; within the total-effect / `G_out(X)` framework it is
+essentially necessary, and no descendant-admitting relaxation is sound.
+`tests/unit/iv-soundness.test.ts` demonstrates the failure directly: on
+fixture #16 the descendant instrument Z (Z ∈ De(X), Z ∉ De(Y)) yields
+β_IV = 0.95 while TE = 0.7. The genuinely sound ancestral-instrument relaxation
+targets the direct effect, which v1 excludes by owner ruling D-09
+(total-effect only). The misleading no-op `IvCriterion` parameter surface was
+therefore **removed** from `src/engine/iv.ts`; the single sound criterion
+stands. Widening to direct-effect identification is an owner scope decision
+(amend D-09), tracked on the Owner review list — not agent-buildable within v1.
 
 ## V-04 — Implied-CI parity semantics
 
