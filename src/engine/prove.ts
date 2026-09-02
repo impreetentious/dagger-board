@@ -1,5 +1,6 @@
 import { enumerateAdjustmentSets, type AdjustmentResult } from "@/engine/adjust";
 import { classifyPaths, type PathClassificationResult } from "@/engine/classify";
+import { dagToCpdag, type CpdagResult } from "@/engine/cpdag";
 import {
   enumerateFrontdoorMediators,
   enumerateFrontdoorSets,
@@ -30,6 +31,8 @@ export interface ProveReport {
   implications: ConditionalIndependence[];
   directedPathCount: number;
   anyPathCount: number;
+  /** Markov equivalence class of the drawn DAG: which arrows are data-forced vs assumptions (§3.15). */
+  cpdag: CpdagResult;
 }
 
 export function proveGraph(
@@ -50,6 +53,7 @@ export function proveGraph(
       implications: [],
       directedPathCount: 0,
       anyPathCount: 0,
+      cpdag: dagToCpdag(graph),
     };
   }
   const directedPathCount = enumerateDirectedPaths(graph, exposureId, outcomeId).filter(
@@ -85,5 +89,6 @@ export function proveGraph(
     implications,
     directedPathCount,
     anyPathCount,
+    cpdag: dagToCpdag(graph),
   };
 }

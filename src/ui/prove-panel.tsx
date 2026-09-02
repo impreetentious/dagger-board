@@ -201,6 +201,28 @@ export function ProvePanel() {
           )}
         </ul>
       </details>
+
+      <details>
+        <summary className="cursor-pointer text-sm font-bold">Which arrows are assumptions? (equivalence class)</summary>
+        <div className="mt-3 space-y-2 text-xs">
+          <p className="text-[var(--muted)]">
+            {report.cpdag.compelled.length} of {report.cpdag.compelled.length + report.cpdag.reversible.length} edges are <strong>compelled</strong> by the data-testable independencies; {report.cpdag.reversible.length} are <strong>reversible</strong> — modelling assumptions whose direction observational data cannot decide.
+          </p>
+          {report.cpdag.reversible.length ? (
+            <ul className="space-y-1 text-[var(--muted)]">
+              {report.cpdag.reversible.map((edge) => (
+                <li key={`${edge.a}-${edge.b}`}>
+                  {name(edge.a)} — {name(edge.b)} <span className="text-[var(--signal)]">(reversible)</span>
+                </li>
+              ))}
+            </ul>
+          ) : report.cpdag.compelled.length ? (
+            <p className="text-[var(--muted)]">Every drawn arrow is compelled — this DAG is the only member of its equivalence class.</p>
+          ) : (
+            <p className="text-[var(--muted)]">Draw some edges to classify them.</p>
+          )}
+        </div>
+      </details>
     </section>
   );
 }
