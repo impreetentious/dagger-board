@@ -33,9 +33,7 @@ export interface LabSnapshot {
 
 function sortedIds(graph: Graph, ids: Iterable<string>): string[] {
   const indexById = new Map(graph.nodes.map((node) => [node.id, node.idx]));
-  return [...new Set(ids)].sort(
-    (left, right) => (indexById.get(left) ?? 0) - (indexById.get(right) ?? 0),
-  );
+  return [...new Set(ids)].sort((left, right) => (indexById.get(left) ?? 0) - (indexById.get(right) ?? 0));
 }
 
 /**
@@ -50,7 +48,9 @@ export function pruneLabSnapshot(input: unknown): LabSnapshot {
   const allowedConditioning = wire.conditioning.filter((id) => {
     const node = nodeById.get(id);
     return (
-      node?.kind === "observed" && id !== graph.roles.exposureId && id !== graph.roles.outcomeId
+      node?.kind === "observed" &&
+      id !== graph.roles.exposureId &&
+      id !== graph.roles.outcomeId
     );
   });
   const knownEdgeKeys = new Set(graph.edges.map((edge) => `${edge.from}\u0000${edge.to}`));
@@ -80,7 +80,7 @@ export function pruneLabSnapshot(input: unknown): LabSnapshot {
     graph,
     parameters,
     conditioning: sortedIds(graph, allowedConditioning),
-    selection: selectedNode?.kind === "selection" ? (wire.selection ?? null) : null,
+    selection: selectedNode?.kind === "selection" ? wire.selection ?? null : null,
     measured,
     seed: wire.seed,
     n: wire.n,
@@ -123,21 +123,24 @@ function bytesFromBase64Url(value: string): Uint8Array {
   return Uint8Array.from(binary, (character) => character.charCodeAt(0));
 }
 
-async function streamBytes(
-  bytes: Uint8Array,
-  mode: "compress" | "decompress",
-): Promise<Uint8Array> {
+async function streamBytes(bytes: Uint8Array, mode: "compress" | "decompress"): Promise<Uint8Array> {
   const Stream = mode === "compress" ? CompressionStream : DecompressionStream;
   if (!Stream) throw new Error("This browser cannot encode a compressed graph fragment.");
   const stream = new Stream("deflate-raw");
-  const writer = stream.writable.getWriter();
   const copy = new Uint8Array(bytes.byteLength);
   copy.set(bytes);
-  const [, output] = await Promise.all([
-    writer.write(copy as unknown as BufferSource).then(() => writer.close()),
-    new Response(stream.readable).arrayBuffer(),
-  ]);
-  return new Uint8Array(output);
+  // Write and read CONCURRENTLY. Awaiting write()+close() *before* draining the
+  // readable deadlocks in browsers: the transform applies backpressure and the
+  // writer never settles because nothing is consuming the output. (Node's
+  // streams don't block on this, which is why the unit tests passed while the
+  // browser hung forever — leaving encodeGraphFragment permanently pending.)
+  const writer = stream.writable.getWriter();
+  const pump = writer
+    .write(copy as unknown as BufferSource)
+    .then(() => writer.close());
+  const output = new Uint8Array(await new Response(stream.readable).arrayBuffer());
+  await pump;
+  return output;
 }
 
 export async function encodeGraphFragment(snapshot: LabSnapshot): Promise<string> {

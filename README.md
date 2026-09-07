@@ -2,7 +2,7 @@
 
 > Draw your assumptions. See your bias. Before the data.
 
-**Status:** v0.11.7 — P0 → P9 implementation is on `main` (graph editor, identification, simulation, design surfaces, curriculum, analysis design record). Static export; v1.0.0 tagging and public deploy remain separate release steps.
+**Status:** v0.11.8 — P0 → P9 implementation is on `main` (graph editor, identification, simulation, design surfaces, curriculum, analysis design record). Static export; v1.0.0 tagging and public deploy remain separate release steps.
 
 ---
 
@@ -82,4 +82,4 @@ This IST timestamp rule is permanent for all future workflows, commits, and AI a
 Follow this format for version control:
 
 * **Base Format Version:** 0.0.0 — the version of the version-block schema itself (the shape of these lines); it is bumped only when this block's structure changes, not on every commit.
-* **Product Version:** `v0.11.7_2026-09-02_22:58:04` (IST)
+* **Product Version:** `v0.11.8_2026-09-08_02:43:36` (IST)

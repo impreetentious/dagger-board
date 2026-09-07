@@ -13,7 +13,8 @@ test("all six Learn scenarios expose their /learn/[slug] entry from the index", 
     "selection-bias",
     "measurement-error",
   ]) {
-    await expect(page.locator(`a[href^='/learn/${slug}']`)).toBeVisible();
+    // trailingSlash: true in next.config → static-export hrefs carry the slash.
+    await expect(page.locator(`a[href='/learn/${slug}/']`)).toBeVisible();
   }
 });
 
@@ -27,5 +28,7 @@ test("a scenario is playable end-to-end (setup → act → observe → reveal)",
 
   const summary = page.getByTestId("learn-choice-result");
   await expect(summary).toContainText(/recommended read/);
+  // trailingSlash: true → the workbench link is "/lab/#g=…" (the slash is
+  // harmless; /lab/ decodes the same fragment).
   await expect(page.getByTestId("open-in-lab")).toHaveAttribute("href", /^\/lab\/?#g=/);
 });

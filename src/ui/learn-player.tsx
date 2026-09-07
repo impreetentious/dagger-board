@@ -32,9 +32,16 @@ export function LearnPlayer({ scenario, snapshot }: Props) {
   const [labHref, setLabHref] = useState<string>("/lab");
   useEffect(() => {
     let cancelled = false;
-    void encodeGraphFragment(snapshot).then((fragment) => {
-      if (!cancelled) setLabHref(`/lab${fragment}`);
-    });
+    encodeGraphFragment(snapshot)
+      .then((fragment) => {
+        if (!cancelled) setLabHref(`/lab${fragment}`);
+      })
+      .catch(() => {
+        // A browser without deflate compression can't carry the graph in the
+        // URL; degrade to the plain workbench link instead of leaving an
+        // unhandled rejection and a permanently stale href.
+        if (!cancelled) setLabHref("/lab");
+      });
     return () => {
       cancelled = true;
     };
