@@ -1,6 +1,7 @@
 # Accessibility audit — P8
 
-Recorded 17 Aug 2026 IST (audit session; per decision D-15).
+Recorded 17 Aug 2026; re-verified and corrected 29 Aug 2026 (IST, D-15
+mapped commit slots).
 
 ## Scope
 
@@ -9,11 +10,19 @@ Recorded 17 Aug 2026 IST (audit session; per decision D-15).
 
 ## Automated pass
 
-- `axe-core` (via `@axe-core/playwright`) runs against the `/lab` editor in
-  `tests/e2e/editor.spec.ts` and reports zero violations.
+- `axe-core` (via `@axe-core/playwright`) runs against the `/lab` editor
+  (`.include("main")`) in `tests/e2e/editor.spec.ts` and reports zero
+  violations. This is now genuinely zero: the earlier record overstated the
+  result. The active surface-tab number badge rendered `--signal` (#b14e2d) on
+  the active `--signal-soft` (#f5ded4), only 4.07:1 — below AA. It now uses a
+  dedicated `--signal-strong` token (5.03:1 light / 5.15:1 dark) and the axe
+  assertion passes with zero serious violations.
 - The audit fixture uses the M-bias canon graph so the assertion covers all
   three node kinds (`observed`, `latent`, and — via the Berkson lesson — the
   `selection` kind), not just the default state.
+- Single-`h1` structure: the `/lab` shell owns the page `h1`; each surface
+  panel (Draw/Prove/Simulate/Design/Communicate) now heads with `h2`, so the
+  document exposes exactly one top-level heading per route.
 
 ## Node-kind encoding
 
