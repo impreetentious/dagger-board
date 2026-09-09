@@ -2,10 +2,7 @@
 
 import { buildScmModel } from "@/engine/scm";
 import { generateSimulationDataAsync } from "@/engine/sim";
-import type {
-  SimWorkerRunMessage,
-  SimWorkerOutgoing,
-} from "@/lib/sim-worker-messages";
+import type { SimWorkerRunMessage, SimWorkerOutgoing } from "@/lib/sim-worker-messages";
 
 const worker = self as unknown as DedicatedWorkerGlobalScope;
 
@@ -14,7 +11,11 @@ worker.onmessage = async (event: MessageEvent<SimWorkerRunMessage>) => {
   if (!message || message.kind !== "run") return;
   try {
     const model = buildScmModel(message.graph, message.parameters);
-    const data = await generateSimulationDataAsync(model, message.options, message.chunkSize ?? 8192);
+    const data = await generateSimulationDataAsync(
+      model,
+      message.options,
+      message.chunkSize ?? 8192,
+    );
     const columns: Record<string, ArrayBuffer> = {};
     const transfers: ArrayBuffer[] = [];
     for (const nodeId of data.nodeIds) {

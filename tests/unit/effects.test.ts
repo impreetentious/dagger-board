@@ -6,7 +6,12 @@ import {
   directEdgeCoefficient,
   pathSpecificEffects,
 } from "@/engine/effects";
-import { defaultScmParameters, matrixTotalEffect, buildScmModel, type SCMParameters } from "@/engine/scm";
+import {
+  defaultScmParameters,
+  matrixTotalEffect,
+  buildScmModel,
+  type SCMParameters,
+} from "@/engine/scm";
 import { Tier1FixtureSchema } from "../../fixtures/tier1/schema";
 
 function fixture(file: string) {
@@ -16,7 +21,8 @@ function fixture(file: string) {
 
 function halfParameters(graph: ReturnType<typeof fixture>["graph"]): SCMParameters {
   const parameters = defaultScmParameters(graph);
-  for (const key of Object.keys(parameters.edgeCoefficients)) parameters.edgeCoefficients[key] = 0.5;
+  for (const key of Object.keys(parameters.edgeCoefficients))
+    parameters.edgeCoefficients[key] = 0.5;
   return parameters;
 }
 
@@ -50,6 +56,8 @@ describe("direct and path-specific effects (item 3 of §2.6)", () => {
     const decomposition = pathSpecificEffects(setFd.graph, parameters, "x", "y");
     expect(decomposition.totalEffect).toBeCloseTo(te, 12);
     expect(decomposition.paths).toHaveLength(2);
-    expect(decomposition.paths.every((entry) => Math.abs(entry.contribution - 0.25) < 1e-12)).toBe(true);
+    expect(decomposition.paths.every((entry) => Math.abs(entry.contribution - 0.25) < 1e-12)).toBe(
+      true,
+    );
   });
 });

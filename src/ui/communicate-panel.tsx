@@ -50,7 +50,9 @@ export function CommunicatePanel() {
   return (
     <section aria-labelledby="communicate-panel-title" className="space-y-5 adr-panel">
       <div>
-        <p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">COMMUNICATE</p>
+        <p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">
+          COMMUNICATE
+        </p>
         <h2 className="mt-2 text-2xl font-black tracking-[-0.05em]" id="communicate-panel-title">
           Ship the reasoning, not just the plot.
         </h2>
@@ -64,7 +66,9 @@ export function CommunicatePanel() {
         <button
           className="tool-button"
           data-testid="adr-download"
-          onClick={() => download(`daggerboard-adr-${doc.appVersion}.json`, JSON.stringify(doc, null, 2))}
+          onClick={() =>
+            download(`daggerboard-adr-${doc.appVersion}.json`, JSON.stringify(doc, null, 2))
+          }
           type="button"
         >
           Download ADR JSON
@@ -74,25 +78,34 @@ export function CommunicatePanel() {
         </button>
       </div>
       <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4 space-y-3">
-        <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">MODEL</p>
-        <p className="text-sm">
-          Exposure:{" "}
-          <span className="font-mono">{doc.exposureId ? names[doc.exposureId] : "—"}</span>. Outcome:{" "}
-          <span className="font-mono">{doc.outcomeId ? names[doc.outcomeId] : "—"}</span>.
+        <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">
+          MODEL
         </p>
         <p className="text-sm">
-          Verdict: <span className="font-bold">{doc.identificationVerdict}</span>. Timestamp: static build ({doc.appVersion}).
+          Exposure:{" "}
+          <span className="font-mono">{doc.exposureId ? names[doc.exposureId] : "—"}</span>.
+          Outcome: <span className="font-mono">{doc.outcomeId ? names[doc.outcomeId] : "—"}</span>.
+        </p>
+        <p className="text-sm">
+          Verdict: <span className="font-bold">{doc.identificationVerdict}</span>. Timestamp: static
+          build ({doc.appVersion}).
         </p>
       </div>
       <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4">
-        <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">ASSUMED ABSENT</p>
+        <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">
+          ASSUMED ABSENT
+        </p>
         <ul className="mt-2 max-h-40 space-y-1 overflow-y-auto text-sm text-[var(--muted)]">
           {doc.absentEdges.map((edge) => (
             <li key={`${edge.u}--${edge.v}`}>
-              no direct effect between <span className="font-mono">{names[edge.u]}</span> and <span className="font-mono">{names[edge.v]}</span> in either direction (as drawn)
+              no direct effect between <span className="font-mono">{names[edge.u]}</span> and{" "}
+              <span className="font-mono">{names[edge.v]}</span> in either direction (as drawn)
             </li>
           ))}
-          <li>all disturbances are mutually independent — no common causes beyond the latent nodes explicitly drawn</li>
+          <li>
+            all disturbances are mutually independent — no common causes beyond the latent nodes
+            explicitly drawn
+          </li>
           {doc.selection ? (
             <li>
               selection rule active: keep the top {(1 - doc.selection.quantile) * 100}% of{" "}
@@ -102,14 +115,20 @@ export function CommunicatePanel() {
         </ul>
       </div>
       <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4">
-        <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">KNOWN THREATS</p>
+        <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">
+          KNOWN THREATS
+        </p>
         {doc.threats.length === 0 ? (
-          <p className="mt-2 text-sm text-[var(--muted)]">No open biasing paths under the current design.</p>
+          <p className="mt-2 text-sm text-[var(--muted)]">
+            No open biasing paths under the current design.
+          </p>
         ) : (
           <ul className="mt-2 space-y-1 text-sm">
             {doc.threats.map((threat, index) => (
               <li key={index}>
-                <span className="font-mono">{threat.pathIds.map((id) => names[id] ?? id).join(" → ")}</span>{" "}
+                <span className="font-mono">
+                  {threat.pathIds.map((id) => names[id] ?? id).join(" → ")}
+                </span>{" "}
                 <span className="text-[var(--muted)]">— {threat.label}</span>
               </li>
             ))}

@@ -4,7 +4,12 @@ import { enumerateAdjustmentSets } from "@/engine/adjust";
 import { enumerateFrontdoorSets } from "@/engine/frontdoor";
 import { enumerateConditionalInstruments } from "@/engine/iv";
 import { validateGraph, type Graph, type GraphNode } from "@/engine/graph";
-import { auditScmIntegrity, buildScmModel, defaultScmParameters, matrixTotalEffect } from "@/engine/scm";
+import {
+  auditScmIntegrity,
+  buildScmModel,
+  defaultScmParameters,
+  matrixTotalEffect,
+} from "@/engine/scm";
 import { frontdoorSetEstimand, ivMultiplicativeIdentity, olsEstimand } from "@/engine/stats";
 
 function seededUniform(seed: number): () => number {
@@ -134,5 +139,4 @@ describe("PROP-4 through PROP-6", () => {
       { seed: 0x306, numRuns: 100 },
     );
   });
-
 });

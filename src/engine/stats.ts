@@ -186,8 +186,8 @@ export function frontdoorSetEstimand(
   const sigmaZZgivenX: Matrix = uniqueMediators.map((rowId) =>
     uniqueMediators.map((columnId) => partialCovariance(context, rowId, columnId, [exposureId])),
   );
-  const sigmaZYgivenX = uniqueMediators.map(
-    (id) => partialCovariance(context, id, outcomeId, [exposureId]),
+  const sigmaZYgivenX = uniqueMediators.map((id) =>
+    partialCovariance(context, id, outcomeId, [exposureId]),
   );
   const inverseSigmaZZgivenX = inverse(sigmaZZgivenX);
   const secondStage = inverseSigmaZZgivenX.map((row) =>

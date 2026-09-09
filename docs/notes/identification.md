@@ -59,7 +59,7 @@ targets.
 **V-11 — resolved (S-017) as a finding, not a relaxed criterion.**
 For the total effect, the Wald identity `Σ_{ZY·W} = TE · Σ_{ZX·W}` is validated
 by a d-separation in `G_out(X)` (all edges out of X removed). That check is a
-faithful proxy for the required covariance `Cov(Z, Y − TE·X | W) = 0` *only*
+faithful proxy for the required covariance `Cov(Z, Y − TE·X | W) = 0` _only_
 when cutting X's outgoing edges leaves the joint law of `{Z} ∪ W` unchanged —
 i.e. exactly when `({Z} ∪ W) ∩ De(X) = ∅`. So the conservative barrier is not
 merely conservative; within the total-effect / `G_out(X)` framework it is
@@ -99,6 +99,7 @@ Resolved against Pearl (2009), _Causality: Models, Reasoning, and Inference_,
 Pearl's **Definition 3.3.3 (front-door)** applies to a **set** Z (not a single
 node) and reads verbatim: a set of variables Z is said to satisfy the
 front-door criterion relative to an ordered pair (X, Y) if
+
 1. Z intercepts all directed paths from X to Y;
 2. there is no back-door path from X to Z; and
 3. all back-door paths from Z to Y are blocked by X.

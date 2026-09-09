@@ -166,10 +166,24 @@ export function evaluateDesign(
     if (!measured[instrument.instrumentId]) continue;
     for (const conditionedIds of instrument.conditioningSets) {
       if (!conditionedIds.every((id) => measured[id])) continue;
-      const estimate = ivEstimand(covariance, instrument.instrumentId, exposureId, outcomeId, conditionedIds, totalEffect);
+      const estimate = ivEstimand(
+        covariance,
+        instrument.instrumentId,
+        exposureId,
+        outcomeId,
+        conditionedIds,
+        totalEffect,
+      );
       const definedForSe = estimate.status !== "undefined" && !(truncation && effectiveN < 50);
       const standardError = definedForSe
-        ? ivTestStandardError(covariance, instrument.instrumentId, exposureId, outcomeId, conditionedIds, effectiveN)
+        ? ivTestStandardError(
+            covariance,
+            instrument.instrumentId,
+            exposureId,
+            outcomeId,
+            conditionedIds,
+            effectiveN,
+          )
         : null;
       const smallSelectedSample = Boolean(truncation && effectiveN < 50);
       rows.push({
@@ -218,13 +232,12 @@ export function evaluateDesign(
 
   rows.sort(comparator(graph));
   const first = rows[0];
-  const bestRowId = first && first.populationBias !== null && Math.abs(first.populationBias) <= 1e-9 ? first.id : null;
+  const bestRowId =
+    first && first.populationBias !== null && Math.abs(first.populationBias) <= 1e-9
+      ? first.id
+      : null;
   const selectionApproximation: DesignReport["selectionApproximation"] =
-    rules.length === 0
-      ? "none"
-      : rules.length === 1
-        ? "exact"
-        : "sequential-gaussian";
+    rules.length === 0 ? "none" : rules.length === 1 ? "exact" : "sequential-gaussian";
   return {
     rows,
     totalEffect,
@@ -275,8 +288,7 @@ export function diffDesignReports(left: DesignReport, right: DesignReport): Desi
       rightBias,
       leftStandardError,
       rightStandardError,
-      biasDelta:
-        leftBias === null || rightBias === null ? null : rightBias - leftBias,
+      biasDelta: leftBias === null || rightBias === null ? null : rightBias - leftBias,
       standardErrorDelta:
         leftStandardError === null || rightStandardError === null
           ? null

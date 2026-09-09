@@ -7,7 +7,10 @@ import {
   type FrontdoorResult,
   type FrontdoorSetResult,
 } from "@/engine/frontdoor";
-import { enumerateImpliedConditionalIndependencies, type ConditionalIndependence } from "@/engine/implications";
+import {
+  enumerateImpliedConditionalIndependencies,
+  type ConditionalIndependence,
+} from "@/engine/implications";
 import { enumerateConditionalInstruments, type ConditionalInstrument } from "@/engine/iv";
 import { enumerateDirectedPaths, enumerateSimplePaths } from "@/engine/paths";
 import type { Graph } from "@/engine/graph";
@@ -68,7 +71,8 @@ export function proveGraph(
   const instruments = enumerateConditionalInstruments(graph, exposureId, outcomeId);
   const paths = classifyPaths(graph, exposureId, outcomeId, conditioned, selection);
   const implications = enumerateImpliedConditionalIndependencies(graph, selection);
-  const frontdoorAvailable = frontdoor.mediatorIds.length > 0 || frontdoorSets.minimalSets.length > 0;
+  const frontdoorAvailable =
+    frontdoor.mediatorIds.length > 0 || frontdoorSets.minimalSets.length > 0;
   const verdict: IdentificationVerdict =
     directedPathCount === 0
       ? "zero-total-effect"

@@ -132,11 +132,5 @@ export function checkFrontdoorSet(
     (path) => path.length > 1,
   );
   if (directedPaths.length === 0) return false;
-  return satisfiesFrontdoorSet(
-    graph,
-    exposureId,
-    outcomeId,
-    [...candidate],
-    directedPaths,
-  );
+  return satisfiesFrontdoorSet(graph, exposureId, outcomeId, [...candidate], directedPaths);
 }

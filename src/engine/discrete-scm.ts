@@ -77,7 +77,10 @@ export function normalizeDiscreteParameters(
         }
       }
     }
-    const coefficients: Record<string, number> = { ...fallback.coefficients, ...supplied?.coefficients };
+    const coefficients: Record<string, number> = {
+      ...fallback.coefficients,
+      ...supplied?.coefficients,
+    };
     logits[node.id] = {
       intercept: supplied?.intercept ?? fallback.intercept,
       coefficients,
@@ -185,7 +188,13 @@ export function averageCausalEffect(
     const interventions = new Map<string, 0 | 1>([[exposureId, value]]);
     let expectation = 0;
     for (const assignment of assignments) {
-      const probability = assignmentProbability(graph, normalized, order, assignment, interventions);
+      const probability = assignmentProbability(
+        graph,
+        normalized,
+        order,
+        assignment,
+        interventions,
+      );
       if (probability === 0) continue;
       const outcome = assignment[order.indexById.get(outcomeId) as number];
       expectation += probability * outcome;

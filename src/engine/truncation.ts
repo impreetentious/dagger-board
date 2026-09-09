@@ -166,7 +166,9 @@ export function truncateCovarianceSequential(
   const seen = new Set<string>();
   for (const rule of rules) {
     if (seen.has(rule.nodeId)) {
-      throw new Error(`Duplicate selection filter on ${rule.nodeId}; multiple thresholds per node are not supported.`);
+      throw new Error(
+        `Duplicate selection filter on ${rule.nodeId}; multiple thresholds per node are not supported.`,
+      );
     }
     seen.add(rule.nodeId);
   }

@@ -61,7 +61,11 @@ describe("WU-6.2 design table", () => {
         expect(entry.biasDelta).toBeNull();
       }
     }
-    expect(diffDesignReports(other, base).map((entry) => entry.id).sort()).toEqual(diff.map((entry) => entry.id).sort());
+    expect(
+      diffDesignReports(other, base)
+        .map((entry) => entry.id)
+        .sort(),
+    ).toEqual(diff.map((entry) => entry.id).sort());
   });
 
   it("threads multiple sequential selection filters through the design table", () => {
@@ -87,17 +91,29 @@ describe("WU-6.2 design table", () => {
 
   it("surfaces the set-valued frontdoor row and an asymptotic IV SE alongside OLS", () => {
     const setFd = fixture("19-set-frontdoor.json");
-    const report = evaluateDesign(setFd.graph, setFd.parameters ?? defaultScmParameters(setFd.graph), allMeasured(setFd.graph), undefined, 10000);
+    const report = evaluateDesign(
+      setFd.graph,
+      setFd.parameters ?? defaultScmParameters(setFd.graph),
+      allMeasured(setFd.graph),
+      undefined,
+      10000,
+    );
     const frontdoorRow = report.rows.find((row) => row.kind === "frontdoor");
     expect(frontdoorRow?.mediatorIds).toEqual(["m1", "m2"]);
     expect(frontdoorRow?.estimand).toBeCloseTo(0.5, 12);
     expect(report.frontdoorSets).toEqual([["m1", "m2"]]);
 
     const iv = fixture("09-iv.json");
-    const ivReport = evaluateDesign(iv.graph, iv.parameters ?? defaultScmParameters(iv.graph), allMeasured(iv.graph), undefined, 10000);
+    const ivReport = evaluateDesign(
+      iv.graph,
+      iv.parameters ?? defaultScmParameters(iv.graph),
+      allMeasured(iv.graph),
+      undefined,
+      10000,
+    );
     const ivRow = ivReport.rows.find((row) => row.kind === "iv");
     expect(ivRow?.standardError).not.toBeNull();
-    expect((ivRow?.power ?? 0)).toBeGreaterThan(0);
+    expect(ivRow?.power ?? 0).toBeGreaterThan(0);
     expect(ivRow?.seLabel).toBe("iv-asymptotic");
   });
 });

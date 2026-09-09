@@ -100,10 +100,7 @@
     },
     "olsNaive": 0.7,
     "frontdoorSet": {
-      "mediatorIds": [
-        "m1",
-        "m2"
-      ],
+      "mediatorIds": ["m1", "m2"],
       "estimand": 0.5
     }
   }

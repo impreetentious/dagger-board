@@ -108,7 +108,9 @@ describe("frontdoor and conditional IV", () => {
     const repairedDescendant = fixture("iv-descendant-repair-negative").graph;
     for (const graph of [descendant, repairedDescendant]) {
       expect(
-        enumerateConditionalInstruments(graph, "x", "y").every((entry) => entry.instrumentId !== "z"),
+        enumerateConditionalInstruments(graph, "x", "y").every(
+          (entry) => entry.instrumentId !== "z",
+        ),
       ).toBe(true);
     }
   });

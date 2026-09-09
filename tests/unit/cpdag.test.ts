@@ -20,26 +20,57 @@ const undirectedKey = (a: string, b: string) => (a < b ? `${a}-${b}` : `${b}-${a
 
 describe("dagToCpdag — hand-verified contract cases (§3.15)", () => {
   it("a chain X→M→Y has no compelled edges (both directions are equivalent)", () => {
-    const { compelled, reversible } = dagToCpdag(graphOf(["x", "m", "y"], [["x", "m"], ["m", "y"]]));
+    const { compelled, reversible } = dagToCpdag(
+      graphOf(
+        ["x", "m", "y"],
+        [
+          ["x", "m"],
+          ["m", "y"],
+        ],
+      ),
+    );
     expect(compelled).toEqual([]);
     expect(reversible.map((e) => undirectedKey(e.a, e.b)).sort()).toEqual(["m-x", "m-y"]);
   });
 
   it("a fork X←Z→Y (no collider) is fully reversible", () => {
-    const { compelled, reversible } = dagToCpdag(graphOf(["z", "x", "y"], [["z", "x"], ["z", "y"]]));
+    const { compelled, reversible } = dagToCpdag(
+      graphOf(
+        ["z", "x", "y"],
+        [
+          ["z", "x"],
+          ["z", "y"],
+        ],
+      ),
+    );
     expect(compelled).toEqual([]);
     expect(reversible.map((e) => undirectedKey(e.a, e.b)).sort()).toEqual(["x-z", "y-z"]);
   });
 
   it("an unshielded collider X→C←Y is fully compelled", () => {
-    const { compelled, reversible } = dagToCpdag(graphOf(["x", "y", "c"], [["x", "c"], ["y", "c"]]));
+    const { compelled, reversible } = dagToCpdag(
+      graphOf(
+        ["x", "y", "c"],
+        [
+          ["x", "c"],
+          ["y", "c"],
+        ],
+      ),
+    );
     expect(reversible).toEqual([]);
     expect(compelled.map((e) => key(e.from, e.to)).sort()).toEqual(["x->c", "y->c"]);
   });
 
   it("Meek R1 propagates: X→C←Y plus C→D compels C→D", () => {
     const { compelled, reversible } = dagToCpdag(
-      graphOf(["x", "y", "c", "d"], [["x", "c"], ["y", "c"], ["c", "d"]]),
+      graphOf(
+        ["x", "y", "c", "d"],
+        [
+          ["x", "c"],
+          ["y", "c"],
+          ["c", "d"],
+        ],
+      ),
     );
     expect(reversible).toEqual([]);
     expect(compelled.map((e) => key(e.from, e.to)).sort()).toEqual(["c->d", "x->c", "y->c"]);
@@ -47,7 +78,14 @@ describe("dagToCpdag — hand-verified contract cases (§3.15)", () => {
 
   it("a shielded triangle X→Y→Z, X→Z has no v-structure and stays reversible", () => {
     const { compelled } = dagToCpdag(
-      graphOf(["x", "y", "z"], [["x", "y"], ["y", "z"], ["x", "z"]]),
+      graphOf(
+        ["x", "y", "z"],
+        [
+          ["x", "y"],
+          ["y", "z"],
+          ["x", "z"],
+        ],
+      ),
     );
     expect(compelled).toEqual([]);
   });
@@ -56,14 +94,28 @@ describe("dagToCpdag — hand-verified contract cases (§3.15)", () => {
 describe("equivalenceClassDags (§3.15)", () => {
   it("a chain X—M—Y has exactly three member DAGs (no orientation is a collider)", () => {
     const { dags, truncated } = equivalenceClassDags(
-      graphOf(["x", "m", "y"], [["x", "m"], ["m", "y"]]),
+      graphOf(
+        ["x", "m", "y"],
+        [
+          ["x", "m"],
+          ["m", "y"],
+        ],
+      ),
     );
     expect(truncated).toBe(false);
     expect(dags.length).toBe(3); // X→M→Y, X←M→Y, X←M←Y — never X→M←Y
   });
 
   it("a compelled collider X→C←Y has exactly one member (itself)", () => {
-    const { dags } = equivalenceClassDags(graphOf(["x", "y", "c"], [["x", "c"], ["y", "c"]]));
+    const { dags } = equivalenceClassDags(
+      graphOf(
+        ["x", "y", "c"],
+        [
+          ["x", "c"],
+          ["y", "c"],
+        ],
+      ),
+    );
     expect(dags.length).toBe(1);
   });
 
@@ -131,7 +183,10 @@ function randomDag(rng: () => number, n: number): Graph {
       if (rng() < 0.45) edges.push({ from: ids[i]!, to: ids[j]! });
     }
   }
-  return graphOf(ids, edges.map((e) => [e.from, e.to]));
+  return graphOf(
+    ids,
+    edges.map((e) => [e.from, e.to]),
+  );
 }
 
 describe("dagToCpdag — DAGitty parity oracle (§3.15)", () => {

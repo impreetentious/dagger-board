@@ -24,9 +24,7 @@ function reconstruct(
   message: SimWorkerDoneMessage,
 ): SimulationRun {
   const indexById = new Map(message.nodeIds.map((id, index) => [id, index]));
-  const columns = new Map(
-    message.nodeIds.map((id) => [id, new Float64Array(message.columns[id])]),
-  );
+  const columns = new Map(message.nodeIds.map((id) => [id, new Float64Array(message.columns[id])]));
   const keptRowIndices = new Uint32Array(message.keptRowIndices);
   const data = {
     nodeIds: [...message.nodeIds],

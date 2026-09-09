@@ -69,7 +69,14 @@ describe("conditional-IV soundness boundary (§3.6, V-11)", () => {
       for (const conditionedIds of instrument.conditioningSets) {
         expect(
           Math.abs(
-            ivMultiplicativeIdentity(model, instrument.instrumentId, "x", "y", conditionedIds, totalEffect),
+            ivMultiplicativeIdentity(
+              model,
+              instrument.instrumentId,
+              "x",
+              "y",
+              conditionedIds,
+              totalEffect,
+            ),
           ),
         ).toBeLessThan(1e-9);
       }
