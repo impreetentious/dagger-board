@@ -86,4 +86,4 @@ MIT © Sidakpreet Singh — see [LICENSE](LICENSE). Application code is MIT; see
 
 ---
 
-**Version:** v0.13.0
+**Version:** v0.13.1
