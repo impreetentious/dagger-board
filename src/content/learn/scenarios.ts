@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { EXAMPLE_SNAPSHOTS } from "@/content/examples";
 import type { LabSnapshot } from "@/lib/codec";
 
@@ -15,31 +15,31 @@ export const LearnChoiceSchema = z.object({
 
 export const LearnScenarioSchema = z.object({
   slug: z.string(),
-  ordinal: z.number().int().positive(),
+  ordinal: z.number().check(z.int(), z.positive()),
   title: z.string(),
   oneLiner: z.string(),
   fixtureId: z.string(),
   setup: z.string(),
   actQuestion: z.string(),
-  choices: z.array(LearnChoiceSchema).min(2),
+  choices: z.array(LearnChoiceSchema).check(z.minLength(2)),
   observe: z.string(),
   reveal: z.object({
     lesson: z.string(),
     populationBias: z.string(),
     pathAnatomy: z.string(),
   }),
-  secondaryReference: z
-    .object({
+  secondaryReference: z.optional(
+    z.object({
       label: z.string(),
       value: z.string(),
-    })
-    .optional(),
+    }),
+  ),
 });
 
 export type LearnScenario = z.infer<typeof LearnScenarioSchema>;
 export type LearnChoice = z.infer<typeof LearnChoiceSchema>;
 
-export const LEARN_SCENARIOS: readonly LearnScenario[] = LearnScenarioSchema.array().parse([
+export const LEARN_SCENARIOS: readonly LearnScenario[] = z.array(LearnScenarioSchema).parse([
   {
     slug: "confounding",
     ordinal: 1,

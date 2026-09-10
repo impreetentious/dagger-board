@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { GraphSchema } from "@/engine/graph";
 import { SCMParametersSchema } from "@/engine/scm";
 
@@ -6,13 +6,13 @@ const DSeparationExpectationSchema = z.object({
   from: z.string(),
   to: z.string(),
   conditioned: z.array(z.string()),
-  selectionNodeId: z.string().optional(),
+  selectionNodeId: z.optional(z.string()),
   separated: z.boolean(),
 });
 
 const PathExpectationSchema = z.object({
   conditioned: z.array(z.string()),
-  selectionNodeId: z.string().optional(),
+  selectionNodeId: z.optional(z.string()),
   primaryLabels: z.array(z.string()),
 });
 
@@ -22,13 +22,14 @@ export const Tier1FixtureSchema = z.object({
   derivation: z.string(),
   graph: GraphSchema,
   parameters: z.optional(SCMParametersSchema),
-  expectedP3: z.unknown().optional(),
-  expectedP1: z
-    .object({
-      dSeparation: z.array(DSeparationExpectationSchema).default([]),
-      paths: z.array(PathExpectationSchema).default([]),
-    })
-    .default({ dSeparation: [], paths: [] }),
+  expectedP3: z.optional(z.unknown()),
+  expectedP1: z._default(
+    z.object({
+      dSeparation: z._default(z.array(DSeparationExpectationSchema), []),
+      paths: z._default(z.array(PathExpectationSchema), []),
+    }),
+    { dSeparation: [], paths: [] },
+  ),
 });
 
 export type Tier1Fixture = z.infer<typeof Tier1FixtureSchema>;

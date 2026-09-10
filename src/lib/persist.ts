@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { pruneLabSnapshot, type LabSnapshot } from "@/lib/codec";
 
 const LIBRARY_KEY = "causal-lab.library.v1";
@@ -11,9 +11,9 @@ export interface SavedLabModel {
 }
 
 const SavedModelWireSchema = z.object({
-  id: z.string().min(1),
-  name: z.string().min(1).max(64),
-  savedAt: z.string().min(1),
+  id: z.string().check(z.minLength(1)),
+  name: z.string().check(z.minLength(1), z.maxLength(64)),
+  savedAt: z.string().check(z.minLength(1)),
   snapshot: z.unknown(),
 });
 

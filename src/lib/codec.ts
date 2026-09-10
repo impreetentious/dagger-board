@@ -1,23 +1,23 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { GraphSchema, validateGraph, type Graph } from "@/engine/graph";
 import { normalizeScmParameters, SCMParametersSchema, type SCMParameters } from "@/engine/scm";
 
 export const URL_FRAGMENT_LIMIT = 2000;
 
 const SelectionSchema = z.object({
-  nodeId: z.string().min(1),
-  quantile: z.number().finite().min(0.01).max(0.99),
+  nodeId: z.string().check(z.minLength(1)),
+  quantile: z.number().check(z.gte(0.01), z.lte(0.99)),
 });
 
 const LabSnapshotWireSchema = z.object({
   v: z.literal(1),
   graph: GraphSchema,
   parameters: z.optional(SCMParametersSchema),
-  conditioning: z.array(z.string()).default([]),
-  selection: z.optional(SelectionSchema.nullable()),
-  measured: z.record(z.string(), z.boolean()).default({}),
-  seed: z.number().int().min(0).max(0xffff_ffff).default(314159),
-  n: z.number().int().min(100).max(1_000_000).default(10_000),
+  conditioning: z._default(z.array(z.string()), []),
+  selection: z.optional(z.nullable(SelectionSchema)),
+  measured: z._default(z.record(z.string(), z.boolean()), {}),
+  seed: z._default(z.number().check(z.int(), z.gte(0), z.lte(0xffff_ffff)), 314159),
+  n: z._default(z.number().check(z.int(), z.gte(100), z.lte(1_000_000)), 10_000),
 });
 
 export interface LabSnapshot {
