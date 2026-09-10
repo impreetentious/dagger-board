@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { parentsOf } from "@/engine/graph";
 import {
   assertScmIntegrity,
@@ -19,11 +19,14 @@ import { truncateCovariance, type SelectionRule, type TruncationResult } from "@
 import { createNormalPairGenerator } from "@/lib/rng";
 
 export const SimulationOptionsSchema = z.object({
-  seed: z.number().int().min(0).max(0xffff_ffff),
-  n: z.number().int().min(100).max(1_000_000),
-  selection: z
-    .object({ nodeId: z.string().min(1), quantile: z.number().min(0.01).max(0.99) })
-    .optional(),
+  seed: z.number().check(z.int(), z.gte(0), z.lte(0xffff_ffff)),
+  n: z.number().check(z.int(), z.gte(100), z.lte(1_000_000)),
+  selection: z.optional(
+    z.object({
+      nodeId: z.string().check(z.minLength(1)),
+      quantile: z.number().check(z.gte(0.01), z.lte(0.99)),
+    }),
+  ),
 });
 
 export type SimulationOptions = z.infer<typeof SimulationOptionsSchema>;

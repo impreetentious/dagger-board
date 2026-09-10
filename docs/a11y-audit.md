@@ -1,7 +1,6 @@
 # Accessibility audit — P8
 
-Recorded 17 Aug 2026; re-verified and corrected 29 Aug 2026 (IST, D-15
-mapped commit slots).
+Recorded 17 Aug 2026; re-verified and corrected 29 Aug 2026 (IST).
 
 ## Scope
 

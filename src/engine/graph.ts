@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 
 export const MAX_NODES = 12;
 export const MAX_EDGES = 24;
@@ -7,28 +7,28 @@ export const NodeKindSchema = z.enum(["observed", "latent", "selection"]);
 export type NodeKind = z.infer<typeof NodeKindSchema>;
 
 export const NodeSchema = z.object({
-  id: z.string().min(1),
-  idx: z.number().int().nonnegative(),
-  name: z.string().trim().min(1).max(64),
+  id: z.string().check(z.minLength(1)),
+  idx: z.number().check(z.int(), z.nonnegative()),
+  name: z.string().check(z.trim(), z.minLength(1), z.maxLength(64)),
   kind: NodeKindSchema,
-  position: z
-    .object({
-      x: z.number().finite(),
-      y: z.number().finite(),
-    })
-    .optional(),
+  position: z.optional(
+    z.object({
+      x: z.number(),
+      y: z.number(),
+    }),
+  ),
 });
 export type GraphNode = z.infer<typeof NodeSchema>;
 
 export const EdgeSchema = z.object({
-  from: z.string().min(1),
-  to: z.string().min(1),
+  from: z.string().check(z.minLength(1)),
+  to: z.string().check(z.minLength(1)),
 });
 export type GraphEdge = z.infer<typeof EdgeSchema>;
 
 export const RolesSchema = z.object({
-  exposureId: z.string().min(1).optional(),
-  outcomeId: z.string().min(1).optional(),
+  exposureId: z.optional(z.string().check(z.minLength(1))),
+  outcomeId: z.optional(z.string().check(z.minLength(1))),
 });
 export type GraphRoles = z.infer<typeof RolesSchema>;
 
@@ -36,7 +36,7 @@ const GraphShapeSchema = z.object({
   v: z.literal(1),
   nodes: z.array(NodeSchema),
   edges: z.array(EdgeSchema),
-  roles: RolesSchema.default({}),
+  roles: z._default(RolesSchema, {}),
 });
 
 export type Graph = z.infer<typeof GraphShapeSchema>;
@@ -109,108 +109,110 @@ function isAcyclic(graph: Pick<Graph, "nodes" | "edges">) {
   return visited === graph.nodes.length;
 }
 
-export const GraphSchema = GraphShapeSchema.superRefine((graph, context) => {
-  if (graph.nodes.length > MAX_NODES) {
-    context.addIssue({
-      code: "custom",
-      message: `A graph can contain at most ${MAX_NODES} nodes.`,
-      path: ["nodes"],
-    });
-  }
-  if (graph.edges.length > MAX_EDGES) {
-    context.addIssue({
-      code: "custom",
-      message: `A graph can contain at most ${MAX_EDGES} edges.`,
-      path: ["edges"],
-    });
-  }
+export const GraphSchema = GraphShapeSchema.check(
+  z.superRefine((graph: Graph, context) => {
+    if (graph.nodes.length > MAX_NODES) {
+      context.addIssue({
+        code: "custom",
+        message: `A graph can contain at most ${MAX_NODES} nodes.`,
+        path: ["nodes"],
+      });
+    }
+    if (graph.edges.length > MAX_EDGES) {
+      context.addIssue({
+        code: "custom",
+        message: `A graph can contain at most ${MAX_EDGES} edges.`,
+        path: ["edges"],
+      });
+    }
 
-  const ids = new Set<string>();
-  const idxs = new Set<number>();
-  const names = new Set<string>();
-  for (const [index, node] of graph.nodes.entries()) {
-    if (ids.has(node.id)) {
-      context.addIssue({
-        code: "custom",
-        message: "Node ids must be unique.",
-        path: ["nodes", index, "id"],
-      });
+    const ids = new Set<string>();
+    const idxs = new Set<number>();
+    const names = new Set<string>();
+    for (const [index, node] of graph.nodes.entries()) {
+      if (ids.has(node.id)) {
+        context.addIssue({
+          code: "custom",
+          message: "Node ids must be unique.",
+          path: ["nodes", index, "id"],
+        });
+      }
+      ids.add(node.id);
+      if (idxs.has(node.idx)) {
+        context.addIssue({
+          code: "custom",
+          message: "Node idx values must be unique.",
+          path: ["nodes", index, "idx"],
+        });
+      }
+      idxs.add(node.idx);
+      const normalizedName = node.name.toLocaleLowerCase();
+      if (names.has(normalizedName)) {
+        context.addIssue({
+          code: "custom",
+          message: "Display names must be unique, ignoring case.",
+          path: ["nodes", index, "name"],
+        });
+      }
+      names.add(normalizedName);
     }
-    ids.add(node.id);
-    if (idxs.has(node.idx)) {
-      context.addIssue({
-        code: "custom",
-        message: "Node idx values must be unique.",
-        path: ["nodes", index, "idx"],
-      });
-    }
-    idxs.add(node.idx);
-    const normalizedName = node.name.toLocaleLowerCase();
-    if (names.has(normalizedName)) {
-      context.addIssue({
-        code: "custom",
-        message: "Display names must be unique, ignoring case.",
-        path: ["nodes", index, "name"],
-      });
-    }
-    names.add(normalizedName);
-  }
 
-  const seenEdges = new Set<string>();
-  for (const [index, edge] of graph.edges.entries()) {
-    if (!ids.has(edge.from) || !ids.has(edge.to)) {
-      context.addIssue({
-        code: "custom",
-        message: "Every edge endpoint must exist.",
-        path: ["edges", index],
-      });
+    const seenEdges = new Set<string>();
+    for (const [index, edge] of graph.edges.entries()) {
+      if (!ids.has(edge.from) || !ids.has(edge.to)) {
+        context.addIssue({
+          code: "custom",
+          message: "Every edge endpoint must exist.",
+          path: ["edges", index],
+        });
+      }
+      if (edge.from === edge.to) {
+        context.addIssue({
+          code: "custom",
+          message: "Self edges are not allowed.",
+          path: ["edges", index],
+        });
+      }
+      const key = `${edge.from}\u0000${edge.to}`;
+      if (seenEdges.has(key)) {
+        context.addIssue({
+          code: "custom",
+          message: "Duplicate edges are not allowed.",
+          path: ["edges", index],
+        });
+      }
+      seenEdges.add(key);
     }
-    if (edge.from === edge.to) {
-      context.addIssue({
-        code: "custom",
-        message: "Self edges are not allowed.",
-        path: ["edges", index],
-      });
-    }
-    const key = `${edge.from}\u0000${edge.to}`;
-    if (seenEdges.has(key)) {
-      context.addIssue({
-        code: "custom",
-        message: "Duplicate edges are not allowed.",
-        path: ["edges", index],
-      });
-    }
-    seenEdges.add(key);
-  }
 
-  if (ids.size === graph.nodes.length && !isAcyclic(graph)) {
-    context.addIssue({ code: "custom", message: "The graph must be acyclic.", path: ["edges"] });
-  }
+    if (ids.size === graph.nodes.length && !isAcyclic(graph)) {
+      context.addIssue({ code: "custom", message: "The graph must be acyclic.", path: ["edges"] });
+    }
 
-  const nodesById = indexedNodes(graph);
-  const { exposureId, outcomeId } = graph.roles;
-  if (exposureId && nodesById.get(exposureId)?.kind !== "observed") {
-    context.addIssue({
-      code: "custom",
-      message: "The exposure must be observed.",
-      path: ["roles", "exposureId"],
-    });
-  }
-  if (outcomeId && nodesById.get(outcomeId)?.kind !== "observed") {
-    context.addIssue({
-      code: "custom",
-      message: "The outcome must be observed.",
-      path: ["roles", "outcomeId"],
-    });
-  }
-  if (exposureId && outcomeId && exposureId === outcomeId) {
-    context.addIssue({
-      code: "custom",
-      message: "Exposure and outcome must differ.",
-      path: ["roles"],
-    });
-  }
-});
+    const nodesById = indexedNodes(graph);
+    const { exposureId, outcomeId } = graph.roles;
+    if (exposureId && nodesById.get(exposureId)?.kind !== "observed") {
+      context.addIssue({
+        code: "custom",
+        message: "The exposure must be observed.",
+        path: ["roles", "exposureId"],
+      });
+    }
+    if (outcomeId && nodesById.get(outcomeId)?.kind !== "observed") {
+      context.addIssue({
+        code: "custom",
+        message: "The outcome must be observed.",
+        path: ["roles", "outcomeId"],
+      });
+    }
+    if (exposureId && outcomeId && exposureId === outcomeId) {
+      context.addIssue({
+        code: "custom",
+        message: "Exposure and outcome must differ.",
+        path: ["roles"],
+      });
+    }
+  }),
+);
 
 export const EMPTY_GRAPH: Graph = { v: 1, nodes: [], edges: [], roles: {} };
 

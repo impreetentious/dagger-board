@@ -12,9 +12,9 @@ const SelectionSchema = z.object({
 const LabSnapshotWireSchema = z.object({
   v: z.literal(1),
   graph: GraphSchema,
-  parameters: SCMParametersSchema.optional(),
+  parameters: z.optional(SCMParametersSchema),
   conditioning: z.array(z.string()).default([]),
-  selection: SelectionSchema.nullable().optional(),
+  selection: z.optional(SelectionSchema.nullable()),
   measured: z.record(z.string(), z.boolean()).default({}),
   seed: z.number().int().min(0).max(0xffff_ffff).default(314159),
   n: z.number().int().min(100).max(1_000_000).default(10_000),

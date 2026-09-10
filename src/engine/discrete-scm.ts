@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { parentsOf, type Graph } from "@/engine/graph";
 
 /**
@@ -14,7 +14,7 @@ import { parentsOf, type Graph } from "@/engine/graph";
  * the analogous self-audit.
  */
 
-const FiniteNumber = z.number().finite();
+const FiniteNumber = z.number();
 
 export const DiscreteScmParametersSchema = z.object({
   v: z.literal(1),

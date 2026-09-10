@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { nodeById, type Graph } from "@/engine/graph";
 import {
   diagonal,
@@ -24,12 +24,12 @@ export const ERROR_SD_MIN = 0.05;
 export const ERROR_SD_MAX = 3;
 export const ILL_CONDITIONING_RATIO = 1e-9;
 
-const FiniteNumberSchema = z.number().finite();
+const FiniteNumberSchema = z.number();
 
 export const SCMParametersSchema = z.object({
   v: z.literal(1),
-  edgeCoefficients: z.record(z.string(), FiniteNumberSchema).default({}),
-  errorSds: z.record(z.string(), FiniteNumberSchema).default({}),
+  edgeCoefficients: z._default(z.record(z.string(), FiniteNumberSchema), {}),
+  errorSds: z._default(z.record(z.string(), FiniteNumberSchema), {}),
 });
 
 export type SCMParameters = z.infer<typeof SCMParametersSchema>;

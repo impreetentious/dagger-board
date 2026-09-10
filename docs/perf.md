@@ -29,9 +29,14 @@ implication enumeration on fixture #14. The first implementation measured
 415.6494 ms, so it was fixed rather than waived: Bayes-Ball now caches immutable
 parent/child topology while retaining its independent traversal semantics.
 
-| Check               | Five fixed runs (ms)                             |   Median |  Gate |
-| ------------------- | ------------------------------------------------ | -------: | ----: |
-| Full Prove workload | 112.0315, 113.0495, 116.9335, 111.5758, 114.8482 | 113.0495 | < 250 |
+`tests/unit/p2-perf.test.ts` samples the median itself: one discarded warm-up
+pass, then five measured passes, asserting on the median. Measuring a single
+cold pass had made the gate depend on when the runner happened to schedule the
+file — under a full parallel `vitest run` that pass alone reached 274 ms.
+
+| Check               | Five fixed runs (ms)                         |  Median |  Gate |
+| ------------------- | -------------------------------------------- | ------: | ----: |
+| Full Prove workload | 85.3836, 85.4730, 86.3175, 90.4507, 103.1920 | 86.3175 | < 250 |
 
 The corrected workload passes on the first post-fix round; no D-16 re-measure
 was needed.
