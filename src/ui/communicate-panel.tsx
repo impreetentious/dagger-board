@@ -1,16 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { buildAdrDocument, type AdrDocument } from "@/engine/adr";
 import { APP_VERSION } from "@/lib/app-version";
+import { graphToSvg } from "@/lib/svg-export";
 import { useLabStore } from "@/store/lab-store";
 
-function formatTimestamp(): string {
-  return "static-export";
-}
-
-function download(name: string, payload: string) {
-  const blob = new Blob([payload], { type: "application/json" });
+function download(name: string, payload: string, type = "application/json") {
+  const blob = new Blob([payload], { type });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
@@ -29,6 +26,13 @@ export function CommunicatePanel() {
   const selection = useLabStore((state) => state.selection);
   const seed = useLabStore((state) => state.seed);
   const n = useLabStore((state) => state.n);
+  const [timestamp, setTimestamp] = useState<string | null>(null);
+  const svg = useMemo(() => graphToSvg(graph), [graph]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setTimestamp(new Date().toISOString()), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const doc = useMemo<AdrDocument>(
     () =>
@@ -38,10 +42,11 @@ export function CommunicatePanel() {
         selection,
         seed,
         n,
-        timestamp: formatTimestamp(),
+        timestamp: timestamp ?? "",
         appVersion: APP_VERSION,
+        svg,
       }),
-    [graph, conditioning, selection, seed, n],
+    [graph, conditioning, selection, seed, n, timestamp, svg],
   );
 
   const names = nodeNameLookup(doc);
@@ -73,6 +78,14 @@ export function CommunicatePanel() {
         >
           Download ADR JSON
         </button>
+        <button
+          className="tool-button"
+          data-testid="svg-download"
+          onClick={() => download("daggerboard-dag.svg", svg, "image/svg+xml")}
+          type="button"
+        >
+          Download DAG SVG
+        </button>
         <button className="tool-button" onClick={() => window.print()} type="button">
           Print / save as PDF
         </button>
@@ -87,15 +100,30 @@ export function CommunicatePanel() {
           Outcome: <span className="font-mono">{doc.outcomeId ? names[doc.outcomeId] : "—"}</span>.
         </p>
         <p className="text-sm">
-          Verdict: <span className="font-bold">{doc.identificationVerdict}</span>. Timestamp: static
-          build ({doc.appVersion}).
+          Verdict: <span className="font-bold">{doc.identificationVerdict}</span>. Timestamp:{" "}
+          <span className="font-mono">{doc.timestamp || "—"}</span> ({doc.appVersion}).
         </p>
+      </div>
+      <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4">
+        <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">
+          DAG
+        </p>
+        <div
+          aria-label="Exported DAG preview"
+          className="mt-3 overflow-x-auto"
+          dangerouslySetInnerHTML={{ __html: svg }}
+          tabIndex={0}
+        />
       </div>
       <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4">
         <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">
           ASSUMED ABSENT
         </p>
-        <ul className="mt-2 max-h-40 space-y-1 overflow-y-auto text-sm text-[var(--muted)]">
+        <ul
+          aria-label="Assumed absent edges"
+          className="mt-2 max-h-40 space-y-1 overflow-y-auto text-sm text-[var(--muted)]"
+          tabIndex={0}
+        >
           {doc.absentEdges.map((edge) => (
             <li key={`${edge.u}--${edge.v}`}>
               no direct effect between <span className="font-mono">{names[edge.u]}</span> and{" "}

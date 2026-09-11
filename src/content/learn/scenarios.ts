@@ -1,5 +1,5 @@
 import * as z from "zod/mini";
-import { EXAMPLE_SNAPSHOTS } from "@/content/examples";
+import { LEARN_FIXTURE_SNAPSHOTS } from "@/content/examples";
 import type { LabSnapshot } from "@/lib/codec";
 
 export const CHOICE_KINDS = ["naive", "adjust", "iv", "frontdoor"] as const;
@@ -267,11 +267,6 @@ export function scenarioBySlug(slug: string): LearnScenario | undefined {
   return LEARN_SCENARIOS.find((scenario) => scenario.slug === slug);
 }
 
-const EXAMPLE_KEYS = Object.keys(EXAMPLE_SNAPSHOTS);
-
 export function openInLabSnapshot(scenario: LearnScenario): LabSnapshot | null {
-  if (EXAMPLE_KEYS.includes(scenario.slug))
-    return EXAMPLE_SNAPSHOTS[scenario.slug as keyof typeof EXAMPLE_SNAPSHOTS];
-  if (scenario.fixtureId === "m-bias") return EXAMPLE_SNAPSHOTS["m-bias"];
-  return EXAMPLE_SNAPSHOTS["m-bias"];
+  return LEARN_FIXTURE_SNAPSHOTS[scenario.fixtureId] ?? null;
 }

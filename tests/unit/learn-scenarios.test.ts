@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { LEARN_SCENARIOS, LEARN_SLUGS, scenarioBySlug } from "@/content/learn/scenarios";
+import { LEARN_TIER1_FIXTURES } from "@/content/examples";
+import {
+  openInLabSnapshot,
+  LEARN_SCENARIOS,
+  LEARN_SLUGS,
+  scenarioBySlug,
+} from "@/content/learn/scenarios";
 
 describe("WU-7.1 Learn scenario schema", () => {
   it("ships all six canonical traps (D-08)", () => {
@@ -28,6 +34,19 @@ describe("WU-7.1 Learn scenario schema", () => {
     for (const scenario of LEARN_SCENARIOS) {
       expect(scenario.choices.length, scenario.slug).toBeGreaterThanOrEqual(2);
       expect(scenario.choices.filter((choice) => choice.correct).length, scenario.slug).toBe(1);
+    }
+  });
+
+  it("opens every lesson with the graph from its own Tier-1 fixture", () => {
+    const fixtures = LEARN_TIER1_FIXTURES as Record<string, { graph: { nodes: { id: string }[] } }>;
+    for (const scenario of LEARN_SCENARIOS) {
+      const snapshot = openInLabSnapshot(scenario);
+      const fixture = fixtures[scenario.fixtureId];
+      expect(snapshot, scenario.slug).not.toBeNull();
+      expect(fixture, scenario.fixtureId).toBeDefined();
+      expect(snapshot?.graph.nodes.map((node) => node.id).sort()).toEqual(
+        fixture?.graph.nodes.map((node) => node.id).sort(),
+      );
     }
   });
 

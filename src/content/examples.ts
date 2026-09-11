@@ -1,5 +1,43 @@
 import { defaultScmParameters, edgeParameterKey } from "@/engine/scm";
 import { pruneLabSnapshot, type LabSnapshot } from "@/lib/codec";
+import forkFixture from "../../fixtures/tier1/02-fork.json";
+import colliderFixture from "../../fixtures/tier1/03-collider.json";
+import mBiasFixture from "../../fixtures/tier1/04-m-bias.json";
+import mediatorOvercontrolFixture from "../../fixtures/tier1/06-mediator-overcontrol.json";
+import berksonSelectionFixture from "../../fixtures/tier1/07-berkson-selection.json";
+import measurementErrorFixture from "../../fixtures/tier1/08-measurement-error.json";
+
+type TierOneFixture = {
+  id: string;
+  graph: unknown;
+  parameters?: unknown;
+};
+
+export const LEARN_TIER1_FIXTURES = {
+  fork: forkFixture,
+  "mediator-overcontrol": mediatorOvercontrolFixture,
+  collider: colliderFixture,
+  "m-bias": mBiasFixture,
+  "berkson-selection": berksonSelectionFixture,
+  "measurement-error": measurementErrorFixture,
+} as const satisfies Record<string, TierOneFixture>;
+
+function snapshotFromFixture(fixture: TierOneFixture): LabSnapshot {
+  return pruneLabSnapshot({
+    v: 1,
+    graph: fixture.graph,
+    parameters: fixture.parameters,
+    conditioning: [],
+    selection: fixture.id === "berkson-selection" ? { nodeId: "s", quantile: 0.5 } : null,
+    measured: {},
+    seed: 314159,
+    n: 10_000,
+  });
+}
+
+export const LEARN_FIXTURE_SNAPSHOTS: Readonly<Record<string, LabSnapshot>> = Object.fromEntries(
+  Object.entries(LEARN_TIER1_FIXTURES).map(([id, fixture]) => [id, snapshotFromFixture(fixture)]),
+);
 
 function mBias(): LabSnapshot {
   const graph = {

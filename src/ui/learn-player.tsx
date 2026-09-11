@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { LearnChoice, LearnScenario } from "@/content/learn/scenarios";
 import { encodeGraphFragment, type LabSnapshot } from "@/lib/codec";
+import { LearnPathAnatomy } from "@/ui/learn-path-anatomy";
 
 type Stage = "setup" | "act" | "observe" | "reveal";
 
@@ -121,6 +122,9 @@ export function LearnPlayer({ scenario, snapshot }: Props) {
               PATH ANATOMY
             </p>
             <p className="mt-2 leading-7">{scenario.reveal.pathAnatomy}</p>
+            <div className="mt-4">
+              <LearnPathAnatomy snapshot={snapshot} />
+            </div>
           </div>
           {scenario.secondaryReference ? (
             <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4">
