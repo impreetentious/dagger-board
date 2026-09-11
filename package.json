@@ -1,6 +1,6 @@
 {
   "name": "daggerboard",
-  "version": "0.13.3",
+  "version": "0.13.4",
   "private": true,
   "engines": {
     "node": ">=20.19.5 <21",
@@ -15,10 +15,12 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "fixtures:dagitty": "node fixtures/tools/generate-dagitty.mjs",
+    "bundle:check": "node scripts/bundle-budget.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "npm run build && PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
-    "test:full": "npm run typecheck && npm run lint && npm run test && npm run test:e2e"
+    "test:full": "npm run check:version && npm run typecheck && npm run lint && npm run test && npm run test:e2e && npm run bundle:check",
+    "check:version": "node scripts/check-version-coherence.mjs"
   },
   "dependencies": {
     "next": "15.5.6",

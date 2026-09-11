@@ -7,5 +7,5 @@
 - The app uses App Router with static export and trailing-slash output, so the built `out/` directory remains portable to a static host.
 - Light and dark themes use CSS custom properties. A minimal inline pre-hydration script reads the persisted preference before the first paint.
 - Runtime assets are local. The product does not load remote fonts, images, scripts, stylesheets, telemetry, or analytics.
-- There is intentionally no CI workflow. Verification gates run locally; a future host integration performs its own build.
+- Superseded: the original plan had no CI workflow. GitHub Actions now runs the local gate chain on pull requests and pushes to `main`; Vercel remains the owner deployment path.
 - Development uses port 3004. Static-export checks and Playwright use port 4004; Playwright browsers are installed and invoked with `PLAYWRIGHT_BROWSERS_PATH=0`.
