@@ -24,7 +24,7 @@ describe("WU-8.1 ADR document", () => {
       selection: null,
       seed: 314159,
       n: 10_000,
-      timestamp: "static-export",
+      timestamp: "2026-07-29T00:00:00.000Z",
       appVersion: "0.9.0",
     });
     expect(doc.v).toBe(1);
@@ -40,6 +40,7 @@ describe("WU-8.1 ADR document", () => {
       { u: "m", v: "y" },
     ]);
     expect(doc.identificationVerdict).toBe("zero-total-effect");
+    expect(doc.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
   });
 
   it("captures a selection-active summary when a rule is set", () => {
@@ -50,7 +51,7 @@ describe("WU-8.1 ADR document", () => {
       selection: { nodeId: "s", quantile: 0.5 },
       seed: 314159,
       n: 10_000,
-      timestamp: "static-export",
+      timestamp: "2026-07-29T00:00:00.000Z",
       appVersion: "0.9.0",
     });
     expect(doc.selection).toEqual({ nodeId: "s", nodeName: "S", quantile: 0.5 });

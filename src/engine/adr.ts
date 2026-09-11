@@ -11,6 +11,7 @@ export interface AdrInputs {
   n: number | null;
   timestamp: string;
   appVersion: string;
+  svg?: string;
 }
 
 export interface AbsentEdge {
@@ -43,6 +44,7 @@ export interface AdrDocument {
   threats: Array<{ pathIds: string[]; label: string }>;
   seed: number | null;
   n: number | null;
+  svg: string;
 }
 
 export function assumedAbsentEdges(graph: Graph): AbsentEdge[] {
@@ -109,5 +111,6 @@ export function buildAdrDocument(inputs: AdrInputs): AdrDocument {
     threats: openBiasingPaths,
     seed: inputs.seed,
     n: inputs.n,
+    svg: inputs.svg ?? "",
   };
 }
