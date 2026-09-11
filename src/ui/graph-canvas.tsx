@@ -2,6 +2,7 @@
 
 import { useRef, useState, type KeyboardEvent, type PointerEvent, type WheelEvent } from "react";
 import { useLabStore } from "@/store/lab-store";
+import { graphToSvg } from "@/lib/svg-export";
 
 interface Viewport {
   x: number;
@@ -37,6 +38,7 @@ export function GraphCanvas() {
   const graph = useLabStore((state) => state.graph);
   const selectedNodeId = useLabStore((state) => state.selectedNodeId);
   const edgeStartId = useLabStore((state) => state.edgeStartId);
+  const highlightedPathNodeIds = useLabStore((state) => state.highlightedPathNodeIds);
   const selectNode = useLabStore((state) => state.selectNode);
   const moveNode = useLabStore((state) => state.moveNode);
   const addNode = useLabStore((state) => state.addNode);
@@ -57,13 +59,13 @@ export function GraphCanvas() {
 
   const pointFor = (event: PointerEvent<SVGSVGElement | SVGGElement>) => {
     const svg = svgRef.current;
-    const matrix = svg?.getScreenCTM();
-    if (!svg || !matrix) return { x: 0, y: 0 };
-    const point = svg.createSVGPoint();
-    point.x = event.clientX;
-    point.y = event.clientY;
-    const transformed = point.matrixTransform(matrix.inverse());
-    return { x: transformed.x, y: transformed.y };
+    if (!svg) return { x: 0, y: 0 };
+    const bounds = svg.getBoundingClientRect();
+    if (bounds.width === 0 || bounds.height === 0) return { x: 0, y: 0 };
+    return {
+      x: viewport.x + ((event.clientX - bounds.left) / bounds.width) * viewport.width,
+      y: viewport.y + ((event.clientY - bounds.top) / bounds.height) * viewport.height,
+    };
   };
 
   const ordered = [...graph.nodes].sort((left, right) => left.idx - right.idx);
@@ -207,9 +209,30 @@ export function GraphCanvas() {
   const positions = new Map(
     graph.nodes.map((node) => [node.id, node.position ?? { x: 120 + node.idx * 80, y: 220 }]),
   );
+  const downloadSvg = () => {
+    const url = URL.createObjectURL(new Blob([graphToSvg(graph)], { type: "image/svg+xml" }));
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "daggerboard-dag.svg";
+    anchor.click();
+    setTimeout(() => URL.revokeObjectURL(url), 500);
+  };
+  const highlightedPairs = new Set(
+    (highlightedPathNodeIds ?? []).slice(1).map((id, index) => {
+      const prior = highlightedPathNodeIds?.[index] ?? "";
+      return `${prior}\u0000${id}`;
+    }),
+  );
 
   return (
     <div className="relative min-h-[31rem] overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--canvas)]">
+      <button
+        className="tool-button absolute right-3 top-3 z-10"
+        onClick={downloadSvg}
+        type="button"
+      >
+        Download SVG
+      </button>
       <svg
         aria-describedby="canvas-help"
         aria-label="Causal graph editor"
@@ -221,7 +244,9 @@ export function GraphCanvas() {
           event.currentTarget.setPointerCapture(event.pointerId);
           setPanStart({ ...point, viewport });
         }}
-        onPointerMove={onPointerMove}
+        // A dragged node captures the pointer on its <g>. Listen during capture
+        // on the SVG so the movement still reaches this shared drag controller.
+        onPointerMoveCapture={onPointerMove}
         onPointerUp={() => {
           setDrag(null);
           setPanStart(null);
@@ -267,15 +292,19 @@ export function GraphCanvas() {
             const to = positions.get(edge.to);
             if (!from || !to) return null;
             const isConnected = edge.from === selectedNodeId || edge.to === selectedNodeId;
+            const isHighlighted =
+              highlightedPairs.has(`${edge.from}\u0000${edge.to}`) ||
+              highlightedPairs.has(`${edge.to}\u0000${edge.from}`);
             return (
               <path
                 d={curvePath(from, to, index % 2 === 0 ? 12 : -12)}
                 fill="none"
                 key={`${edge.from}-${edge.to}`}
                 markerEnd="url(#causal-arrow)"
-                stroke={isConnected ? "var(--signal)" : "var(--ink)"}
-                strokeOpacity={isConnected ? 0.95 : 0.62}
-                strokeWidth={isConnected ? 2.6 : 1.7}
+                data-testid={isHighlighted ? "highlighted-path-edge" : undefined}
+                stroke={isHighlighted || isConnected ? "var(--signal)" : "var(--ink)"}
+                strokeOpacity={isHighlighted || isConnected ? 0.95 : 0.62}
+                strokeWidth={isHighlighted ? 4 : isConnected ? 2.6 : 1.7}
               />
             );
           })}
@@ -284,6 +313,7 @@ export function GraphCanvas() {
           const position = positions.get(node.id)!;
           const isSelected = selectedNodeId === node.id;
           const isEdgeSource = edgeStartId === node.id;
+          const isPathNode = highlightedPathNodeIds?.includes(node.id) ?? false;
           const role =
             node.id === graph.roles.exposureId
               ? "X"
@@ -329,14 +359,15 @@ export function GraphCanvas() {
                   strokeWidth="2"
                 />
               )}
-              {isSelected || isEdgeSource ? (
+              {isSelected || isEdgeSource || isPathNode ? (
                 <circle
                   cx={position.x}
                   cy={position.y}
                   fill="none"
                   r="38"
+                  data-testid={isPathNode ? "highlighted-path-node" : undefined}
                   stroke="var(--signal)"
-                  strokeWidth="2.5"
+                  strokeWidth={isPathNode ? 4 : 2.5}
                 />
               ) : null}
               <text

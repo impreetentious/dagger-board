@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { pathSpecificEffects } from "@/engine/effects";
 import { proveGraph } from "@/engine/prove";
 import { useLabStore } from "@/store/lab-store";
 
@@ -10,9 +11,11 @@ function setLabel(ids: readonly string[], names: (id: string) => string): string
 
 export function ProvePanel() {
   const graph = useLabStore((state) => state.graph);
+  const parameters = useLabStore((state) => state.parameters);
   const conditioning = useLabStore((state) => state.conditioning);
   const selection = useLabStore((state) => state.selection);
   const setConditioning = useLabStore((state) => state.setConditioning);
+  const setHighlightedPath = useLabStore((state) => state.setHighlightedPath);
   const names = useMemo(
     () => new Map(graph.nodes.map((node) => [node.id, node.name])),
     [graph.nodes],
@@ -27,6 +30,13 @@ export function ProvePanel() {
       ),
     [conditioning, graph, selection],
   );
+  const effects = useMemo(() => {
+    const exposureId = graph.roles.exposureId;
+    const outcomeId = graph.roles.outcomeId;
+    return exposureId && outcomeId
+      ? pathSpecificEffects(graph, parameters, exposureId, outcomeId)
+      : null;
+  }, [graph, parameters]);
   const observedCandidates = graph.nodes.filter(
     (node) =>
       node.kind === "observed" &&
@@ -116,15 +126,31 @@ export function ProvePanel() {
       <details open>
         <summary className="cursor-pointer text-sm font-bold">Adjustment sets</summary>
         <div className="mt-3 space-y-2 text-sm">
+          {report.adjustment?.emptySetValid ? (
+            <p className="rounded-xl border border-[var(--moss)] bg-[var(--moss-soft)] px-3 py-2 font-semibold">
+              No adjustment needed: the empty set is valid for the total effect.
+            </p>
+          ) : null}
           {report.adjustment?.minimalSets.length ? (
-            report.adjustment.minimalSets.map((set) => (
-              <p
-                className="rounded-xl border border-[var(--line)] px-3 py-2"
-                key={set.join("-") || "empty"}
-              >
-                {setLabel(set, name)}
-              </p>
-            ))
+            report.adjustment.minimalSets
+              .filter((set) => set.length > 0)
+              .map((set) => {
+                const isMinimumSize = report.adjustment?.minimumSizeSets.some(
+                  (candidate) =>
+                    candidate.length === set.length && candidate.every((id) => set.includes(id)),
+                );
+                return (
+                  <p
+                    className="rounded-xl border border-[var(--line)] px-3 py-2"
+                    key={set.join("-") || "empty"}
+                  >
+                    {setLabel(set, name)}{" "}
+                    {isMinimumSize ? (
+                      <span className="ml-2 text-xs text-[var(--signal)]">minimum size</span>
+                    ) : null}
+                  </p>
+                );
+              })
           ) : (
             <p className="text-[var(--muted)]">
               No valid adjustment set exists. The canonical candidate leaves:{" "}
@@ -143,7 +169,15 @@ export function ProvePanel() {
         </summary>
         <ul className="mt-3 space-y-2 text-xs leading-5">
           {report.paths?.paths.map((path) => (
-            <li className="rounded-xl border border-[var(--line)] p-2" key={path.nodeIds.join("-")}>
+            <li
+              className="rounded-xl border border-[var(--line)] p-2"
+              key={path.nodeIds.join("-")}
+              onBlur={() => setHighlightedPath(null)}
+              onFocus={() => setHighlightedPath(path.nodeIds)}
+              onMouseEnter={() => setHighlightedPath(path.nodeIds)}
+              onMouseLeave={() => setHighlightedPath(null)}
+              tabIndex={0}
+            >
               <span className="font-bold">{path.nodeIds.map(name).join(" → ")}</span>
               <span className="ml-2 text-[var(--signal)]">
                 {path.primaryLabel.replaceAll("-", " ")}
@@ -152,6 +186,21 @@ export function ProvePanel() {
                 <span className="block text-[var(--muted)]">
                   blocked by{" "}
                   {path.evaluation.blockers.map((blocker) => name(blocker.nodeId)).join(", ")}
+                </span>
+              ) : null}
+              {path.colliderOpeningWitnesses.length > 0 ? (
+                <span className="block text-[var(--muted)]">
+                  {path.colliderOpeningWitnesses
+                    .map(
+                      (witness) =>
+                        `open because you conditioned on ${setLabel(witness.nodeIds, name)}, descendant${witness.nodeIds.length === 1 ? "" : "s"} of collider ${name(witness.colliderId)}`,
+                    )
+                    .join("; ")}
+                </span>
+              ) : null}
+              {path.overcontrolNodeIds.length > 0 ? (
+                <span className="block text-[var(--muted)]">
+                  blocked by the mediator {setLabel(path.overcontrolNodeIds, name)} — overcontrol.
                 </span>
               ) : null}
             </li>
@@ -183,6 +232,33 @@ export function ProvePanel() {
           )}
         </div>
       </details>
+
+      {effects ? (
+        <details>
+          <summary className="cursor-pointer text-sm font-bold">Path decomposition</summary>
+          <div className="mt-3 space-y-2 text-xs leading-5 text-[var(--muted)]">
+            <p>
+              Direct X → Y coefficient: {effects.directEdgeCoefficient.toFixed(4)} · total path sum:{" "}
+              {effects.totalEffect.toFixed(4)}.
+            </p>
+            {effects.paths.length ? (
+              <ul className="space-y-1">
+                {effects.paths.map((path) => (
+                  <li key={path.nodeIds.join("-")}>
+                    {path.nodeIds.map(name).join(" → ")}: {path.contribution.toFixed(4)}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No directed X → Y path is present, so the structural total effect is zero.</p>
+            )}
+            <p>
+              These are structural path contributions, not an identification verdict; v1&apos;s
+              verdict remains about the total effect.
+            </p>
+          </div>
+        </details>
+      ) : null}
 
       <details>
         <summary className="cursor-pointer text-sm font-bold">Testable implications</summary>

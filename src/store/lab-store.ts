@@ -22,11 +22,13 @@ interface LabStore extends LabSnapshot {
   activeSurface: LabSurface;
   selectedNodeId: string | null;
   edgeStartId: string | null;
+  highlightedPathNodeIds: string[] | null;
   notice: string | null;
   past: LabSnapshot[];
   future: LabSnapshot[];
   setActiveSurface: (surface: LabSurface) => void;
   selectNode: (id: string | null) => void;
+  setHighlightedPath: (nodeIds: string[] | null) => void;
   clearNotice: () => void;
   setNotice: (notice: string | null) => void;
   addNode: (kind?: NodeKind) => void;
@@ -104,6 +106,11 @@ function statePatch(
       current.edgeStartId && snapshot.graph.nodes.some((node) => node.id === current.edgeStartId)
         ? current.edgeStartId
         : null,
+    highlightedPathNodeIds: current.highlightedPathNodeIds?.every((id) =>
+      snapshot.graph.nodes.some((node) => node.id === id),
+    )
+      ? current.highlightedPathNodeIds
+      : null,
     past: recordHistory ? [...current.past.slice(-99), snapshotOf(current)] : current.past,
     future: recordHistory ? [] : current.future,
     notice: notice ?? current.notice,
@@ -129,6 +136,7 @@ export const useLabStore = create<LabStore>((set, get) => {
     activeSurface: "draw",
     selectedNodeId: null,
     edgeStartId: null,
+    highlightedPathNodeIds: null,
     notice: null,
     past: [],
     future: [],
@@ -142,6 +150,7 @@ export const useLabStore = create<LabStore>((set, get) => {
         selectedNodeId,
         edgeStartId: selectedNodeId === null ? null : current.edgeStartId,
       })),
+    setHighlightedPath: (highlightedPathNodeIds) => set({ highlightedPathNodeIds }),
     clearNotice: () => set({ notice: null }),
     setNotice: (notice) => set({ notice }),
     addNode: (kind = "observed") =>
