@@ -8,6 +8,12 @@ function value(number: number | null): string {
   return number === null || !Number.isFinite(number) ? "—" : number.toFixed(4);
 }
 
+function standardErrorLabel(row: DesignReport["rows"][number], selectionActive: boolean): string {
+  if (row.seLabel === "unavailable") return "SE unavailable";
+  if (selectionActive) return "asymptotic approximation";
+  return row.seLabel === "iv-asymptotic" ? "IV asymptotic SE" : "OLS asymptotic SE";
+}
+
 export function DesignPanel() {
   const graph = useLabStore((state) => state.graph);
   const parameters = useLabStore((state) => state.parameters);
@@ -24,11 +30,11 @@ export function DesignPanel() {
   const name = (id: string) => graph.nodes.find((node) => node.id === id)?.name ?? id;
   const report = useMemo(() => {
     try {
-      return evaluateDesign(graph, parameters, measured, selection ?? undefined, n);
+      return evaluateDesign(graph, parameters, measured, selection ?? undefined, n, conditioning);
     } catch (error) {
       return error instanceof Error ? error : new Error("Design table unavailable.");
     }
-  }, [graph, measured, n, parameters, selection]);
+  }, [conditioning, graph, measured, n, parameters, selection]);
   const [pinned, setPinned] = useState<DesignReport | null>(null);
   const diff = pinned && !(report instanceof Error) ? diffDesignReports(pinned, report) : [];
 
@@ -107,6 +113,15 @@ export function DesignPanel() {
                 {node.name}
               </label>
             ))}
+          {report.forbiddenConditioningNodeIds.length > 0 ? (
+            <p
+              className="rounded-xl bg-[var(--signal-soft)] p-2 text-xs leading-5 text-[var(--ink)]"
+              role="alert"
+            >
+              Forbidden adjustment: {report.forbiddenConditioningNodeIds.map(name).join(", ")}{" "}
+              descends from a causal-path node and can bias the total effect.
+            </p>
+          ) : null}
         </div>
       </details>
       <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4">
@@ -181,8 +196,19 @@ export function DesignPanel() {
           ? ". Selection-free identification and selection-aware exact bias can legitimately differ."
           : ""}
       </p>
+      {report.selectionApproximation !== "none" ? (
+        <p className="text-xs leading-5 text-[var(--muted)]">
+          {report.selectionApproximation === "sequential-gaussian"
+            ? "Multiple filters use a sequential-Gaussian approximation."
+            : "A single selection filter uses the exact Gaussian truncation."}
+        </p>
+      ) : null}
 
-      <div className="overflow-x-auto rounded-2xl border border-[var(--line)]">
+      <div
+        aria-label="Design estimator table"
+        className="overflow-x-auto rounded-2xl border border-[var(--line)]"
+        tabIndex={0}
+      >
         <table className="w-full min-w-[35rem] border-collapse text-left text-xs">
           <thead className="bg-[var(--moss-soft)]">
             <tr>
@@ -227,7 +253,12 @@ export function DesignPanel() {
                     {row.ivStatus === "weak" ? " · weak" : ""}
                     {row.ivStatus === "undefined" ? " · undefined" : ""}
                   </td>
-                  <td className="p-2">{seCell}</td>
+                  <td className="p-2">
+                    {seCell}
+                    <span className="block text-[10px] leading-4 text-[var(--muted)]">
+                      {standardErrorLabel(row, report.selectionActive)}
+                    </span>
+                  </td>
                 </tr>
               );
             })}

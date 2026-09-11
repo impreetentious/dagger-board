@@ -2,10 +2,18 @@
 
 import { useMemo, useState } from "react";
 import { proveGraph } from "@/engine/prove";
+import { averageCausalEffect, defaultDiscreteParameters } from "@/engine/discrete-scm";
 import { auditScmIntegrity, edgeParameterKey, matrixTotalEffect } from "@/engine/scm";
 import { convergenceSeries, type SimulationRun } from "@/engine/sim";
-import { frontdoorSetEstimand, ivEstimand, olsEstimand } from "@/engine/stats";
+import {
+  frontdoorSetEstimand,
+  IV_UNDEFINED_CORRELATION,
+  IV_WEAK_CORRELATION,
+  ivEstimand,
+  olsEstimand,
+} from "@/engine/stats";
 import { runSimulationInWorker } from "@/lib/sim-worker-client";
+import { createUniformGenerator, randomizedCoefficient } from "@/lib/rng";
 import { useLabStore } from "@/store/lab-store";
 
 function number(value: number | null | undefined): string {
@@ -83,6 +91,14 @@ export function SimulatePanel() {
       ),
     [conditioning, graph, selection],
   );
+  const discreteReadout = useMemo(() => {
+    if (!exposureId || !outcomeId) return null;
+    try {
+      return averageCausalEffect(graph, defaultDiscreteParameters(graph), exposureId, outcomeId);
+    } catch (cause) {
+      return { error: cause instanceof Error ? cause.message : "Discrete oracle unavailable." };
+    }
+  }, [exposureId, graph, outcomeId]);
   const selectedInstrument = useMemo(
     () =>
       report.instruments[0]
@@ -97,6 +113,13 @@ export function SimulatePanel() {
     () => report.frontdoorSets?.minimalSets[0]?.mediatorIds ?? null,
     [report.frontdoorSets],
   );
+  const randomizeParameters = () => {
+    const uniform = createUniformGenerator(seed);
+    for (const edge of [...graph.edges].sort((left, right) =>
+      edgeParameterKey(left.from, left.to).localeCompare(edgeParameterKey(right.from, right.to)),
+    ))
+      setCoefficient(edge.from, edge.to, randomizedCoefficient(uniform));
+  };
 
   const readout = useMemo(() => {
     if (!run || !exposureId || !outcomeId) return null;
@@ -243,6 +266,13 @@ export function SimulatePanel() {
       <details>
         <summary className="cursor-pointer text-sm font-bold">Structural parameters</summary>
         <div className="mt-3 space-y-2 text-xs">
+          <p className="leading-5 text-[var(--muted)]">
+            v1 uses a linear-Gaussian SCM with mean-zero errors and no intercepts. A generated
+            sample is capped at 1,000,000 rows.
+          </p>
+          <button className="tool-button" onClick={randomizeParameters} type="button">
+            Randomize parameters
+          </button>
           {graph.edges.map((edge) => (
             <label
               className="flex items-center justify-between gap-2"
@@ -278,6 +308,29 @@ export function SimulatePanel() {
               />
             </label>
           ))}
+        </div>
+      </details>
+
+      <details>
+        <summary className="cursor-pointer text-sm font-bold">
+          Discrete oracle (Bernoulli-logistic)
+        </summary>
+        <div className="mt-3 space-y-2 text-xs leading-5 text-[var(--muted)]">
+          <p>
+            An exact enumeration over at most 2¹² assignments. It uses zero intercepts and a unit
+            logit coefficient for every drawn parent edge; it does not alter the linear-Gaussian
+            verdict, covariance, or path identities above.
+          </p>
+          {discreteReadout && "error" in discreteReadout ? (
+            <p role="alert">{discreteReadout.error}</p>
+          ) : discreteReadout ? (
+            <p>
+              P(Y=1 | do(X=0)): {number(discreteReadout.x0)} · P(Y=1 | do(X=1)):{" "}
+              {number(discreteReadout.x1)} · ATE: {number(discreteReadout.ate)}
+            </p>
+          ) : (
+            <p>Designate observed X and Y to inspect the discrete oracle.</p>
+          )}
         </div>
       </details>
 
@@ -321,6 +374,10 @@ export function SimulatePanel() {
                 {number(readout.exactIv?.populationBias)}{" "}
                 {readout.exactIv?.status === "weak" ? "· weak-instrument warning" : ""}
                 {readout.exactIv?.status === "undefined" ? "· first stage undefined" : ""}
+              </p>
+              <p className="mt-2 text-xs leading-5 text-[var(--muted)]">
+                The first stage is undefined below |r| {IV_UNDEFINED_CORRELATION.toExponential(0)};
+                it is marked weak below |r| {IV_WEAK_CORRELATION}.
               </p>
             </article>
           ) : null}

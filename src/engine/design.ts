@@ -1,4 +1,4 @@
-import { checkAdjustmentSet, adjustmentCandidateIds } from "@/engine/adjust";
+import { checkAdjustmentSet, adjustmentCandidateIds, forbiddenNodeIds } from "@/engine/adjust";
 import { enumerateFrontdoorMediators, enumerateFrontdoorSets } from "@/engine/frontdoor";
 import { observedNodeIds, type Graph } from "@/engine/graph";
 import { enumerateConditionalInstruments } from "@/engine/iv";
@@ -44,6 +44,8 @@ export interface DesignReport {
   bestRowId: string | null;
   selectionApproximation: "exact" | "sequential-gaussian" | "none";
   selectionRuleCount: number;
+  /** Advisory only: Design rows enumerate their own sets; this is the playground's unsafe Z. */
+  forbiddenConditioningNodeIds: string[];
 }
 
 export type DesignSelectionInput = SelectionRule | readonly SelectionRule[] | undefined;
@@ -116,6 +118,7 @@ export function evaluateDesign(
   measured: Readonly<Record<string, boolean>>,
   selection: DesignSelectionInput,
   sampleSize: number,
+  conditioning: readonly string[] = [],
 ): DesignReport {
   const exposureId = graph.roles.exposureId;
   const outcomeId = graph.roles.outcomeId;
@@ -137,6 +140,11 @@ export function evaluateDesign(
   const covariance = truncation ?? model;
   const effectiveN = sampleSize * truncationEffectiveFraction;
   const totalEffect = matrixTotalEffect(model, exposureId, outcomeId);
+  const forbidden = forbiddenNodeIds(graph, exposureId, outcomeId);
+  const forbiddenConditioningNodeIds = sortedNodeIds(
+    graph,
+    conditioning.filter((id) => forbidden.has(id)),
+  );
   const adjustmentSets = enumerateMeasuredAdjustmentSets(graph, exposureId, outcomeId, measured);
   const rows: DesignRow[] = [];
   const olsRow = (kind: "naive" | "adjustment", ids: string[]) => {
@@ -248,6 +256,7 @@ export function evaluateDesign(
     bestRowId,
     selectionApproximation,
     selectionRuleCount: rules.length,
+    forbiddenConditioningNodeIds,
   };
 }
 

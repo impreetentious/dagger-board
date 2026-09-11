@@ -46,6 +46,19 @@ describe("WU-6.2 design table", () => {
     expect(report.rows.some((row) => row.conditioningIds.includes("m"))).toBe(false);
   });
 
+  it("warns when the Design conditioning playground includes a causal-path descendant", () => {
+    const item = fixture("06-mediator-overcontrol.json");
+    const report = evaluateDesign(
+      item.graph,
+      item.parameters ?? defaultScmParameters(item.graph),
+      allMeasured(item.graph),
+      undefined,
+      1000,
+      ["m"],
+    );
+    expect(report.forbiddenConditioningNodeIds).toEqual(["m"]);
+  });
+
   it("diffs two design reports symmetrically for A/B side-by-side", () => {
     const item = fixture("04-m-bias.json");
     const parameters = item.parameters ?? defaultScmParameters(item.graph);
