@@ -38,9 +38,19 @@ test("keyboard-only construction assigns roles, kinds, and causal edges", async 
   await expect(page.getByText("Y", { exact: true })).toBeVisible();
 });
 
-test("editor has no automated accessibility violations", async ({ page }) => {
+test("all shipped routes and workbench surfaces have no automated accessibility violations", async ({
+  page,
+}) => {
+  for (const route of ["/", "/learn", "/learn/m-bias"]) {
+    await page.goto(route);
+    const results = await new AxeBuilder({ page }).include("main").analyze();
+    expect(results.violations).toEqual([]);
+  }
   await page.goto("/lab");
   await page.getByRole("button", { name: "Load M-bias" }).click();
-  const results = await new AxeBuilder({ page }).include("main").analyze();
-  expect(results.violations).toEqual([]);
+  for (const surface of ["Draw", "Prove", "Simulate", "Design", "Communicate"]) {
+    await page.getByRole("tab", { name: new RegExp(surface) }).click();
+    const results = await new AxeBuilder({ page }).include("main").analyze();
+    expect(results.violations).toEqual([]);
+  }
 });

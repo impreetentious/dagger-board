@@ -14,7 +14,6 @@ export function DrawPanel() {
   const graph = useLabStore((state) => state.graph);
   const selectedNodeId = useLabStore((state) => state.selectedNodeId);
   const edgeStartId = useLabStore((state) => state.edgeStartId);
-  const notice = useLabStore((state) => state.notice);
   const addNode = useLabStore((state) => state.addNode);
   const startEdge = useLabStore((state) => state.startEdge);
   const renameNode = useLabStore((state) => state.renameNode);
@@ -140,9 +139,6 @@ export function DrawPanel() {
           Select a node to rename it, assign X/Y, change its kind, or begin an edge.
         </div>
       )}
-      <p aria-live="polite" className="min-h-5 text-sm text-[var(--muted)]">
-        {notice}
-      </p>
       <InteropPanel />
     </section>
   );

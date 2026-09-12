@@ -23,6 +23,7 @@ export function LabShell() {
   const setActiveSurface = useLabStore((state) => state.setActiveSurface);
   const loadSnapshot = useLabStore((state) => state.loadSnapshot);
   const setNotice = useLabStore((state) => state.setNotice);
+  const notice = useLabStore((state) => state.notice);
   useEffect(() => {
     if (!window.location.hash.startsWith("#g=")) return;
     void decodeGraphFragment(window.location.hash)
@@ -45,6 +46,9 @@ export function LabShell() {
           and selection rule.
         </p>
       </header>
+      <p aria-live="polite" className="min-h-5 text-sm text-[var(--muted)]">
+        {notice}
+      </p>
       <div
         className="mb-4 flex gap-2 overflow-x-auto pb-1"
         role="tablist"

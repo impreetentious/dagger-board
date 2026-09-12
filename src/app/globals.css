@@ -125,7 +125,7 @@ a {
 }
 
 .surface-tab span {
-  color: var(--signal);
+  color: var(--signal-strong);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.7rem;
   letter-spacing: 0.08em;

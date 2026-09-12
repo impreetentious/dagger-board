@@ -9,7 +9,8 @@ Recorded 17 Aug 2026; re-verified and corrected 29 Aug 2026 (IST).
 
 ## Automated pass
 
-- `axe-core` (via `@axe-core/playwright`) runs against the `/lab` editor
+- `axe-core` (via `@axe-core/playwright`) runs against `/`, `/learn`, `/learn/m-bias`, and every
+  `/lab` workbench surface (Draw, Prove, Simulate, Design, Communicate).
   (`.include("main")`) in `tests/e2e/editor.spec.ts` and reports zero
   violations. This is now genuinely zero: the earlier record overstated the
   result. The active surface-tab number badge rendered `--signal` (#b14e2d) on
