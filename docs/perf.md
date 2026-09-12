@@ -54,3 +54,19 @@ turning the deliberately dense graph into an ill-conditioned demonstration.
 
 The gate passed on its first concurrent-load round. The implementation yields
 after each 8,192-row even chunk without changing the global RNG stream.
+
+## P6 Design-table gate
+
+`tests/unit/p6-perf.test.ts` runs the Design table workload on frozen fixture
+#14 with every observed node measurable and a 10,000-row preview. It discards
+one warm-up, then gates the median of five independent calls to
+`evaluateDesign`.
+
+| Check                  | Five runs (ms)                              |  Median |  Gate |
+| ---------------------- | ------------------------------------------- | ------: | ----: |
+| Full Design-table load | 27.0564, 27.2244, 27.2281, 27.5059, 29.0867 | 27.2281 | < 750 |
+
+Run `PERF_LOG=1 npm run test -- tests/unit/p6-perf.test.ts` to record a fresh
+five-run sample on the reference environment. The editor drag interaction is
+covered as a browser interaction in the pointer acceptance flow; its frame-time
+budget remains a browser measurement rather than a Node timing surrogate.

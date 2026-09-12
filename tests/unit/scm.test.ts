@@ -19,7 +19,13 @@ import {
   olsEstimand,
 } from "@/engine/stats";
 import { normalCdf, normalInverse, truncateCovariance } from "@/engine/truncation";
-import { boxMullerPair, createUniformGenerator, mulberry32, uniformFromRaw } from "@/lib/rng";
+import {
+  boxMullerPair,
+  createUniformGenerator,
+  mulberry32,
+  randomizedCoefficient,
+  uniformFromRaw,
+} from "@/lib/rng";
 import { Tier1FixtureSchema, type Tier1Fixture } from "../../fixtures/tier1/schema";
 
 const fixtureDirectory = fileURLToPath(new URL("../../fixtures/tier1/", import.meta.url));
@@ -57,6 +63,19 @@ describe("WU-3.1 seeded primitives", () => {
     expect(pair.second).toBeCloseTo(0.00336973522237399, 14);
     const poisonUniform = createUniformGenerator(0x92d4860b)();
     expect(Number.isFinite(Math.sqrt(-2 * Math.log(poisonUniform)))).toBe(true);
+  });
+
+  it("generates reproducible, bounded coefficient magnitudes", () => {
+    const draw = (seed: number) => {
+      const uniform = createUniformGenerator(seed);
+      return Array.from({ length: 6 }, () => randomizedCoefficient(uniform));
+    };
+    const first = draw(314159);
+    expect(first).toEqual(draw(314159));
+    for (const coefficient of first) {
+      expect(Math.abs(coefficient)).toBeGreaterThanOrEqual(0.3);
+      expect(Math.abs(coefficient)).toBeLessThanOrEqual(0.9);
+    }
   });
 });
 
