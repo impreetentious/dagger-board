@@ -19,6 +19,7 @@ function snapshotFromStore(state: LabSnapshot): LabSnapshot {
     conditioning: state.conditioning,
     selection: state.selection,
     measured: state.measured,
+    reliability: state.reliability,
     seed: state.seed,
     n: state.n,
   };

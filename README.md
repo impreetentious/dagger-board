@@ -13,7 +13,7 @@ This project is a pre-data instrument for stress-testing causal claims and study
 1. **Draw** your causal assumptions as a directed acyclic graph — observed, latent, and selection nodes; pick an exposure and an outcome.
 2. **Prove** — the engine computes, _exactly_, what your assumptions already imply: whether your effect is identified by the classical strategies — covariate adjustment, front-door, instrumental variables — and exactly how (and it tells you honestly when its strategy set is exhausted rather than claiming non-identifiability), every minimal valid adjustment set, every biasing path, available instruments, frontdoor routes, and the conditional independencies your model claims are testable.
 3. **Simulate** — the graph becomes a working structural causal model. Seeded, replayable data generation shows the precise bias your naive analysis would produce — confounding, collider conditioning, M-bias, selection, measurement error — and every simulated estimate converges to a closed-form population value the engine derives independently.
-4. **Design** — declare what you can measure, what you'll condition on, how your sample is selected, and how big it is. Get back which effects are identified under that design's measurement and conditioning choices, the exact population bias of each feasible estimator, and a variance/power preview — before you collect a single row.
+4. **Design** — declare what you can measure, how *well* you can measure it, what you'll condition on, how your sample is selected, and how big it is. Get back which effects are identified under that design's measurement and conditioning choices, the exact population bias of each feasible estimator, a variance/power preview, and — since a noisy proxy is not the variable it stands in for — what each estimator recovers once your declared reliabilities are applied.
 5. **Learn** — a curriculum of canonical traps, each a playable scenario: you make the analysis call first, then the engine reveals what happened and the theory underneath.
 6. **Communicate** — export an Analysis Design Record: the graph, the assumptions (including what you assumed _absent_), the chosen identification strategy, and the known threats.
 
@@ -35,6 +35,8 @@ This project is a pre-data instrument for stress-testing causal claims and study
 - **Linear-Gaussian structural models.** Simulation and closed-form bias assume linear structural equations with Gaussian noise. Non-linear and discrete-outcome models are outside the engine.
 - **Selection is quantified, not certified.** Under an active selection rule the app reports the exact bias it induces, and labels the identification verdict as "selection ignored" — it does not certify that an adjustment set remains valid _under_ selection.
 - **Classical strategies only.** Identification covers covariate adjustment, front-door, and conditional IV. When those are exhausted the app says so explicitly instead of declaring the effect non-identifiable.
+
+- **Measurement error is the classical model.** A mismeasured node is the true node plus independent noise, parameterised by reliability. Differential and correlated measurement error are different models and are not offered.
 
 ## Stack
 
@@ -86,4 +88,4 @@ MIT © Sidakpreet Singh — see [LICENSE](LICENSE). Application code is MIT; see
 
 ---
 
-**Version:** v0.14.5
+**Version:** v0.14.6

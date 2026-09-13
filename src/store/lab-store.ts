@@ -14,6 +14,7 @@ import {
 } from "@/engine/graph";
 import { assistedLayout } from "@/engine/layout";
 import { edgeParameterKey, normalizeScmParameters } from "@/engine/scm";
+import { RELIABILITY_MIN } from "@/engine/measurement";
 import { pruneLabSnapshot, type LabSnapshot } from "@/lib/codec";
 
 export type LabSurface = "draw" | "prove" | "simulate" | "design" | "communicate";
@@ -42,6 +43,7 @@ interface LabStore extends LabSnapshot {
   setConditioning: (ids: string[]) => void;
   setSelection: (selection: LabSnapshot["selection"]) => void;
   setMeasured: (id: string, measured: boolean) => void;
+  setReliability: (id: string, reliability: number) => void;
   setCoefficient: (from: string, to: string, value: number) => void;
   setErrorSd: (id: string, value: number) => void;
   setSeed: (seed: number) => void;
@@ -60,6 +62,7 @@ function emptySnapshot(): LabSnapshot {
     conditioning: [],
     selection: null,
     measured: {},
+    reliability: {},
     seed: 314159,
     n: 10_000,
   });
@@ -73,6 +76,7 @@ function snapshotOf(state: LabSnapshot): LabSnapshot {
     conditioning: state.conditioning,
     selection: state.selection,
     measured: state.measured,
+    reliability: state.reliability,
     seed: state.seed,
     n: state.n,
   });
@@ -251,6 +255,19 @@ export const useLabStore = create<LabStore>((set, get) => {
         return;
       }
       apply({ ...snapshotOf(current), measured: { ...current.measured, [id]: measured } }, false);
+    },
+    setReliability: (id, reliability) => {
+      const current = get();
+      const node = current.graph.nodes.find((candidate) => candidate.id === id);
+      if (!node || node.kind !== "observed") {
+        set({ notice: "Only an observed node can carry a measurement reliability." });
+        return;
+      }
+      const clamped = Math.min(1, Math.max(RELIABILITY_MIN, reliability));
+      apply(
+        { ...snapshotOf(current), reliability: { ...current.reliability, [id]: clamped } },
+        false,
+      );
     },
     setCoefficient: (from, to, value) =>
       attempt(() => {

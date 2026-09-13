@@ -16,6 +16,7 @@ const LabSnapshotWireSchema = z.object({
   conditioning: z._default(z.array(z.string()), []),
   selection: z.optional(z.nullable(SelectionSchema)),
   measured: z._default(z.record(z.string(), z.boolean()), {}),
+  reliability: z._default(z.record(z.string(), z.number().check(z.gt(0), z.lte(1))), {}),
   seed: z._default(z.number().check(z.int(), z.gte(0), z.lte(0xffff_ffff)), 314159),
   n: z._default(z.number().check(z.int(), z.gte(100), z.lte(1_000_000)), 10_000),
 });
@@ -27,6 +28,8 @@ export interface LabSnapshot {
   conditioning: string[];
   selection: { nodeId: string; quantile: number } | null;
   measured: Record<string, boolean>;
+  /** Per-node measurement reliability λ ∈ (0, 1]; 1 (or absent) means perfectly measured. */
+  reliability: Record<string, number>;
   seed: number;
   n: number;
 }
@@ -74,6 +77,15 @@ export function pruneLabSnapshot(input: unknown): LabSnapshot {
           : (wire.measured[node.id] ?? true),
       ]),
   );
+  const reliability = Object.fromEntries(
+    graph.nodes
+      .filter((node) => node.kind === "observed")
+      .map((node) => {
+        const declared = wire.reliability[node.id];
+        const usable = typeof declared === "number" && declared > 0 && declared <= 1;
+        return [node.id, usable ? declared : 1];
+      }),
+  );
   const selectedNode = wire.selection ? nodeById.get(wire.selection.nodeId) : undefined;
   return {
     v: 1,
@@ -82,6 +94,7 @@ export function pruneLabSnapshot(input: unknown): LabSnapshot {
     conditioning: sortedIds(graph, allowedConditioning),
     selection: selectedNode?.kind === "selection" ? (wire.selection ?? null) : null,
     measured,
+    reliability,
     seed: wire.seed,
     n: wire.n,
   };

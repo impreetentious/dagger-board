@@ -17,6 +17,13 @@ import {
   truncateCovarianceSequential,
   type SelectionRule,
 } from "@/engine/truncation";
+import {
+  anyMismeasured,
+  attenuateCovariance,
+  attenuationNotes,
+  type AttenuationNote,
+  type ReliabilityMap,
+} from "@/engine/measurement";
 
 export interface DesignRow {
   id: string;
@@ -32,6 +39,13 @@ export interface DesignRow {
   smallSelectedSample: boolean;
   ivStatus?: "defined" | "weak" | "undefined";
   seLabel?: "ols-asymptotic" | "iv-asymptotic" | "unavailable";
+  /**
+   * What this estimator recovers once the declared reliabilities are applied, and how far that
+   * sits from the true effect. Null when every node is declared perfectly measured — the
+   * column then has nothing to say and does not pretend otherwise.
+   */
+  estimandUnderMismeasurement: number | null;
+  biasUnderMismeasurement: number | null;
 }
 
 export interface DesignReport {
@@ -46,6 +60,8 @@ export interface DesignReport {
   selectionRuleCount: number;
   /** Advisory only: Design rows enumerate their own sets; this is the playground's unsafe Z. */
   forbiddenConditioningNodeIds: string[];
+  /** Per-node measurement bookkeeping; empty when nothing is declared mismeasured. */
+  attenuation: AttenuationNote[];
 }
 
 export type DesignSelectionInput = SelectionRule | readonly SelectionRule[] | undefined;
@@ -119,6 +135,7 @@ export function evaluateDesign(
   selection: DesignSelectionInput,
   sampleSize: number,
   conditioning: readonly string[] = [],
+  reliabilities?: ReliabilityMap,
 ): DesignReport {
   const exposureId = graph.roles.exposureId;
   const outcomeId = graph.roles.outcomeId;
@@ -138,6 +155,11 @@ export function evaluateDesign(
         ? (truncation as { effectiveFraction: number }).effectiveFraction
         : 1;
   const covariance = truncation ?? model;
+  // Selection first, then measurement: the sample is selected, and then what survives is
+  // measured. Both are diagonal-or-rank-one edits to Σ, so the order is stated rather than
+  // discovered — and reversing it would model a different world.
+  const mismeasured = anyMismeasured(reliabilities);
+  const observedCovariance = attenuateCovariance(covariance, reliabilities);
   const effectiveN = sampleSize * truncationEffectiveFraction;
   const totalEffect = matrixTotalEffect(model, exposureId, outcomeId);
   const forbidden = forbiddenNodeIds(graph, exposureId, outcomeId);
@@ -149,6 +171,9 @@ export function evaluateDesign(
   const rows: DesignRow[] = [];
   const olsRow = (kind: "naive" | "adjustment", ids: string[]) => {
     const estimate = olsEstimand(covariance, exposureId, outcomeId, ids, totalEffect);
+    const attenuated = mismeasured
+      ? olsEstimand(observedCovariance, exposureId, outcomeId, ids, totalEffect)
+      : null;
     const identified = checkAdjustmentSet(graph, exposureId, outcomeId, new Set(ids)).valid;
     const smallSelectedSample = Boolean(truncation && effectiveN < 50);
     const standardError = smallSelectedSample
@@ -165,6 +190,8 @@ export function evaluateDesign(
       power: standardError === null ? null : powerPreview(estimate.estimand, standardError),
       smallSelectedSample,
       seLabel: standardError === null ? "unavailable" : "ols-asymptotic",
+      estimandUnderMismeasurement: attenuated?.estimand ?? null,
+      biasUnderMismeasurement: attenuated?.populationBias ?? null,
     });
   };
   olsRow("naive", []);
@@ -182,6 +209,16 @@ export function evaluateDesign(
         conditionedIds,
         totalEffect,
       );
+      const attenuatedIv = mismeasured
+        ? ivEstimand(
+            observedCovariance,
+            instrument.instrumentId,
+            exposureId,
+            outcomeId,
+            conditionedIds,
+            totalEffect,
+          )
+        : null;
       const definedForSe = estimate.status !== "undefined" && !(truncation && effectiveN < 50);
       const standardError = definedForSe
         ? ivTestStandardError(
@@ -210,6 +247,8 @@ export function evaluateDesign(
         smallSelectedSample,
         ivStatus: estimate.status,
         seLabel: standardError === null ? "unavailable" : "iv-asymptotic",
+        estimandUnderMismeasurement: attenuatedIv?.estimand ?? null,
+        biasUnderMismeasurement: attenuatedIv?.populationBias ?? null,
       });
     }
   }
@@ -220,6 +259,9 @@ export function evaluateDesign(
   for (const entry of frontdoorSets) {
     try {
       const estimand = frontdoorSetEstimand(covariance, exposureId, entry.mediatorIds, outcomeId);
+      const attenuatedFrontdoor = mismeasured
+        ? frontdoorSetEstimand(observedCovariance, exposureId, entry.mediatorIds, outcomeId)
+        : null;
       rows.push({
         id: `frontdoor:${entry.mediatorIds.join(",")}`,
         kind: "frontdoor",
@@ -232,6 +274,9 @@ export function evaluateDesign(
         power: null,
         smallSelectedSample: Boolean(truncation && effectiveN < 50),
         seLabel: "unavailable",
+        estimandUnderMismeasurement: attenuatedFrontdoor,
+        biasUnderMismeasurement:
+          attenuatedFrontdoor === null ? null : attenuatedFrontdoor - totalEffect,
       });
     } catch {
       // Frontdoor estimand is ill-defined for this parameterization; skip the row.
@@ -257,6 +302,7 @@ export function evaluateDesign(
     selectionApproximation,
     selectionRuleCount: rules.length,
     forbiddenConditioningNodeIds,
+    attenuation: attenuationNotes(covariance, reliabilities),
   };
 }
 
