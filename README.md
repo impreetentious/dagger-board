@@ -14,7 +14,7 @@ This project is a pre-data instrument for stress-testing causal claims and study
 2. **Prove** — the engine computes, _exactly_, what your assumptions already imply: whether your effect is identified by the classical strategies — covariate adjustment, front-door, instrumental variables — and exactly how (and it tells you honestly when its strategy set is exhausted rather than claiming non-identifiability), every minimal valid adjustment set, every biasing path, available instruments, frontdoor routes, and the conditional independencies your model claims are testable.
 3. **Simulate** — the graph becomes a working structural causal model. Seeded, replayable data generation shows the precise bias your naive analysis would produce — confounding, collider conditioning, M-bias, selection, measurement error — and every simulated estimate converges to a closed-form population value the engine derives independently.
 4. **Design** — declare what you can measure, how *well* you can measure it, what you'll condition on, how your sample is selected, and how big it is. Get back which effects are identified under that design's measurement and conditioning choices, the exact population bias of each feasible estimator, a variance/power preview, and — since a noisy proxy is not the variable it stands in for — what each estimator recovers once your declared reliabilities are applied.
-5. **Stress-test** — the verdict on every screen assumes the drawn graph is complete, so the sensitivity surface prices that assumption: the exact strength an *undrawn* confounder would need, in partial R² with the exposure and with the outcome, to bring the estimate to zero or reverse its sign, with the drawn covariates placed on the same axes as calibration.
+5. **Stress-test** — the verdict on every screen assumes the drawn graph is complete, so the sensitivity surface prices that assumption: the exact strength an *undrawn* confounder would need, in partial R² with the exposure and with the outcome, to bring the estimate to zero or reverse its sign, with the drawn covariates placed on the same axes as calibration. And where the verdict is "not identified", the engine constructs a witness pair — two parameterizations of your graph that agree on every observable covariance and disagree about the effect.
 6. **Learn** — a curriculum of canonical traps, each a playable scenario: you make the analysis call first, then the engine reveals what happened and the theory underneath.
 7. **Communicate** — export an Analysis Design Record: the graph, the assumptions (including what you assumed _absent_), the chosen identification strategy, and the known threats.
 
@@ -39,6 +39,7 @@ This project is a pre-data instrument for stress-testing causal claims and study
 - **Classical strategies only.** Identification covers covariate adjustment, front-door, and conditional IV. When those are exhausted the app says so explicitly instead of declaring the effect non-identifiable.
 
 - **Sensitivity is a population statement, not a significance test.** Robustness values are computed from the model-implied covariance, before any data exists, so there is no standard error to condition on and no significance-adjusted variant is offered. Confounder strength is the only currency.
+- **A witness search is bounded and local.** Finding a witness pair proves non-identification for that graph. Failing to find one proves nothing: the search is a deterministic hill-climb inside the model's own parameter bounds, and it says so rather than implying the effect is identified.
 - **Measurement error is the classical model.** A mismeasured node is the true node plus independent noise, parameterised by reliability. Differential and correlated measurement error are different models and are not offered.
 
 ## Stack
@@ -91,4 +92,4 @@ MIT © Sidakpreet Singh — see [LICENSE](LICENSE). Application code is MIT; see
 
 ---
 
-**Version:** v0.14.7
+**Version:** v0.14.8

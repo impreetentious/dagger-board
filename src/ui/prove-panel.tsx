@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { pathSpecificEffects } from "@/engine/effects";
 import { proveGraph } from "@/engine/prove";
 import { useLabStore } from "@/store/lab-store";
+import { WitnessCard } from "@/ui/witness-card";
 
 function setLabel(ids: readonly string[], names: (id: string) => string): string {
   return ids.length === 0 ? "∅" : ids.map(names).join(", ");
@@ -89,6 +90,11 @@ export function ProvePanel() {
             Selection is conditioning your sample; adjustment certification above is selection-free.
             Inspect exact bias on Simulate or Design.
           </p>
+        ) : null}
+        {report.verdict === "unsupported" ? (
+          <div className="mt-4">
+            <WitnessCard />
+          </div>
         ) : null}
       </article>
 
