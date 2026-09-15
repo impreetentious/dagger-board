@@ -16,7 +16,7 @@ This project is a pre-data instrument for stress-testing causal claims and study
 4. **Design** — declare what you can measure, how *well* you can measure it, what you'll condition on, how your sample is selected, and how big it is. Get back which effects are identified under that design's measurement and conditioning choices, the exact population bias of each feasible estimator, a variance/power preview, and — since a noisy proxy is not the variable it stands in for — what each estimator recovers once your declared reliabilities are applied.
 5. **Stress-test** — the verdict on every screen assumes the drawn graph is complete, so the sensitivity surface prices that assumption: the exact strength an *undrawn* confounder would need, in partial R² with the exposure and with the outcome, to bring the estimate to zero or reverse its sign, with the drawn covariates placed on the same axes as calibration. And where the verdict is "not identified", the engine constructs a witness pair — two parameterizations of your graph that agree on every observable covariance and disagree about the effect.
 6. **Learn** — a curriculum of canonical traps, each a playable scenario: you make the analysis call first, then the engine reveals what happened and the theory underneath.
-7. **Communicate** — export an Analysis Design Record: the graph, the assumptions (including what you assumed _absent_), the chosen identification strategy, and the known threats.
+7. **Communicate** — export an Analysis Design Record: the graph, the assumptions (including what you assumed _absent_), the chosen identification strategy, the known threats, and the robustness line that says how wrong the assumptions would have to be.
 
 ## What makes it different
 
@@ -37,7 +37,6 @@ This project is a pre-data instrument for stress-testing causal claims and study
 - **Linear-Gaussian structural models.** Simulation and closed-form bias assume linear structural equations with Gaussian noise. Non-linear and discrete-outcome models are outside the engine.
 - **Selection is quantified, not certified.** Under an active selection rule the app reports the exact bias it induces, and labels the identification verdict as "selection ignored" — it does not certify that an adjustment set remains valid _under_ selection.
 - **Classical strategies only.** Identification covers covariate adjustment, front-door, and conditional IV. When those are exhausted the app says so explicitly instead of declaring the effect non-identifiable.
-
 - **Sensitivity is a population statement, not a significance test.** Robustness values are computed from the model-implied covariance, before any data exists, so there is no standard error to condition on and no significance-adjusted variant is offered. Confounder strength is the only currency.
 - **A witness search is bounded and local.** Finding a witness pair proves non-identification for that graph. Failing to find one proves nothing: the search is a deterministic hill-climb inside the model's own parameter bounds, and it says so rather than implying the effect is identified.
 - **Measurement error is the classical model.** A mismeasured node is the true node plus independent noise, parameterised by reliability. Differential and correlated measurement error are different models and are not offered.
@@ -92,4 +91,4 @@ MIT © Sidakpreet Singh — see [LICENSE](LICENSE). Application code is MIT; see
 
 ---
 
-**Version:** v0.14.8
+**Version:** v0.14.9

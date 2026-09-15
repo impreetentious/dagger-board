@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { diffDesignReports, evaluateDesign, type DesignReport } from "@/engine/design";
+import { RELIABILITY_MIN } from "@/engine/measurement";
 import { useLabStore } from "@/store/lab-store";
+import { SensitivityCard } from "@/ui/sensitivity-card";
 
 function value(number: number | null): string {
   return number === null || !Number.isFinite(number) ? "—" : number.toFixed(4);
@@ -18,10 +20,12 @@ export function DesignPanel() {
   const graph = useLabStore((state) => state.graph);
   const parameters = useLabStore((state) => state.parameters);
   const measured = useLabStore((state) => state.measured);
+  const reliability = useLabStore((state) => state.reliability);
   const conditioning = useLabStore((state) => state.conditioning);
   const selection = useLabStore((state) => state.selection);
   const n = useLabStore((state) => state.n);
   const setMeasured = useLabStore((state) => state.setMeasured);
+  const setReliability = useLabStore((state) => state.setReliability);
   const setConditioning = useLabStore((state) => state.setConditioning);
   const setSelection = useLabStore((state) => state.setSelection);
   const setSampleSize = useLabStore((state) => state.setSampleSize);
@@ -30,11 +34,19 @@ export function DesignPanel() {
   const name = (id: string) => graph.nodes.find((node) => node.id === id)?.name ?? id;
   const report = useMemo(() => {
     try {
-      return evaluateDesign(graph, parameters, measured, selection ?? undefined, n, conditioning);
+      return evaluateDesign(
+        graph,
+        parameters,
+        measured,
+        selection ?? undefined,
+        n,
+        conditioning,
+        reliability,
+      );
     } catch (error) {
       return error instanceof Error ? error : new Error("Design table unavailable.");
     }
-  }, [conditioning, graph, measured, n, parameters, selection]);
+  }, [conditioning, graph, measured, n, parameters, reliability, selection]);
   const [pinned, setPinned] = useState<DesignReport | null>(null);
   const diff = pinned && !(report instanceof Error) ? diffDesignReports(pinned, report) : [];
 
@@ -75,13 +87,32 @@ export function DesignPanel() {
                     {node.name}
                     {roleBound ? " (required)" : ""}
                   </span>
-                  <input
-                    aria-label={`Measure ${node.name}`}
-                    checked={measured[node.id] ?? true}
-                    disabled={roleBound}
-                    onChange={(event) => setMeasured(node.id, event.target.checked)}
-                    type="checkbox"
-                  />
+                  <span className="flex items-center gap-3">
+                    <label className="flex items-center gap-2 text-xs text-[var(--muted)]">
+                      <span>reliability λ</span>
+                      <input
+                        aria-label={`Measurement reliability for ${node.name}`}
+                        className="w-24"
+                        disabled={!(measured[node.id] ?? true)}
+                        max={1}
+                        min={RELIABILITY_MIN}
+                        onChange={(event) => setReliability(node.id, Number(event.target.value))}
+                        step={0.05}
+                        type="range"
+                        value={reliability[node.id] ?? 1}
+                      />
+                      <span className="w-8 font-mono tabular-nums">
+                        {(reliability[node.id] ?? 1).toFixed(2)}
+                      </span>
+                    </label>
+                    <input
+                      aria-label={`Measure ${node.name}`}
+                      checked={measured[node.id] ?? true}
+                      disabled={roleBound}
+                      onChange={(event) => setMeasured(node.id, event.target.checked)}
+                      type="checkbox"
+                    />
+                  </span>
                 </label>
               );
             })}
@@ -217,6 +248,9 @@ export function DesignPanel() {
                 {report.selectionActive ? "Identified (selection ignored)" : "Identified?"}
               </th>
               <th className="p-2">Population bias</th>
+              {report.attenuation.length > 0 ? (
+                <th className="p-2">Bias under mismeasurement</th>
+              ) : null}
               <th className="p-2">SE / power</th>
             </tr>
           </thead>
@@ -253,6 +287,14 @@ export function DesignPanel() {
                     {row.ivStatus === "weak" ? " · weak" : ""}
                     {row.ivStatus === "undefined" ? " · undefined" : ""}
                   </td>
+                  {report.attenuation.length > 0 ? (
+                    <td className="p-2">
+                      {value(row.biasUnderMismeasurement)}
+                      <span className="block text-[10px] leading-4 text-[var(--muted)]">
+                        recovers {value(row.estimandUnderMismeasurement)}
+                      </span>
+                    </td>
+                  ) : null}
                   <td className="p-2">
                     {seCell}
                     <span className="block text-[10px] leading-4 text-[var(--muted)]">
@@ -325,6 +367,7 @@ export function DesignPanel() {
           </table>
         </div>
       ) : null}
+      <SensitivityCard conditioningIds={conditioning} />
       {selection && (
         <button
           className="text-left text-xs text-[var(--signal)] underline"

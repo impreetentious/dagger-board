@@ -23,6 +23,8 @@ function nodeNameLookup(document: AdrDocument): Record<string, string> {
 export function CommunicatePanel() {
   const graph = useLabStore((state) => state.graph);
   const conditioning = useLabStore((state) => state.conditioning);
+  const parameters = useLabStore((state) => state.parameters);
+  const reliability = useLabStore((state) => state.reliability);
   const selection = useLabStore((state) => state.selection);
   const seed = useLabStore((state) => state.seed);
   const n = useLabStore((state) => state.n);
@@ -45,8 +47,10 @@ export function CommunicatePanel() {
         timestamp: timestamp ?? "",
         appVersion: APP_VERSION,
         svg,
+        parameters,
+        reliability,
       }),
-    [graph, conditioning, selection, seed, n, timestamp, svg],
+    [graph, conditioning, selection, seed, n, timestamp, svg, parameters, reliability],
   );
 
   const names = nodeNameLookup(doc);
@@ -103,6 +107,11 @@ export function CommunicatePanel() {
           Verdict: <span className="font-bold">{doc.identificationVerdict}</span>. Timestamp:{" "}
           <span className="font-mono">{doc.timestamp || "—"}</span> ({doc.appVersion}).
         </p>
+        {doc.robustness ? (
+          <p className="text-sm leading-6">
+            <span className="font-bold">Robustness.</span> {doc.robustness.statement}
+          </p>
+        ) : null}
       </div>
       <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4">
         <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">

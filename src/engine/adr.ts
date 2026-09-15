@@ -1,5 +1,9 @@
 import { hasEdge, type Graph, type GraphNode } from "@/engine/graph";
+import { attenuateCovariance, type ReliabilityMap } from "@/engine/measurement";
 import { proveGraph, type ProveReport } from "@/engine/prove";
+import { buildScmModel, matrixTotalEffect, type SCMParameters } from "@/engine/scm";
+import { evaluateSensitivity, sensitivitySummary } from "@/engine/sensitivity";
+import { truncateCovariance } from "@/engine/truncation";
 import type { SelectionContext } from "@/engine/dsep";
 import type { SelectionRule } from "@/engine/truncation";
 
@@ -12,6 +16,13 @@ export interface AdrInputs {
   timestamp: string;
   appVersion: string;
   svg?: string;
+  /**
+   * Supplying a parameterization adds the robustness line. It is optional so that a record
+   * built without one is byte-identical to what it always was — a design record should not
+   * silently acquire a number the design did not declare.
+   */
+  parameters?: SCMParameters;
+  reliability?: ReliabilityMap;
 }
 
 export interface AbsentEdge {
@@ -42,6 +53,13 @@ export interface AdrDocument {
   instruments: Array<{ instrumentId: string; conditioningSets: string[][] }>;
   implications: Array<{ leftId: string; rightId: string; separatorIds: string[] }>;
   threats: Array<{ pathIds: string[]; label: string }>;
+  /** Present only when the record was built with a parameterization to read Σ from. */
+  robustness?: {
+    estimand: number;
+    robustnessValue: number;
+    robustnessValueSignFlip: number;
+    statement: string;
+  };
   seed: number | null;
   n: number | null;
   svg: string;
@@ -80,6 +98,7 @@ export function buildAdrDocument(inputs: AdrInputs): AdrDocument {
         quantile: selection.quantile,
       }
     : null;
+  const robustness = buildRobustness(inputs);
   return {
     v: 1,
     appVersion: inputs.appVersion,
@@ -109,8 +128,46 @@ export function buildAdrDocument(inputs: AdrInputs): AdrDocument {
       separatorIds: implication.separatorIds,
     })),
     threats: openBiasingPaths,
+    ...(robustness ? { robustness } : {}),
     seed: inputs.seed,
     n: inputs.n,
     svg: inputs.svg ?? "",
   };
+}
+
+/**
+ * The record's robustness line. Every other line in an ADR says what the design assumes; this
+ * one says how wrong those assumptions could be before the conclusion changes — which is the
+ * question a reviewer asks about the assumed-absent list on the line above it.
+ */
+function buildRobustness(inputs: AdrInputs): AdrDocument["robustness"] {
+  const { graph, parameters, selection, conditioning, reliability } = inputs;
+  const exposureId = graph.roles.exposureId;
+  const outcomeId = graph.roles.outcomeId;
+  if (!parameters || !exposureId || !outcomeId) return undefined;
+  try {
+    const model = buildScmModel(graph, parameters);
+    if (model.illConditioned) return undefined;
+    const selected = selection ? truncateCovariance(model, selection) : model;
+    const context = attenuateCovariance(
+      { covariance: selected.covariance, indexById: model.indexById },
+      reliability,
+    );
+    const report = evaluateSensitivity({
+      graph,
+      context,
+      exposureId,
+      outcomeId,
+      conditioningIds: [...conditioning],
+      totalEffect: matrixTotalEffect(model, exposureId, outcomeId),
+    });
+    return {
+      estimand: report.estimand,
+      robustnessValue: report.robustnessValue,
+      robustnessValueSignFlip: report.robustnessValueSignFlip,
+      statement: sensitivitySummary(report),
+    };
+  } catch {
+    return undefined;
+  }
 }
