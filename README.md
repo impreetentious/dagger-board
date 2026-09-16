@@ -76,6 +76,10 @@ npm run build
 
 This emits a plain static site in `out/`, which serves from any static host. `npm run serve:out` serves that build locally at `http://localhost:4004`. There is no hosted instance — run it locally or deploy the bundle yourself.
 
+Whatever host you use should send the response headers documented in [docs/STATIC-HOST-HEADERS.md](docs/STATIC-HOST-HEADERS.md). `vercel.json` applies them on Vercel and `serve.json` applies the same policy to the local preview, so the browser test suite runs against the real policy. `npm run check:csp` fails if the two host configs and the document ever disagree.
+
+The GitHub remote is authoritative and carries the only pipeline; `.github/workflows/ci.yml` runs every gate. The GitLab remote is a backup mirror kept in sync, deliberately without a `.gitlab-ci.yml` — there is no second publication target to gate, and a mirrored pipeline would only create a second place for gate drift.
+
 ## Third-party notice
 
 Test-only DAGitty fixtures under `fixtures/tools/dagitty/` are GPL-2.0-or-later. Application code under `src/` does not import that fixture tooling. See [NOTICE](NOTICE).
@@ -91,4 +95,4 @@ MIT © Sidakpreet Singh — see [LICENSE](LICENSE). Application code is MIT; see
 
 ---
 
-**Version:** v0.15.1
+**Version:** v0.15.2

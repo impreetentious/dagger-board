@@ -1,6 +1,6 @@
 {
   "name": "daggerboard",
-  "version": "0.15.1",
+  "version": "0.15.2",
   "private": true,
   "engines": {
     "node": ">=20.20.2 <21",
@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "next dev --port 3004",
     "build": "next build",
-    "serve:out": "serve -l 4004 out",
+    "serve:out": "serve -l 4004 --config ../serve.json out",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -19,9 +19,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "npm run build && PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
-    "test:full": "npm run check:version && npm run typecheck && npm run lint && npm run check:citations && npm run test && npm run test:e2e && npm run bundle:check",
+    "test:full": "npm run check:version && npm run typecheck && npm run lint && npm run check:citations && npm run test && npm run test:e2e && npm run check:csp && npm run bundle:check",
     "check:version": "node scripts/check-version-coherence.mjs",
-    "check:citations": "node scripts/check-citations.mjs"
+    "check:citations": "node scripts/check-citations.mjs",
+    "check:csp": "node scripts/check-csp.mjs"
   },
   "dependencies": {
     "next": "16.2.2",
