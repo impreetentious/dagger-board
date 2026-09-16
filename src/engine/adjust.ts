@@ -72,10 +72,10 @@ export function canonicalAdjustmentSet(
       const node = graph.nodes.find((candidate) => candidate.id === id);
       return Boolean(
         node &&
-          node.kind === "observed" &&
-          id !== exposureId &&
-          id !== outcomeId &&
-          !forbidden.has(id),
+        node.kind === "observed" &&
+        id !== exposureId &&
+        id !== outcomeId &&
+        !forbidden.has(id),
       );
     }),
   );
