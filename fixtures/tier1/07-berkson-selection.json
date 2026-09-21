@@ -39,7 +39,7 @@
       "outcomeId": "y"
     }
   },
-  "expectedP1": {
+  "expectedGraph": {
     "dSeparation": [
       {
         "from": "x",
@@ -75,7 +75,7 @@
       "s": 1
     }
   },
-  "expectedP3": {
+  "expectedScm": {
     "selection": {
       "nodeId": "s",
       "quantile": 0.5,

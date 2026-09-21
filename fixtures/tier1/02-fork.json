@@ -15,7 +15,7 @@
     ],
     "roles": { "exposureId": "x", "outcomeId": "y" }
   },
-  "expectedP1": {
+  "expectedGraph": {
     "dSeparation": [{ "from": "x", "to": "y", "conditioned": ["u"], "separated": true }],
     "paths": [{ "conditioned": [], "primaryLabels": ["confounding"] }]
   }

@@ -15,5 +15,5 @@
     ],
     "roles": { "exposureId": "x", "outcomeId": "y" }
   },
-  "expectedP1": { "paths": [{ "conditioned": [], "primaryLabels": ["confounding"] }] }
+  "expectedGraph": { "paths": [{ "conditioned": [], "primaryLabels": ["confounding"] }] }
 }

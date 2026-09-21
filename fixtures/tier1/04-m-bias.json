@@ -59,7 +59,7 @@
       "outcomeId": "y"
     }
   },
-  "expectedP1": {
+  "expectedGraph": {
     "dSeparation": [
       {
         "from": "x",
@@ -97,7 +97,7 @@
       "y": 1
     }
   },
-  "expectedP3": {
+  "expectedScm": {
     "totalEffect": 0,
     "covariance": {
       "x,m": 0.25,
