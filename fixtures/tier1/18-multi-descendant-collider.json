@@ -19,7 +19,7 @@
     ],
     "roles": { "exposureId": "x", "outcomeId": "y" }
   },
-  "expectedP1": {
+  "expectedGraph": {
     "paths": [{ "conditioned": ["d1", "d2"], "primaryLabels": ["collider-opened"] }]
   }
 }

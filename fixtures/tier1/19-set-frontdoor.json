@@ -85,10 +85,10 @@
       "y": 1
     }
   },
-  "expectedP1": {
+  "expectedGraph": {
     "dSeparation": []
   },
-  "expectedP3": {
+  "expectedScm": {
     "totalEffect": 0.5,
     "covariance": {
       "x,x": 1.25,

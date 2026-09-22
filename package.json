@@ -1,6 +1,6 @@
 {
   "name": "daggerboard",
-  "version": "0.16.2",
+  "version": "0.16.3",
   "private": true,
   "engines": {
     "node": ">=20.20.2 <21",
@@ -15,6 +15,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "fixtures:dagitty": "node fixtures/tools/generate-dagitty.mjs",
+    "fixtures:adversarial": "node fixtures/tools/gen-fixture14.mjs",
     "bundle:check": "node scripts/bundle-budget.mjs",
     "test": "vitest run",
     "test:watch": "vitest",

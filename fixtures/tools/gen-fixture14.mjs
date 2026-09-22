@@ -1,4 +1,4 @@
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const seed = "fixture14-layered-v1";
@@ -18,12 +18,18 @@ const fixture = {
   id: "adversarial-perf",
   derivation: `Frozen ${seed}: a 12-node / 24-edge layered DAG for agreement and performance only.`,
   graph: { v: 1, nodes, edges, roles: { exposureId: "x", outcomeId: "y" } },
-  expectedP1: { dSeparation: [], paths: [] },
+  expectedGraph: { dSeparation: [], paths: [] },
 };
 
 if (nodes.length !== 12 || edges.length !== 24)
   throw new Error("Fixture #14 must stay at the contract cap.");
-writeFileSync(
-  resolve(import.meta.dirname, "../tier1/14-adversarial-perf.json"),
-  `${JSON.stringify(fixture, null, 2)}\n`,
-);
+const outputPath = resolve(import.meta.dirname, "../tier1/14-adversarial-perf.json");
+const serialized = `${JSON.stringify(fixture, null, 2)}\n`;
+
+if (process.argv.includes("--check")) {
+  if (readFileSync(outputPath, "utf8") !== serialized) {
+    throw new Error("Adversarial fixture is stale; run npm run fixtures:adversarial.");
+  }
+} else {
+  writeFileSync(outputPath, serialized);
+}

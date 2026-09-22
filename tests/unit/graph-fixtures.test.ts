@@ -14,8 +14,8 @@ const fixtures = readdirSync(fixtureDirectory)
     Tier1FixtureSchema.parse(JSON.parse(readFileSync(`${fixtureDirectory}/${file}`, "utf8"))),
   ) as Tier1Fixture[];
 
-describe("P1 Tier-1 fixtures", () => {
-  it("contains the complete post-v1 fixture canon", () => {
+describe("graph fixture canon", () => {
+  it("contains the complete fixture canon", () => {
     expect(fixtures.length).toBeGreaterThanOrEqual(18);
     expect(fixtures.map((fixture) => fixture.id)).toContain("adversarial-perf");
     expect(fixtures.map((fixture) => fixture.id)).toContain("set-frontdoor");
@@ -24,7 +24,7 @@ describe("P1 Tier-1 fixtures", () => {
   for (const fixture of fixtures) {
     it(`${fixture.id} agrees between both d-separation implementations`, () => {
       const { graph } = fixture;
-      for (const query of fixture.expectedP1.dSeparation) {
+      for (const query of fixture.expectedGraph.dSeparation) {
         const conditioned = new Set(query.conditioned);
         const selection = query.selectionNodeId ? { nodeId: query.selectionNodeId } : undefined;
         expect(dSeparatedBayesBall(graph, query.from, query.to, conditioned, selection)).toBe(
@@ -41,7 +41,7 @@ describe("P1 Tier-1 fixtures", () => {
       const exposureId = graph.roles.exposureId;
       const outcomeId = graph.roles.outcomeId;
       if (!exposureId || !outcomeId) throw new Error("Tier-1 fixtures require roles.");
-      for (const expectation of fixture.expectedP1.paths) {
+      for (const expectation of fixture.expectedGraph.paths) {
         const result = classifyPaths(
           graph,
           exposureId,
@@ -63,7 +63,7 @@ describe("P1 Tier-1 fixtures", () => {
     ]);
   });
 
-  it("keeps the cap fixture within the P1 path-enumeration budget", () => {
+  it("keeps the cap fixture within the path-enumeration budget", () => {
     const fixture = fixtures.find((candidate) => candidate.id === "adversarial-perf");
     if (!fixture) throw new Error("Missing fixture #14.");
     const start = performance.now();

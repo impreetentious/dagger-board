@@ -16,13 +16,6 @@ const PathExpectationSchema = z.object({
   primaryLabels: z.array(z.string()),
 });
 
-const ExpectedGraphSchema = z.object({
-  dSeparation: z._default(z.array(DSeparationExpectationSchema), []),
-  paths: z._default(z.array(PathExpectationSchema), []),
-});
-
-const EmptyExpectedGraph = { dSeparation: [], paths: [] };
-
 const ExpectedScmSchema = z.object({
   totalEffect: z.optional(z.number()),
   covariance: z.optional(z.record(z.string(), z.number())),
@@ -46,24 +39,20 @@ const ExpectedScmSchema = z.object({
   ),
 });
 
-const TransitionalTier1FixtureSchema = z.object({
+export const Tier1FixtureSchema = z.object({
   v: z.literal(1),
   id: z.string(),
   derivation: z.string(),
   graph: GraphSchema,
   parameters: z.optional(SCMParametersSchema),
-  expectedP3: z.optional(ExpectedScmSchema),
   expectedScm: z.optional(ExpectedScmSchema),
-  expectedP1: z.optional(ExpectedGraphSchema),
-  expectedGraph: z.optional(ExpectedGraphSchema),
+  expectedGraph: z._default(
+    z.object({
+      dSeparation: z._default(z.array(DSeparationExpectationSchema), []),
+      paths: z._default(z.array(PathExpectationSchema), []),
+    }),
+    { dSeparation: [], paths: [] },
+  ),
 });
-
-export const Tier1FixtureSchema = z.pipe(
-  TransitionalTier1FixtureSchema,
-  z.transform((fixture) => ({
-    ...fixture,
-    expectedP1: fixture.expectedP1 ?? fixture.expectedGraph ?? EmptyExpectedGraph,
-  })),
-);
 
 export type Tier1Fixture = z.infer<typeof Tier1FixtureSchema>;

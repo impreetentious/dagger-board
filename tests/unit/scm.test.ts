@@ -48,7 +48,7 @@ function parametersFor(graph: Tier1Fixture["graph"], coefficient = 0.5): SCMPara
   return result;
 }
 
-describe("WU-3.1 seeded primitives", () => {
+describe("seeded random primitives", () => {
   it("matches raw mulberry32, open-interval, Box–Muller, and poison-seed vectors", () => {
     const raw = mulberry32(0);
     expect([raw(), raw(), raw()]).toEqual([1144304738, 1416247, 958946056]);
@@ -79,7 +79,79 @@ describe("WU-3.1 seeded primitives", () => {
   });
 });
 
-describe("WU-3.2–3.4 exact SCM", () => {
+describe("exact SCM", () => {
+  it("matches every committed hand-derived SCM expectation", () => {
+    for (const item of fixtures) {
+      const expected = item.expectedScm;
+      if (!expected) continue;
+      const exposureId = item.graph.roles.exposureId;
+      const outcomeId = item.graph.roles.outcomeId;
+      if (!exposureId || !outcomeId)
+        throw new Error(`${item.id} is missing exposure/outcome roles.`);
+      const model = buildScmModel(item.graph, item.parameters ?? defaultScmParameters(item.graph));
+
+      if (expected.totalEffect !== undefined) {
+        expect(matrixTotalEffect(model, exposureId, outcomeId), item.id).toBeCloseTo(
+          expected.totalEffect,
+          12,
+        );
+      }
+      for (const [pair, value] of Object.entries(expected.covariance ?? {})) {
+        const [left, right] = pair.split(",");
+        if (!left || !right) throw new Error(`${item.id} has invalid covariance key ${pair}.`);
+        expect(covarianceAt(model, left, right), `${item.id}: ${pair}`).toBeCloseTo(value, 12);
+      }
+      for (const [conditioningId, value] of Object.entries(expected.ols ?? {})) {
+        const conditioning = conditioningId === "empty" ? [] : [conditioningId];
+        const totalEffect = matrixTotalEffect(model, exposureId, outcomeId);
+        expect(
+          olsEstimand(model, exposureId, outcomeId, conditioning, totalEffect).estimand,
+          `${item.id}: OLS ${conditioningId}`,
+        ).toBeCloseTo(value, 12);
+      }
+      if (expected.olsNaive !== undefined) {
+        const totalEffect = matrixTotalEffect(model, exposureId, outcomeId);
+        expect(olsEstimand(model, exposureId, outcomeId, [], totalEffect).estimand).toBeCloseTo(
+          expected.olsNaive,
+          12,
+        );
+      }
+      if (expected.frontdoorSet) {
+        expect(
+          frontdoorSetEstimand(model, exposureId, expected.frontdoorSet.mediatorIds, outcomeId),
+        ).toBeCloseTo(expected.frontdoorSet.estimand, 12);
+      }
+      if (expected.selection) {
+        const truncated = truncateCovariance(model, expected.selection);
+        const selectionIndex = model.indexById.get(expected.selection.nodeId);
+        const exposureIndex = model.indexById.get(exposureId);
+        const outcomeIndex = model.indexById.get(outcomeId);
+        if (
+          selectionIndex === undefined ||
+          exposureIndex === undefined ||
+          outcomeIndex === undefined
+        ) {
+          throw new Error(`${item.id} selection expectation references a missing node.`);
+        }
+        expect(
+          covarianceAt(model, expected.selection.nodeId, expected.selection.nodeId),
+        ).toBeCloseTo(expected.selection.varS, 12);
+        expect(truncated.covariance[exposureIndex]![exposureIndex]).toBeCloseTo(
+          expected.selection.varX,
+          12,
+        );
+        expect(truncated.covariance[exposureIndex]![outcomeIndex]).toBeCloseTo(
+          expected.selection.covXY,
+          12,
+        );
+        expect(truncated.covariance[selectionIndex]![selectionIndex]).toBeCloseTo(
+          expected.selection.varSSelected,
+          12,
+        );
+      }
+    }
+  });
+
   it("reproduces the M-bias hand derivation", () => {
     const graph = fixture("m-bias").graph;
     const model = buildScmModel(graph, parametersFor(graph));
