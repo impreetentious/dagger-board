@@ -18,5 +18,5 @@
     ],
     "roles": { "exposureId": "x", "outcomeId": "y" }
   },
-  "expectedP1": { "dSeparation": [] }
+  "expectedGraph": { "dSeparation": [] }
 }

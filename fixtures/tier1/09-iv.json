@@ -1,7 +1,7 @@
 {
   "v": 1,
   "id": "iv",
-  "derivation": "Z predicts X while latent U confounds X and Y; P2 verifies the conditional-IV criterion.",
+  "derivation": "Z predicts X while latent U confounds X and Y, exercising the conditional-IV criterion.",
   "graph": {
     "v": 1,
     "nodes": [
@@ -18,5 +18,5 @@
     ],
     "roles": { "exposureId": "x", "outcomeId": "y" }
   },
-  "expectedP1": { "dSeparation": [] }
+  "expectedGraph": { "dSeparation": [] }
 }

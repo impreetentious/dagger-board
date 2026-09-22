@@ -1,7 +1,7 @@
 {
   "v": 1,
   "id": "iv-exact-cancellation",
-  "derivation": "Z -> X and Z -> A -> X can cancel under P3 coefficients, exercising the undefined-instrument guard without a graph change.",
+  "derivation": "Z -> X and Z -> A -> X can cancel under the fixture coefficients, exercising the undefined-instrument guard without a graph change.",
   "graph": {
     "v": 1,
     "nodes": [
@@ -18,5 +18,5 @@
     ],
     "roles": { "exposureId": "x", "outcomeId": "y" }
   },
-  "expectedP1": { "dSeparation": [] }
+  "expectedGraph": { "dSeparation": [] }
 }

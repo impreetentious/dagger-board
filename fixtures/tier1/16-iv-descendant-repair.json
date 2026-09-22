@@ -1,7 +1,7 @@
 {
   "v": 1,
   "id": "iv-descendant-repair-negative",
-  "derivation": "CX-B: moving relevance into the cut graph cannot repair a descendant instrument; P3 records beta_IV=0.95 while TE=0.7.",
+  "derivation": "Moving relevance into the cut graph cannot repair a descendant instrument; the covariance oracle gives beta_IV=0.95 while TE=0.7.",
   "graph": {
     "v": 1,
     "nodes": [
@@ -21,5 +21,5 @@
     ],
     "roles": { "exposureId": "x", "outcomeId": "y" }
   },
-  "expectedP1": { "dSeparation": [] }
+  "expectedGraph": { "dSeparation": [] }
 }

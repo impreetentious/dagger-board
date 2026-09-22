@@ -181,7 +181,7 @@
       "outcomeId": "y"
     }
   },
-  "expectedP1": {
+  "expectedGraph": {
     "dSeparation": [],
     "paths": []
   }

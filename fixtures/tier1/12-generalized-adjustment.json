@@ -1,7 +1,7 @@
 {
   "v": 1,
   "id": "generalized-adjustment",
-  "derivation": "D is a harmless descendant of X outside every proper causal path; P2 records that it is valid but not minimal.",
+  "derivation": "D is a harmless descendant of X outside every proper causal path; it is valid but not minimal.",
   "graph": {
     "v": 1,
     "nodes": [
@@ -15,5 +15,5 @@
     ],
     "roles": { "exposureId": "x", "outcomeId": "y" }
   },
-  "expectedP1": { "paths": [{ "conditioned": [], "primaryLabels": ["causal-open"] }] }
+  "expectedGraph": { "paths": [{ "conditioned": [], "primaryLabels": ["causal-open"] }] }
 }
