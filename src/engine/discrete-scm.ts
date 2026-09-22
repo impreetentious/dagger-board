@@ -2,9 +2,8 @@ import * as z from "zod/mini";
 import { parentsOf, type Graph } from "@/engine/graph";
 
 /**
- * Binary/discrete SCM path (item 2 of §2.6). D-03 pinned v1 to linear-Gaussian;
- * this module adds a self-contained Bernoulli-logistic oracle without
- * touching that ledger row. It cannot share the §3 identity-assertion
+ * Binary/discrete SCM path. This self-contained Bernoulli-logistic oracle
+ * complements the primary linear-Gaussian model. It cannot share the §3 identity-assertion
  * machinery (matrix-vs-trek Σ, path-sum vs matrix TE, Schur partials) because
  * those identities are linear equalities: Wright's path decomposition and the
  * Schur complement live in the linear-Gaussian moment algebra. The discrete
@@ -16,7 +15,7 @@ import { parentsOf, type Graph } from "@/engine/graph";
 
 const FiniteNumber = z.number();
 
-export const DiscreteScmParametersSchema = z.object({
+const DiscreteScmParametersSchema = z.object({
   v: z.literal(1),
   logits: z.record(
     z.string(),
@@ -29,7 +28,7 @@ export const DiscreteScmParametersSchema = z.object({
 
 export type DiscreteScmParameters = z.infer<typeof DiscreteScmParametersSchema>;
 
-export class DiscreteScmError extends Error {
+class DiscreteScmError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "DiscreteScmError";

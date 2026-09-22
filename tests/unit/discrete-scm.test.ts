@@ -47,7 +47,7 @@ function forkParameters(): DiscreteScmParameters {
   };
 }
 
-describe("discrete SCM oracle (item 2 of §2.6)", () => {
+describe("discrete SCM oracle", () => {
   it("normalises parameters, rejects non-parent coefficients, and defaults to unit logits", () => {
     const defaults = defaultDiscreteParameters(chainGraph);
     expect(defaults.logits.m.coefficients.x).toBe(1);

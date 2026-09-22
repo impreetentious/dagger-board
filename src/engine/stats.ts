@@ -31,7 +31,7 @@ function indexFor(context: CovarianceContext, id: string): number {
   return index;
 }
 
-export function covarianceEntry(context: CovarianceContext, left: string, right: string): number {
+function covarianceEntry(context: CovarianceContext, left: string, right: string): number {
   return context.covariance[indexFor(context, left)][indexFor(context, right)];
 }
 
@@ -164,7 +164,7 @@ export function frontdoorEstimand(
  * with `β_{Z ~ X}` the OLS slopes of each Z_i on X alone and
  * `β_{Y ~ Z · X} = Σ_{ZZ · X}⁻¹ · Σ_{ZY · X}` the OLS coefficients on Z in
  * the joint regression `Y ~ X + Z`. Collapses to the singleton form when
- * |Z| = 1. See docs/notes/identification.md §V-08 for the derivation.
+ * |Z| = 1. See the set-valued front-door section in docs/notes/identification.md.
  */
 export function frontdoorSetEstimand(
   context: CovarianceContext,

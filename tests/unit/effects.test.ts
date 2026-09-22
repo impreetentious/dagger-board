@@ -26,12 +26,12 @@ function halfParameters(graph: ReturnType<typeof fixture>["graph"]): SCMParamete
   return parameters;
 }
 
-describe("direct and path-specific effects (item 3 of §2.6)", () => {
+describe("direct and path-specific effects", () => {
   it("returns the edge coefficient for a direct X→Y edge, and 0 otherwise", () => {
     const chain = fixture("01-chain.json");
     const setFd = fixture("19-set-frontdoor.json");
     expect(directEdgeCoefficient(chain.graph, halfParameters(chain.graph), "x", "y")).toBe(0);
-    // set-frontdoor has no direct X→Y edge in v1's fixture (only X→M1→Y and X→M2→Y)
+    // The set-frontdoor fixture has only X→M1→Y and X→M2→Y, with no direct edge.
     expect(directEdgeCoefficient(setFd.graph, halfParameters(setFd.graph), "x", "y")).toBe(0);
   });
 

@@ -4,9 +4,8 @@ import { edgeCoefficient, type SCMParameters } from "@/engine/scm";
 import { pathCoefficient, type CoefficientLookup } from "@/engine/treks";
 
 /**
- * Direct and path-specific effects (item 3 of §2.6). §3 was total-effect-only
- * per D-09; this module adds three exact readings that stay inside the
- * linear-Gaussian oracle and do not touch identification.
+ * Direct and path-specific effects. These exact readings stay inside the
+ * linear-Gaussian oracle and do not change the total-effect identification verdict.
  *
  * 1. **Direct edge coefficient** — the structural weight on the edge X → Y,
  *    or 0 if no such edge exists.
@@ -19,7 +18,7 @@ import { pathCoefficient, type CoefficientLookup } from "@/engine/treks";
  *    their individual contributions, so a UI can attribute TE per path.
  */
 
-export interface PathContribution {
+interface PathContribution {
   nodeIds: string[];
   contribution: number;
 }

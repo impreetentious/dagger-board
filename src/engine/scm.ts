@@ -22,7 +22,7 @@ export const EDGE_COEFFICIENT_MIN = -2;
 export const EDGE_COEFFICIENT_MAX = 2;
 export const ERROR_SD_MIN = 0.05;
 export const ERROR_SD_MAX = 3;
-export const ILL_CONDITIONING_RATIO = 1e-9;
+const ILL_CONDITIONING_RATIO = 1e-9;
 
 const FiniteNumberSchema = z.number();
 
@@ -34,14 +34,14 @@ export const SCMParametersSchema = z.object({
 
 export type SCMParameters = z.infer<typeof SCMParametersSchema>;
 
-export class ScmParameterError extends Error {
+class ScmParameterError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "ScmParameterError";
   }
 }
 
-export class ScmIntegrityError extends Error {
+class ScmIntegrityError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "ScmIntegrityError";
@@ -107,7 +107,7 @@ export function edgeCoefficient(parameters: SCMParameters, from: string, to: str
   return coefficient;
 }
 
-export function errorVariance(parameters: SCMParameters, nodeId: string): number {
+function errorVariance(parameters: SCMParameters, nodeId: string): number {
   const errorSd = parameters.errorSds[nodeId];
   if (errorSd === undefined) throw new ScmParameterError(`Missing error SD for ${nodeId}.`);
   return errorSd * errorSd;

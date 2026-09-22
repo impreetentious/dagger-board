@@ -17,7 +17,7 @@ export function pathCoefficient(path: readonly string[], coefficient: Coefficien
  * Ordered trek pairs are intentionally retained. For u === v, left/right path
  * pairs A,B and B,A are distinct cross terms in the variance.
  */
-export function trekCovariance(
+function trekCovariance(
   graph: Graph,
   leftId: string,
   rightId: string,

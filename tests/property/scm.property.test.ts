@@ -53,7 +53,7 @@ function moderateParameters(graph: Graph) {
   return parameters;
 }
 
-describe("PROP-4 through PROP-6", () => {
+describe("SCM identification identities", () => {
   it("keeps trek/matrix covariance and path/matrix total effect identical", () => {
     fc.assert(
       fc.property(fc.integer(), (seed) => {

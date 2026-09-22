@@ -43,7 +43,7 @@ function halfParameters(graph: ReturnType<typeof fixture>["graph"]): SCMParamete
   return parameters;
 }
 
-describe("WU-3.5–3.6 deterministic simulation", () => {
+describe("deterministic simulation", () => {
   it("matches all three pinned-runtime golden seed fixtures", () => {
     for (const golden of goldens.cases) {
       const graph = fixture(golden.fixture).graph;
