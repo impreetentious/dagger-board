@@ -28,7 +28,7 @@ import {
  * matches to tolerance and its total effect does not. A search that fails says so.
  */
 
-export interface WitnessSide {
+interface WitnessSide {
   parameters: SCMParameters;
   totalEffect: number;
 }

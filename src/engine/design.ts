@@ -25,7 +25,7 @@ import {
   type ReliabilityMap,
 } from "@/engine/measurement";
 
-export interface DesignRow {
+interface DesignRow {
   id: string;
   kind: "naive" | "adjustment" | "iv" | "frontdoor";
   conditioningIds: string[];
@@ -71,7 +71,7 @@ function normalizeSelectionInput(input: DesignSelectionInput): SelectionRule[] {
   return Array.isArray(input) ? [...input] : [input as SelectionRule];
 }
 
-export function enumerateMeasuredAdjustmentSets(
+function enumerateMeasuredAdjustmentSets(
   graph: Graph,
   exposureId: string,
   outcomeId: string,
@@ -321,7 +321,7 @@ export interface DesignRowDiff {
   standardErrorDelta: number | null;
 }
 
-/** Pure comparison utility for the Design A/B side-by-side (item 7 of §2.6). */
+/** Pure comparison utility for the Design A/B side-by-side. */
 export function diffDesignReports(left: DesignReport, right: DesignReport): DesignRowDiff[] {
   const leftById = new Map(left.rows.map((row) => [row.id, row]));
   const rightById = new Map(right.rows.map((row) => [row.id, row]));

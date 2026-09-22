@@ -3,18 +3,17 @@ import { descendantsOf, observedNodeIds, type Graph, withoutEdges } from "@/engi
 import { compareNodeSets, isSubset, sortedNodeIds, subsetsBySize } from "@/engine/sets";
 
 /**
- * Conditional instruments for the **total** effect (§3.6). v1 uses the single
- * sound criterion `({Z} ∪ W) ∩ De(X) = ∅`, which makes the `G_out(X)`
+ * Conditional instruments for the **total** effect (§3.6). The sound criterion
+ * `({Z} ∪ W) ∩ De(X) = ∅` makes the `G_out(X)`
  * d-separation faithfully validate the Wald identity `Σ_{ZY·W} = TE · Σ_{ZX·W}`.
  *
- * There is no relaxed criterion here, and V-11 (resolved) explains why: relaxing
- * the barrier toward Brito & Pearl / van der Zander–Textor–Liśkiewicz ancestral
+ * There is no relaxed criterion here: relaxing the barrier toward Brito & Pearl /
+ * van der Zander–Textor–Liśkiewicz ancestral
  * instruments admits descendants of X, which re-introduce a back-door term the
  * mutilated-graph check cannot see — `tests/unit/iv-soundness.test.ts` witnesses
  * it on fixture #16 (β_IV = 0.95 ≠ TE = 0.7). The sound ancestral relaxation
- * identifies the DIRECT effect, and v1 is total-effect only (owner ruling D-09),
- * so it is out of v1 scope rather than a hidden capability. See V-02/V-11 in
- * docs/notes/identification.md.
+ * identifies the direct effect, while this module targets total effects. See
+ * docs/notes/identification.md for the literature trace and counterexample.
  */
 
 export interface InstrumentCheck {
@@ -29,7 +28,7 @@ export interface ConditionalInstrument {
   conditioningSets: string[][];
 }
 
-export function graphWithoutExposureOutgoingEdges(graph: Graph, exposureId: string): Graph {
+function graphWithoutExposureOutgoingEdges(graph: Graph, exposureId: string): Graph {
   return withoutEdges(graph, (edge) => edge.from === exposureId);
 }
 

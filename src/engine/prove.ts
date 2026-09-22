@@ -16,7 +16,7 @@ import { enumerateDirectedPaths, enumerateSimplePaths } from "@/engine/paths";
 import type { Graph } from "@/engine/graph";
 import type { SelectionContext } from "@/engine/dsep";
 
-export type IdentificationVerdict =
+type IdentificationVerdict =
   | "design-incomplete"
   | "zero-total-effect"
   | "adjustment"

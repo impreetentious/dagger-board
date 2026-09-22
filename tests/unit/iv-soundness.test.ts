@@ -13,7 +13,7 @@ import { ivMultiplicativeIdentity } from "@/engine/stats";
 import fixture16 from "../../fixtures/tier1/16-iv-descendant-repair.json";
 
 /**
- * §3.6 / V-11 — why the conservative `({Z} ∪ W) ∩ De(X) = ∅` barrier is retained
+ * Why the conservative `({Z} ∪ W) ∩ De(X) = ∅` barrier in §3.6 is retained
  * for the total effect, and why the DAGitty/Brito–Pearl "literature" ancestral
  * instrument is not a sound drop-in here.
  *
@@ -28,13 +28,12 @@ import fixture16 from "../../fixtures/tier1/16-iv-descendant-repair.json";
  *
  * The genuinely sound literature relaxation (van der Zander–Textor–Liśkiewicz
  * ancestral instruments with the arrow-cut `X → Y` mutilation) identifies the
- * DIRECT effect, not the total effect. v1 is total-effect only (owner ruling
- * D-09), so relaxing the barrier is out of v1 scope — not a hidden capability.
+ * direct effect, not the total effect targeted by this implementation.
  */
 
 const graph = validateGraph(fixture16.graph as Graph);
 
-describe("conditional-IV soundness boundary (§3.6, V-11)", () => {
+describe("conditional-IV soundness boundary (§3.6)", () => {
   it("reproduces β_IV = 0.95 ≠ TE = 0.7 for the descendant instrument Z (fixture #16)", () => {
     const parameters = defaultScmParameters(graph); // all coefficients 1, all SDs 1
     parameters.edgeCoefficients[edgeParameterKey("x", "y")] = 0.7;

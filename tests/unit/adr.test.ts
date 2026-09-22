@@ -9,7 +9,7 @@ function fixture(file: string) {
   return Tier1FixtureSchema.parse(JSON.parse(readFileSync(path, "utf8")));
 }
 
-describe("WU-8.1 ADR document", () => {
+describe("ADR document", () => {
   it("enumerates the assumed-absent list deterministically by (min idx, max idx)", () => {
     const chain = fixture("01-chain.json").graph;
     const absent = assumedAbsentEdges(chain);

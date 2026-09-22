@@ -16,7 +16,7 @@ function allMeasured(graph: ReturnType<typeof fixture>["graph"]) {
   );
 }
 
-describe("WU-6.2 design table", () => {
+describe("design table", () => {
   it("uses exact selection covariance, expected effective n, and a parented selection node", () => {
     const item = fixture("07-berkson-selection.json");
     const report = evaluateDesign(

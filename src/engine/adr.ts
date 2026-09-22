@@ -30,7 +30,7 @@ export interface AbsentEdge {
   v: string;
 }
 
-export interface AdrSelectionSummary {
+interface AdrSelectionSummary {
   nodeId: string;
   nodeName: string;
   quantile: number;
