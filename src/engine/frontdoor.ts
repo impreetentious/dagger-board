@@ -8,7 +8,7 @@ export interface FrontdoorResult {
   reason: "identified" | "no-directed-path" | "no-singleton-frontdoor";
 }
 
-export interface FrontdoorSet {
+interface FrontdoorSet {
   mediatorIds: string[];
 }
 
@@ -63,9 +63,9 @@ export function enumerateFrontdoorMediators(
  *   (1) Z intercepts every directed path X → … → Y (some Z_i on every path);
  *   (2) no unblocked back-door path from X to any Z_i under empty conditioning;
  *   (3) every back-door path from any Z_i to Y is blocked by {X}.
- * v1.x enumerates every subset within the graph bound (§3.1), keeps
+ * The engine enumerates every subset within the graph bound (§3.1), keeps
  * inclusion-minimal witnesses, and returns them ordered by (size, lex idx).
- * V-08 in docs/notes/identification.md records the source verification.
+ * docs/notes/identification.md records the source verification and derivation.
  */
 export function enumerateFrontdoorSets(
   graph: Graph,

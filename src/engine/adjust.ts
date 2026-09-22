@@ -1,4 +1,4 @@
-import { classifyPaths, properCausalPathNodeIds } from "@/engine/classify";
+import { properCausalPathNodeIds } from "@/engine/classify";
 import { dSeparatedBayesBall, evaluatePath } from "@/engine/dsep";
 import {
   ancestorsOf,
@@ -59,11 +59,7 @@ export function adjustmentCandidateIds(
   );
 }
 
-export function canonicalAdjustmentSet(
-  graph: Graph,
-  exposureId: string,
-  outcomeId: string,
-): string[] {
+function canonicalAdjustmentSet(graph: Graph, exposureId: string, outcomeId: string): string[] {
   const forbidden = forbiddenNodeIds(graph, exposureId, outcomeId);
   const ancestors = ancestorsOf(graph, [exposureId, outcomeId]);
   return sortedNodeIds(
@@ -150,13 +146,4 @@ export function enumerateAdjustmentSets(
     canonicalSetValid,
     noSetWitnessPaths,
   };
-}
-
-export function adjustmentPathReport(
-  graph: Graph,
-  exposureId: string,
-  outcomeId: string,
-  candidate: ReadonlySet<string>,
-) {
-  return classifyPaths(graph, exposureId, outcomeId, candidate);
 }

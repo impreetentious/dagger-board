@@ -7,7 +7,7 @@ import {
 } from "@/engine/dsep";
 import { enumerateDirectedPaths, enumerateSimplePaths, isDirectedPath } from "@/engine/paths";
 
-export type PathLabel =
+type PathLabel =
   | "causal-open"
   | "causal-blocked"
   | "selection-opened"
@@ -16,7 +16,7 @@ export type PathLabel =
   | "noncausal-open"
   | "inert";
 
-export interface ClassifiedPath {
+interface ClassifiedPath {
   nodeIds: string[];
   isCausal: boolean;
   isBackdoor: boolean;
@@ -27,7 +27,7 @@ export interface ClassifiedPath {
   colliderOpeningWitnesses: Array<{ colliderId: string; nodeIds: string[] }>;
 }
 
-export interface ForbiddenAdjustmentWarning {
+interface ForbiddenAdjustmentWarning {
   type: "forbidden-adjustment";
   nodeIds: string[];
 }
@@ -49,7 +49,7 @@ export function properCausalPathNodeIds(
   return nodes;
 }
 
-export function forbiddenAdjustmentNodeIds(
+function forbiddenAdjustmentNodeIds(
   graph: Graph,
   exposureId: string,
   outcomeId: string,

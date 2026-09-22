@@ -66,7 +66,7 @@ function queryFor(graph: Graph, seed: number) {
   };
 }
 
-describe("PROP-1: d-separation implementation agreement", () => {
+describe("d-separation implementation agreement", () => {
   it("matches exhaustive simple-path evaluation across seeded random DAGs", () => {
     fc.assert(
       fc.property(fc.integer(), fc.integer(), (graphSeed, querySeed) => {

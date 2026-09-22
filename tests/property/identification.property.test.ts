@@ -39,7 +39,7 @@ function graphFromSeed(seed: number): Graph {
   });
 }
 
-describe("PROP-2, PROP-3, PROP-7", () => {
+describe("graphical identification properties", () => {
   it("returns only valid, inclusion-minimal adjustment sets and validates canonical existence", () => {
     fc.assert(
       fc.property(fc.integer(), (seed) => {

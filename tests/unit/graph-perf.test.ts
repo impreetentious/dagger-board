@@ -15,7 +15,7 @@ const fixture = readdirSync(fixtureDirectory)
 
 if (!fixture) throw new Error("Missing fixture #14.");
 
-it("meets P1 d-separation and path-enumeration budgets", () => {
+it("meets d-separation and path-enumeration budgets", () => {
   const startDsep = performance.now();
   for (let index = 0; index < 500; index += 1) {
     dSeparatedBayesBall(fixture.graph, "x", "y", new Set());
@@ -28,7 +28,7 @@ it("meets P1 d-separation and path-enumeration budgets", () => {
 
   if (process.env.PERF_LOG === "1") {
     process.stdout.write(
-      `P1_PERF dsep_ms=${dsepMs.toFixed(4)} paths_ms=${pathsMs.toFixed(4)} paths=${paths.length}\n`,
+      `GRAPH_PERF dsep_ms=${dsepMs.toFixed(4)} paths_ms=${pathsMs.toFixed(4)} paths=${paths.length}\n`,
     );
   }
 

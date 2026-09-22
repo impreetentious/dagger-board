@@ -1,12 +1,12 @@
 import * as z from "zod/mini";
 
-export const MAX_NODES = 12;
-export const MAX_EDGES = 24;
+const MAX_NODES = 12;
+const MAX_EDGES = 24;
 
-export const NodeKindSchema = z.enum(["observed", "latent", "selection"]);
+const NodeKindSchema = z.enum(["observed", "latent", "selection"]);
 export type NodeKind = z.infer<typeof NodeKindSchema>;
 
-export const NodeSchema = z.object({
+const NodeSchema = z.object({
   id: z.string().check(z.minLength(1)),
   idx: z.number().check(z.int(), z.nonnegative()),
   name: z.string().check(z.trim(), z.minLength(1), z.maxLength(64)),
@@ -20,13 +20,13 @@ export const NodeSchema = z.object({
 });
 export type GraphNode = z.infer<typeof NodeSchema>;
 
-export const EdgeSchema = z.object({
+const EdgeSchema = z.object({
   from: z.string().check(z.minLength(1)),
   to: z.string().check(z.minLength(1)),
 });
 export type GraphEdge = z.infer<typeof EdgeSchema>;
 
-export const RolesSchema = z.object({
+const RolesSchema = z.object({
   exposureId: z.optional(z.string().check(z.minLength(1))),
   outcomeId: z.optional(z.string().check(z.minLength(1))),
 });
@@ -280,11 +280,7 @@ export function childrenOf(graph: Pick<Graph, "nodes" | "edges">, id: string): s
   );
 }
 
-function closure(
-  graph: Pick<Graph, "nodes" | "edges">,
-  ids: Iterable<string>,
-  next: (id: string) => string[],
-): Set<string> {
+function closure(ids: Iterable<string>, next: (id: string) => string[]): Set<string> {
   const visited = new Set<string>();
   const queue = [...ids];
   while (queue.length > 0) {
@@ -302,25 +298,21 @@ export function ancestorsOf(
   graph: Pick<Graph, "nodes" | "edges">,
   ids: Iterable<string>,
 ): Set<string> {
-  return closure(graph, ids, (id) => parentsOf(graph, id));
+  return closure(ids, (id) => parentsOf(graph, id));
 }
 
 export function descendantsOf(
   graph: Pick<Graph, "nodes" | "edges">,
   ids: Iterable<string>,
 ): Set<string> {
-  return closure(graph, ids, (id) => childrenOf(graph, id));
+  return closure(ids, (id) => childrenOf(graph, id));
 }
 
 export function hasEdge(graph: Pick<Graph, "edges">, from: string, to: string): boolean {
   return graph.edges.some((edge) => edge.from === from && edge.to === to);
 }
 
-export function hasDirectedPath(
-  graph: Pick<Graph, "nodes" | "edges">,
-  from: string,
-  to: string,
-): boolean {
+function hasDirectedPath(graph: Pick<Graph, "nodes" | "edges">, from: string, to: string): boolean {
   return descendantsOf(graph, [from]).has(to);
 }
 
@@ -358,14 +350,6 @@ export function removeNode(graph: Graph, id: string): Graph {
   });
 }
 
-export function renameNode(graph: Graph, id: string, name: string): Graph {
-  nodeById(graph, id);
-  return validateGraph({
-    ...graph,
-    nodes: graph.nodes.map((node) => (node.id === id ? { ...node, name } : node)),
-  });
-}
-
 export function setNodeKind(graph: Graph, id: string, kind: NodeKind): Graph {
   if (graph.roles.exposureId === id || graph.roles.outcomeId === id) {
     throw new GraphMutationError("Unassign the exposure or outcome before changing its node kind.");
@@ -393,15 +377,6 @@ export function addEdge(graph: Graph, edge: GraphEdge): Graph {
     throw new GraphMutationError("That edge would introduce a directed cycle.");
   }
   return validateGraph({ ...graph, edges: [...graph.edges, edge] });
-}
-
-export function removeEdge(graph: Graph, edge: GraphEdge): Graph {
-  return validateGraph({
-    ...graph,
-    edges: graph.edges.filter(
-      (candidate) => candidate.from !== edge.from || candidate.to !== edge.to,
-    ),
-  });
 }
 
 export function observedNodeIds(graph: Pick<Graph, "nodes">): string[] {

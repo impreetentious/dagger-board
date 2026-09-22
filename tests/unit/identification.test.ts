@@ -99,7 +99,7 @@ describe("frontdoor and conditional IV", () => {
     );
   });
 
-  it("keeps the De(X) barrier: descendant instrument Z is excluded on both negative fixtures (V-11)", () => {
+  it("keeps the De(X) barrier: descendant instrument Z is excluded on both negative fixtures", () => {
     // Admitting a descendant of X breaks the total-effect Wald identity — see
     // tests/unit/iv-soundness.test.ts (β_IV = 0.95 ≠ TE = 0.7 on fixture #16).
     // There is no sound relaxation for the total effect, so the single criterion

@@ -5,13 +5,13 @@ export interface SelectionContext {
   nodeId: string;
 }
 
-export interface ColliderWitness {
+interface ColliderWitness {
   colliderId: string;
   conditionedNodeIds: string[];
   openedByVirtualSelectionIndicator: boolean;
 }
 
-export interface PathBlocker {
+interface PathBlocker {
   nodeId: string;
   reason: "conditioned-noncollider" | "unconditioned-collider";
 }
@@ -193,18 +193,4 @@ export function dSeparatedBayesBall(
   }
 
   return true;
-}
-
-export function assertDSeparationAgreement(
-  graph: Graph,
-  from: string,
-  to: string,
-  conditioned: ReadonlySet<string>,
-  selection?: SelectionContext,
-): void {
-  const bayesBall = dSeparatedBayesBall(graph, from, to, conditioned, selection);
-  const paths = dSeparatedByPaths(graph, from, to, conditioned, selection);
-  if (bayesBall !== paths) {
-    throw new Error("Bayes-Ball and exhaustive path enumeration disagree.");
-  }
 }
