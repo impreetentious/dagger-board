@@ -23,7 +23,7 @@ function markCompleted(slug: string) {
     map[slug] = true;
     window.localStorage.setItem(PROGRESS_KEY, JSON.stringify(map));
   } catch {
-    // localStorage disabled — silent fallback per §2.5 (no telemetry).
+    // Local storage can be disabled; progress then degrades silently without telemetry.
   }
 }
 

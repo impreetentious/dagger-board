@@ -40,7 +40,7 @@ function reconstruct(
 }
 
 /**
- * Off-main-thread simulation (item 8 of §2.6). The pure-engine kernel in
+ * Off-main-thread simulation. The pure-engine kernel in
  * `src/engine/sim.ts` stays untouched; the worker owns Float64Array
  * generation and transfers the buffers back so the main thread never blocks
  * on RNG work. Falls back to the direct async path if `Worker` is missing

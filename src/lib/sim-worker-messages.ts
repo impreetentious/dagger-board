@@ -3,7 +3,7 @@ import type { SCMParameters } from "@/engine/scm";
 import type { SimulationOptions } from "@/engine/sim";
 
 /**
- * Wire types for the simulation Web Worker (item 8 of §2.6). The main thread
+ * Wire types for the simulation Web Worker. The main thread
  * ships the graph + parameters + options; the worker returns generated node
  * columns (transferable `ArrayBuffer`s) and the kept-row indices. The main
  * thread rebuilds the ScmModel and computes sample moments locally so the
@@ -31,7 +31,7 @@ export interface SimWorkerDoneMessage {
   selection: SimulationOptions["selection"];
 }
 
-export interface SimWorkerErrorMessage {
+interface SimWorkerErrorMessage {
   kind: "error";
   requestId: string;
   message: string;

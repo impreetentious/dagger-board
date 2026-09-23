@@ -2,10 +2,9 @@ import * as z from "zod/mini";
 import { LEARN_FIXTURE_SNAPSHOTS } from "@/content/examples";
 import type { LabSnapshot } from "@/lib/codec";
 
-export const CHOICE_KINDS = ["naive", "adjust", "iv", "frontdoor"] as const;
-export type ChoiceKind = (typeof CHOICE_KINDS)[number];
+const CHOICE_KINDS = ["naive", "adjust", "iv", "frontdoor"] as const;
 
-export const LearnChoiceSchema = z.object({
+const LearnChoiceSchema = z.object({
   id: z.string(),
   label: z.string(),
   kind: z.enum(CHOICE_KINDS),
@@ -13,7 +12,7 @@ export const LearnChoiceSchema = z.object({
   correct: z.boolean(),
 });
 
-export const LearnScenarioSchema = z.object({
+const LearnScenarioSchema = z.object({
   slug: z.string(),
   ordinal: z.number().check(z.int(), z.positive()),
   title: z.string(),
@@ -203,7 +202,7 @@ export const LEARN_SCENARIOS: readonly LearnScenario[] = z.array(LearnScenarioSc
         label: "Report the raw slope alongside the truncated-Σ population bias.",
         kind: "naive",
         detail:
-          'The engine\'s truncated closed form quantifies the selection bias exactly; v1 does not certify "valid under selection" sets.',
+          'The engine\'s truncated closed form quantifies the selection bias exactly; it does not certify "valid under selection" sets.',
         correct: true,
       },
     ],
@@ -247,7 +246,7 @@ export const LEARN_SCENARIOS: readonly LearnScenario[] = z.array(LearnScenarioSc
       "TE(X → Y) is structurally zero because X does not cause Y. The raw slope is nonzero, driven by T's shared influence, and it is a downwardly attenuated proxy of the latent T → Y coefficient.",
     reveal: {
       lesson:
-        "When the workbench's designated exposure is a noisy proxy for the true cause, the raw slope answers a different question. v1 will not silently rebrand it; the ADR must state that the reported estimand is the proxy's association, not the latent effect.",
+        "When the workbench's designated exposure is a noisy proxy for the true cause, the raw slope answers a different question. The ADR states that the reported estimand is the proxy's association, not the latent effect.",
       populationBias:
         "β(∅) − TE(X → Y) = β(∅) − 0. The slope equals a specific fraction of the latent T → Y coefficient — the classical attenuation factor.",
       pathAnatomy:

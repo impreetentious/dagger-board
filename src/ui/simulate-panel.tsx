@@ -267,8 +267,8 @@ export function SimulatePanel() {
         <summary className="cursor-pointer text-sm font-bold">Structural parameters</summary>
         <div className="mt-3 space-y-2 text-xs">
           <p className="leading-5 text-[var(--muted)]">
-            v1 uses a linear-Gaussian SCM with mean-zero errors and no intercepts. A generated
-            sample is capped at 1,000,000 rows.
+            The simulator uses a linear-Gaussian SCM with mean-zero errors and no intercepts. A
+            generated sample is capped at 1,000,000 rows.
           </p>
           <button className="tool-button" onClick={randomizeParameters} type="button">
             Randomize parameters

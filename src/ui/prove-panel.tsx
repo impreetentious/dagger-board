@@ -60,10 +60,13 @@ export function ProvePanel() {
     );
   }
 
+  const frontdoorSets = report.frontdoorSets?.minimalSets ?? [];
   const verdictCopy = {
     "zero-total-effect": "TE ≡ 0 under your own assumptions.",
     adjustment: "Identified via covariate adjustment.",
-    frontdoor: "Identified via a singleton front-door mediator.",
+    frontdoor: frontdoorSets.some((entry) => entry.mediatorIds.length > 1)
+      ? "Identified via a front-door mediator set."
+      : "Identified via a front-door mediator.",
     instrument: "Identified via a conditional instrument.",
     unsupported: "No supported strategy identifies this effect.",
   }[report.verdict];
@@ -80,8 +83,8 @@ export function ProvePanel() {
         <p className="text-base font-black">{verdictCopy}</p>
         {report.verdict === "unsupported" ? (
           <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-            v1 checks covariate adjustment, front-door, and conditional instruments; effects
-            identifiable only by more general machinery (do-calculus/ID) are beyond v1&apos;s
+            This instrument checks covariate adjustment, front-door, and conditional instruments;
+            effects identifiable only by more general machinery (do-calculus/ID) are beyond its
             verdict.
           </p>
         ) : null}
@@ -219,11 +222,11 @@ export function ProvePanel() {
         <div className="mt-3 space-y-3 text-sm">
           <p>
             Front-door:{" "}
-            {report.frontdoor?.mediatorIds.length
-              ? setLabel(report.frontdoor.mediatorIds, name)
+            {frontdoorSets.length
+              ? frontdoorSets.map((entry) => setLabel(entry.mediatorIds, name)).join(" or ")
               : report.frontdoor?.reason === "no-directed-path"
                 ? "no mediated path — TE = 0 structurally"
-                : "no singleton witness"}
+                : "no witness"}
             .
           </p>
           {report.instruments.length ? (
@@ -259,8 +262,8 @@ export function ProvePanel() {
               <p>No directed X → Y path is present, so the structural total effect is zero.</p>
             )}
             <p>
-              These are structural path contributions, not an identification verdict; v1&apos;s
-              verdict remains about the total effect.
+              These are structural path contributions, not an identification verdict; the verdict
+              remains about the total effect.
             </p>
           </div>
         </details>

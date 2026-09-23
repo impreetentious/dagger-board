@@ -18,7 +18,7 @@ export default function Home() {
         <p className="relative mb-7 font-mono text-xs font-bold tracking-[0.2em] text-[var(--signal)]">
           PRE-DATA CAUSAL INSTRUMENT
         </p>
-        <h1 className="relative max-w-4xl text-balance text-5xl font-black tracking-[-0.065em] sm:text-7xl lg:text-8xl">
+        <h1 className="relative max-w-4xl text-balance text-[clamp(1.75rem,9vw,6rem)] font-black tracking-[-0.065em]">
           {PRODUCT_NAME}
         </h1>
         <p className="relative mt-7 max-w-2xl text-lg leading-8 text-[var(--muted)] sm:text-xl">

@@ -11,7 +11,7 @@ export default function LearnPage() {
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-[var(--muted)]">
           Six canonical traps, each a playable scenario. Make the analysis call first — the engine
-          then reveals the path anatomy, the exact bias, and a one-click hand-off to the workbench.
+          then reveals the path anatomy, the exact bias, and a one-click route to the workbench.
         </p>
       </section>
       <section aria-label="Lessons" className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

@@ -24,3 +24,15 @@ test("static routes render, theme persists, and requests stay local", async ({ p
 
   expect(externalRequests).toEqual([]);
 });
+
+test("the launch hero fits narrow mobile viewports", async ({ page }) => {
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto("/");
+    const heading = page.getByRole("heading", { level: 1, name: "DAGGERBOARD" });
+    await expect(heading).toBeVisible();
+    expect(await heading.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(
+      true,
+    );
+  }
+});
