@@ -31,7 +31,7 @@ import {
  *   is the bias that node would actually cause, not a bound on it.
  */
 
-export interface SensitivityBenchmark {
+interface SensitivityBenchmark {
   nodeId: string;
   /** R²_{X ~ W | Z∖W} — how much of the exposure this node explains, net of the rest of Z. */
   exposureShare: number;
@@ -47,7 +47,7 @@ export interface SensitivityBenchmark {
   multipleToOverturn: number | null;
 }
 
-export interface ContourLevel {
+interface ContourLevel {
   /** The adjusted estimate this curve traces. */
   value: number;
   /** Exact points on the iso-curve, in (exposure share, outcome share) coordinates. */

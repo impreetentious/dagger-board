@@ -10,7 +10,7 @@ export function identity(size: number): Matrix {
   return result;
 }
 
-export function cloneMatrix(matrix: Matrix): Matrix {
+function cloneMatrix(matrix: Matrix): Matrix {
   return matrix.map((row) => [...row]);
 }
 
@@ -80,7 +80,7 @@ export function inverse(matrix: Matrix): Matrix {
   return augmented.map((row) => row.slice(size));
 }
 
-export function relativeClose(left: number, right: number, tolerance = 1e-9): boolean {
+function relativeClose(left: number, right: number, tolerance = 1e-9): boolean {
   return Math.abs(left - right) <= tolerance * Math.max(1, Math.abs(left), Math.abs(right));
 }
 

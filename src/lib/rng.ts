@@ -13,7 +13,7 @@ export function mulberry32(seed: number): () => number {
   };
 }
 
-export const UINT32_RANGE = 0x1_0000_0000;
+const UINT32_RANGE = 0x1_0000_0000;
 
 /** Maps a raw uint32 to the open interval (0, 1). */
 export function uniformFromRaw(raw: number): number {

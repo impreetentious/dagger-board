@@ -53,7 +53,7 @@ function selectionDagFromSeed(seed: number): Graph {
   });
 }
 
-describe("PROP-8: selected-sample truncation agrees with its population target", () => {
+describe("selected-sample truncation agrees with its population target", () => {
   it("keeps realized OLS within four standard errors on seeded random selection DAGs", () => {
     // The committed seed list varies both topology and coefficients. No advanced seed is skipped;
     // every run retains well over the 50-row minimum required by the readout contract.

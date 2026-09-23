@@ -75,8 +75,8 @@ function structureByName(snapshot: LabSnapshot) {
   };
 }
 
-describe("PROP-9 and PROP-10: randomized codec and DAGitty interop", () => {
-  it("PROP-9 preserves idx and seeded simulation output across URL round-trips", async () => {
+describe("randomized codec and DAGitty interoperability", () => {
+  it("preserves idx and seeded simulation output across URL round-trips", async () => {
     await fc.assert(
       fc.asyncProperty(fc.integer(), async (seed) => {
         const original = snapshotFromSeed(seed);
@@ -104,7 +104,7 @@ describe("PROP-9 and PROP-10: randomized codec and DAGitty interop", () => {
     );
   });
 
-  it("PROP-10 preserves representable structure, kind, roles, and adjustments", () => {
+  it("preserves representable structure, kind, roles, and adjustments", () => {
     fc.assert(
       fc.property(fc.integer(), (seed) => {
         const original = snapshotFromSeed(seed);

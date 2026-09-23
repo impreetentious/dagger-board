@@ -1,7 +1,8 @@
 import * as z from "zod/mini";
 import { pruneLabSnapshot, type LabSnapshot } from "@/lib/codec";
 
-const LIBRARY_KEY = "causal-lab.library.v1";
+const LIBRARY_KEY = "daggerboard.library.v1";
+const LEGACY_LIBRARY_KEY = "causal-lab.library.v1";
 
 export interface SavedLabModel {
   id: string;
@@ -25,7 +26,9 @@ export function loadLibrary(): SavedLabModel[] {
   const local = storage();
   if (!local) return [];
   try {
-    const value = JSON.parse(local.getItem(LIBRARY_KEY) ?? "[]") as unknown[];
+    const value = JSON.parse(
+      local.getItem(LIBRARY_KEY) ?? local.getItem(LEGACY_LIBRARY_KEY) ?? "[]",
+    ) as unknown[];
     return z
       .array(SavedModelWireSchema)
       .parse(value)

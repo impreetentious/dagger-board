@@ -2,7 +2,7 @@ import * as z from "zod/mini";
 import { GraphSchema, validateGraph, type Graph } from "@/engine/graph";
 import { normalizeScmParameters, SCMParametersSchema, type SCMParameters } from "@/engine/scm";
 
-export const URL_FRAGMENT_LIMIT = 2000;
+const URL_FRAGMENT_LIMIT = 2000;
 
 const SelectionSchema = z.object({
   nodeId: z.string().check(z.minLength(1)),
@@ -100,7 +100,7 @@ export function pruneLabSnapshot(input: unknown): LabSnapshot {
   };
 }
 
-export function canonicalizeSnapshot(snapshot: LabSnapshot): LabSnapshot {
+function canonicalizeSnapshot(snapshot: LabSnapshot): LabSnapshot {
   return pruneLabSnapshot(snapshot);
 }
 

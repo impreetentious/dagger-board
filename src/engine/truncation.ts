@@ -39,7 +39,7 @@ const ERFC_S = [
   3.369076451000815,
 ];
 
-export function erf(value: number): number {
+function erf(value: number): number {
   if (!Number.isFinite(value)) return Math.sign(value);
   const magnitude = Math.abs(value);
   if (magnitude > 1) return 1 - erfc(value);
@@ -47,7 +47,7 @@ export function erf(value: number): number {
   return (value * polevl(squared, ERF_T)) / p1evl(squared, ERF_U);
 }
 
-export function erfc(value: number): number {
+function erfc(value: number): number {
   if (Number.isNaN(value)) return Number.NaN;
   const magnitude = Math.abs(value);
   if (magnitude < 1) return 1 - erf(value);
@@ -59,7 +59,7 @@ export function erfc(value: number): number {
   return value < 0 ? 2 - result : result;
 }
 
-export function normalPdf(value: number): number {
+function normalPdf(value: number): number {
   return Math.exp(-0.5 * value * value) / SQRT_TWO_PI;
 }
 
@@ -67,7 +67,7 @@ export function normalCdf(value: number): number {
   return 0.5 * erfc(-value / Math.SQRT2);
 }
 
-export function normalSurvival(value: number): number {
+function normalSurvival(value: number): number {
   return 0.5 * erfc(value / Math.SQRT2);
 }
 
@@ -138,9 +138,9 @@ export interface SequentialTruncationResult extends CovarianceContext {
 }
 
 /**
- * Multiple simultaneous selection filters (item 6 of §2.6). The exact joint
+ * Multiple simultaneous selection filters. The exact joint
  * truncation for k > 1 correlated selection axes requires multivariate normal
- * orthant moments (Tallis 1961) — beyond v1.x's pure-arithmetic contract.
+ * orthant moments (Tallis 1961) — beyond the current pure-arithmetic contract.
  * This function applies each rule sequentially: each filter runs the §3.10
  * closed form on the previously-truncated covariance, taking the *marginal*
  * SD of the selection axis in the running truncated moments (§3.10's

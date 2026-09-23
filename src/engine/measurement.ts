@@ -41,9 +41,9 @@ import type { CovarianceContext } from "@/engine/stats";
 export type ReliabilityMap = Readonly<Record<string, number>>;
 
 export const RELIABILITY_MIN = 0.05;
-export const RELIABILITY_MAX = 1;
+const RELIABILITY_MAX = 1;
 
-export class MeasurementError extends Error {
+class MeasurementError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "MeasurementError";
