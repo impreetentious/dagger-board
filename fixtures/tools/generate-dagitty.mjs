@@ -2,6 +2,7 @@ import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { format } from "prettier";
 
 const require = createRequire(import.meta.url);
 const { GraphAnalyzer, GraphParser } = require("./dagitty/dagitty-node.js");
@@ -77,7 +78,7 @@ function oracleEntry(id, graph) {
     criterionDifferences.push({
       kind: "adjustment",
       reason:
-        "DAGitty treats selected status as a direct selection condition; v1 certifies adjustment on the selection-free graph and reports selected-sample bias separately.",
+        "DAGitty treats selected status as a direct selection condition; this implementation certifies adjustment on the selection-free graph and reports selected-sample bias separately.",
     });
   }
   for (const instrument of instruments) {
@@ -90,7 +91,7 @@ function oracleEntry(id, graph) {
         instrument: instrument.instrument,
         conditioning: instrument.conditioning,
         reason:
-          "DAGitty ancestral-instrument output is broader; v1 rejects exposure descendants in Z or W by §3.6's conservative non-descendance rule.",
+          "DAGitty ancestral-instrument output is broader; this implementation rejects exposure descendants in Z or W by §3.6's conservative non-descendance rule.",
       });
     }
   }
@@ -159,5 +160,12 @@ const corpus = {
   entries,
 };
 
-mkdirSync(dirname(outputPath), { recursive: true });
-writeFileSync(outputPath, `${JSON.stringify(corpus, null, 2)}\n`);
+const serialized = await format(JSON.stringify(corpus), { filepath: outputPath });
+if (process.argv.includes("--check")) {
+  if (readFileSync(outputPath, "utf8") !== serialized) {
+    throw new Error("DAGitty oracle corpus is stale; run npm run fixtures:dagitty.");
+  }
+} else {
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, serialized);
+}

@@ -1,6 +1,6 @@
 {
   "name": "daggerboard",
-  "version": "0.16.9",
+  "version": "0.16.10",
   "private": true,
   "engines": {
     "node": ">=20.20.2 <21",
@@ -16,44 +16,45 @@
     "format:check": "prettier --check .",
     "fixtures:dagitty": "node fixtures/tools/generate-dagitty.mjs",
     "fixtures:adversarial": "node fixtures/tools/gen-fixture14.mjs",
+    "fixtures:check": "node fixtures/tools/gen-fixture14.mjs --check && node fixtures/tools/generate-dagitty.mjs --check",
     "bundle:check": "node scripts/bundle-budget.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "npm run build && PLAYWRIGHT_BROWSERS_PATH=0 playwright test",
-    "test:full": "npm run check:version && npm run typecheck && npm run lint && npm run check:citations && npm run test && npm run test:e2e && npm run check:csp && npm run bundle:check",
+    "test:full": "npm run check:version && npm run fixtures:check && npm run typecheck && npm run lint && npm run check:citations && npm run format:check && npm run test && npm run test:e2e && npm run check:csp && npm run bundle:check",
     "check:version": "node scripts/check-version-coherence.mjs",
     "check:citations": "node scripts/check-citations.mjs",
     "check:csp": "node scripts/check-csp.mjs"
   },
   "dependencies": {
-    "next": "16.2.2",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "zod": "^4.3.6",
+    "next": "16.2.4",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "zod": "^4.4.2",
     "zustand": "^5.0.12"
   },
   "overrides": {
-    "postcss": "^8.5.8",
+    "postcss": "^8.5.13",
     "next": {
       "sharp": "^0.34.5"
     }
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.1",
+    "@axe-core/playwright": "^4.11.3",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "eslint": "^9",
-    "eslint-config-next": "16.2.2",
-    "fast-check": "^4.6.0",
-    "prettier": "^3.8.1",
+    "eslint-config-next": "16.2.4",
+    "fast-check": "^4.7.0",
+    "prettier": "^3.8.3",
     "serve": "^14.2.6",
     "tailwindcss": "^4",
     "typescript": "^5",
     "underscore": "^1.13.8",
-    "vitest": "^4.1.3"
+    "vitest": "^4.1.5"
   },
   "license": "MIT",
   "author": "Sidakpreet Singh",
@@ -65,5 +66,5 @@
   "bugs": {
     "url": "https://github.com/ItsMonarch04/dagger-board/issues"
   },
-  "homepage": "https://github.com/ItsMonarch04/dagger-board#"
+  "homepage": "https://github.com/ItsMonarch04/dagger-board"
 }

@@ -26,4 +26,5 @@ Permissions-Policy: camera=(), geolocation=(), microphone=(), payment=(), usb=()
 
 `npm run check:csp` fails if `vercel.json`, `serve.json`, and this document disagree, if a required directive goes missing, if a wildcard or unsafe execution token appears, or if the built `out/` gains an off-origin reference. Update all three together, then re-run `npm run test:e2e` — the suite serves `out/` under this exact policy, so a CSP that breaks the worker or navigation fails the gate rather than shipping.
 
-Host-specific tuning and verification of the deployed response headers remain an owner step at deploy time; nothing here has been checked against a live host.
+Verify these headers on the deployed origin after publishing; the repository can
+only test the bundled local preview, not a live host's configuration.

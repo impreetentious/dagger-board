@@ -2,13 +2,12 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-/**
- * Every numbered `docs/MATH-SPEC.md` citation in source must resolve to a real heading.
- */
+/** Every numbered Markdown citation in executable code must point to the
+ * normative math spec, and every cited section must resolve to a real heading. */
 const SPEC = "docs/MATH-SPEC.md";
+// This file legitimately contains the patterns it hunts for.
 const SELF = path.relative(process.cwd(), fileURLToPath(import.meta.url));
 const ROOTS = ["src", "scripts", "tests", "fixtures"];
-const EXTRA_FILES = [];
 const EXTENSIONS = new Set([".ts", ".tsx", ".mjs", ".js", ".css"]);
 
 async function filesUnder(directory) {
@@ -38,28 +37,37 @@ if (specHeadings.size === 0) {
   process.exit(1);
 }
 
-const files = [...(await Promise.all(ROOTS.map(filesUnder))).flat(), ...EXTRA_FILES].filter(
-  (file) => EXTENSIONS.has(path.extname(file)) && path.normalize(file) !== SELF,
-);
+const files = (await Promise.all(ROOTS.map(filesUnder)))
+  .flat()
+  .filter((file) => EXTENSIONS.has(path.extname(file)) && path.normalize(file) !== SELF);
 
+const offSpec = [];
 const unresolved = [];
 
 for (const file of files) {
   const content = await readFile(file, "utf8");
   content.split("\n").forEach((line, index) => {
-    for (const match of line.matchAll(/docs\/MATH-SPEC\.md §(\d+(?:\.\d+)*[a-z]?)/g)) {
-      if (!specHeadings.has(match[1])) {
-        unresolved.push(`${file}:${index + 1}: §${match[1]} is not a heading in ${SPEC}`);
+    for (const match of line.matchAll(/([\w./-]+\.md) §(\d+(?:\.\d+)*[a-z]?)/g)) {
+      if (match[1] !== SPEC) {
+        offSpec.push(`${file}:${index + 1}: ${match[1]} §${match[2]} is not the normative spec`);
+      } else if (!specHeadings.has(match[2])) {
+        unresolved.push(`${file}:${index + 1}: §${match[2]} is not a heading in ${SPEC}`);
       }
     }
   });
 }
 
-if (unresolved.length > 0) {
+if (offSpec.length > 0 || unresolved.length > 0) {
   console.error("citation check failed.");
-  console.error(`\n${unresolved.length} citation(s) name a section that does not exist:`);
-  for (const hit of unresolved) console.error(` - ${hit}`);
-  console.error("\nEither add the section to the spec or cite the one that governs.");
+  if (offSpec.length > 0) {
+    console.error(`\n${offSpec.length} numbered citation(s) point outside ${SPEC}:`);
+    for (const hit of offSpec) console.error(` - ${hit}`);
+  }
+  if (unresolved.length > 0) {
+    console.error(`\n${unresolved.length} citation(s) name a section that does not exist:`);
+    for (const hit of unresolved) console.error(` - ${hit}`);
+    console.error("\nEither add the section to the spec or cite the one that governs.");
+  }
   process.exit(1);
 }
 

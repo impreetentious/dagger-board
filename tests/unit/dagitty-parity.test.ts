@@ -63,7 +63,7 @@ describe("Tier-2 DAGitty oracle corpus", () => {
     }
   });
 
-  it("validates every oracle instrument under the conservative v1 criterion", () => {
+  it("validates every oracle instrument under the conservative total-effect criterion", () => {
     const documentedDifferences = new Set(
       corpus.entries.flatMap((entry) =>
         entry.criterionDifferences
