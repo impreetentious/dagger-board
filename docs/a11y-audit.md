@@ -1,33 +1,21 @@
-# Accessibility audit — P8
+# Accessibility verification
 
-Recorded 17 Aug 2026; re-verified and corrected 29 Aug 2026 (IST).
+## Automated coverage
 
-## Scope
+`npm run test:e2e` runs axe-core against `/`, `/learn`, `/learn/m-bias`, and
+each `/lab` surface (Draw, Prove, Simulate, Design, and Communicate). The lab
+check loads the M-bias example so the rendered graph includes observed and
+latent node kinds. The same suite verifies keyboard-only graph construction
+and role assignment.
 
-- Surfaces covered: `/`, `/lab`, `/learn`, `/learn/[slug]`.
-- Bar: WCAG 2.1 AA intent + the §4.5 shape/stroke encoding requirement.
+The application also enforces these behaviors in code:
 
-## Automated pass
-
-- `axe-core` (via `@axe-core/playwright`) runs against `/`, `/learn`, `/learn/m-bias`, and every
-  `/lab` workbench surface (Draw, Prove, Simulate, Design, Communicate).
-  (`.include("main")`) in `tests/e2e/editor.spec.ts` and reports zero
-  violations. This is now genuinely zero: the earlier record overstated the
-  result. The active surface-tab number badge rendered `--signal` (#b14e2d) on
-  the active `--signal-soft` (#f5ded4), only 4.07:1 — below AA. It now uses a
-  dedicated `--signal-strong` token (5.03:1 light / 5.15:1 dark) and the axe
-  assertion passes with zero serious violations.
-- The audit fixture uses the M-bias canon graph so the assertion covers all
-  three node kinds (`observed`, `latent`, and — via the Berkson lesson — the
-  `selection` kind), not just the default state.
-- Single-`h1` structure: the `/lab` shell owns the page `h1`; each surface
-  panel (Draw/Prove/Simulate/Design/Communicate) now heads with `h2`, so the
-  document exposes exactly one top-level heading per route.
-
-## Node-kind encoding
-
-Node kinds are drawn by shape and stroke pattern, never by colour alone
-(§4.5). The current renderings are:
+- Each route has one top-level heading; workbench panels use second-level
+  headings beneath the `/lab` shell.
+- The graph is a labelled `graphics-document` with roving tabindex, keyboard
+  construction commands, visible focus, and polite live announcements.
+- Reduced-motion preferences disable transitions and smooth scrolling.
+- Node kinds use shape and stroke pattern rather than color alone.
 
 | Kind      | Shape          | Stroke         |
 | --------- | -------------- | -------------- |
@@ -35,30 +23,16 @@ Node kinds are drawn by shape and stroke pattern, never by colour alone
 | latent    | Dashed circle  | Dashed outline |
 | selection | Double diamond | Solid outline  |
 
-## Manual keyboard pass
+## Manual release checklist
 
-- Editor: `n` adds a node, arrows navigate, `x`/`y`/`l`/`s` assign role/kind,
-  `e` + arrow + `Enter` draws an edge, `?` opens the help sheet, Cmd/Ctrl+Z
-  and Shift+Cmd/Ctrl+Z drive the undo stack (`WU-4.3`).
-- Focus is always visible; the canvas uses a roving `tabindex` so a single
-  Tab press enters the graph and arrows then walk it (V-06).
-- Live announcements: `aria-live="polite"` region reports node adds, kind
-  changes, and role assignments so a screen reader hears the mutation.
+Automated checks do not replace assistive-technology testing. Before deploying
+a public instance, verify the current build with a screen reader and keyboard:
 
-## Screen reader spot check
-
-Manually verified with macOS VoiceOver:
-
-- Editor announces `Causal graph editor` when focused; each node reads its
-  name, kind, and role in order.
-- Prove panel's identification verdict reads first ("adjustment", "frontdoor",
-  etc.); the path list is a labeled list; the conditioning toggles announce
-  their state.
-- Communicate panel's Download button reports a clear label; the assumed-absent
-  list reads coherently in reading order.
-
-## Remaining owner review
-
-- No live user-research pass has been performed; the audit above is
-  builder-verified against the ratified WCAG intent (§4.5). Full assistive-tech
-  coverage is on the Owner review list in §9.
+- The editor announces its label and each node's name, kind, and role.
+- Arrow-key navigation and the `n`, `x`, `y`, `l`, `s`, `e`, and undo commands
+  expose visible focus and announce mutations.
+- Prove announces its verdict before diagnostics, and conditioning controls
+  expose their state.
+- Every surface remains readable at 200% zoom and under forced colors.
+- The deployment preserves the document language, reduced-motion behavior, and
+  the response headers documented in `STATIC-HOST-HEADERS.md`.

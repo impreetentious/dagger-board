@@ -34,7 +34,7 @@ This project is a pre-data instrument for stress-testing causal claims and study
 ## Limitations
 
 - **Graphs are capped at 12 nodes.** That bound is what makes the exhaustive claims true: within it, adjustment-set enumeration, path enumeration, and testable-implication search are complete rather than heuristic.
-- **Linear-Gaussian structural models.** Simulation and closed-form bias assume linear structural equations with Gaussian noise. Non-linear and discrete-outcome models are outside the engine.
+- **The main estimator model is linear-Gaussian.** Simulation, covariance identities, estimator bias, standard errors, power, and sensitivity use linear structural equations with Gaussian noise. A separate Bernoulli-logistic oracle exactly enumerates binary outcomes under fixed default logits; it is an intervention sanity check, not a replacement for those estimator diagnostics.
 - **Selection is quantified, not certified.** Under an active selection rule the app reports the exact bias it induces, and labels the identification verdict as "selection ignored" — it does not certify that an adjustment set remains valid _under_ selection.
 - **Classical strategies only.** Identification covers covariate adjustment, front-door, and conditional IV. When those are exhausted the app says so explicitly instead of declaring the effect non-identifiable.
 - **Sensitivity is a population statement, not a significance test.** Robustness values are computed from the model-implied covariance, before any data exists, so there is no standard error to condition on and no significance-adjusted variant is offered. Confounder strength is the only currency.
@@ -59,14 +59,15 @@ Open `http://localhost:3004`.
 ## Verify
 
 ```bash
-npm run typecheck
-npm run lint
-npm run test
-npm run build
-npm run test:e2e
+npm ci
+PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium
+npm audit --audit-level=high
+npm run test:full
 ```
 
-Or `npm run test:full` to run all of the above in sequence.
+`test:full` checks version wiring, generated-fixture freshness, types, lint,
+citations, formatting, unit and property tests, the production build, browser
+and accessibility behavior, the static-host policy, and bundle budgets.
 
 ## Build and deploy
 
@@ -78,16 +79,17 @@ This emits a plain static site in `out/`, which serves from any static host. `np
 
 Whatever host you use should send the response headers documented in [docs/STATIC-HOST-HEADERS.md](docs/STATIC-HOST-HEADERS.md). `vercel.json` applies them on Vercel and `serve.json` applies the same policy to the local preview, so the browser test suite runs against the real policy. `npm run check:csp` fails if the two host configs and the document ever disagree.
 
-The GitHub remote is authoritative and carries the only pipeline; `.github/workflows/ci.yml` runs every gate. The GitLab remote is a backup mirror kept in sync, deliberately without a `.gitlab-ci.yml` — there is no second publication target to gate, and a mirrored pipeline would only create a second place for gate drift.
-
 ## Third-party notice
 
 Test-only DAGitty fixtures under `fixtures/tools/dagitty/` are GPL-2.0-or-later. Application code under `src/` does not import that fixture tooling. See [NOTICE](NOTICE).
 
 ## Docs
 
-- `docs/a11y-audit.md` — accessibility audit notes (axe, keyboard, screen-reader spot checks, contrast, reduced motion)
-- `docs/notes/` — design and engine notes for contributors
+- [Mathematical specification](docs/MATH-SPEC.md) — graph, identification, simulation, and design semantics
+- [Accessibility](docs/a11y-audit.md) — automated coverage and the manual verification checklist
+- [Performance budgets](docs/perf.md) — reproducible workloads and enforced limits
+- [Static-host headers](docs/STATIC-HOST-HEADERS.md) — required deployment policy
+- [Contributor notes](docs/notes/) — implementation rationale and research sources
 
 ## License
 
@@ -95,4 +97,4 @@ MIT © Sidakpreet Singh — see [LICENSE](LICENSE). Application code is MIT; see
 
 ---
 
-**Version:** v0.16.10
+**Version:** v0.16.11

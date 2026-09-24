@@ -1,8 +1,8 @@
-# Identification Research Notes
+# Identification research notes
 
-## V-01 — Generalized adjustment criterion
+## Generalized adjustment criterion
 
-Resolved against Perković, Textor, Kalisch, and Maathuis (2018),
+The implementation follows Perković, Textor, Kalisch, and Maathuis (2018),
 _Complete Graphical Characterization and Construction of Adjustment Sets in Markov
 Equivalence Classes of Ancestral Graphs_.
 
@@ -20,18 +20,19 @@ Equivalence Classes of Ancestral Graphs_.
 
 Primary source: [JMLR paper, Definition 3–6 and Corollary 15](https://www.jmlr.org/papers/volume18/16-319/16-319.pdf).
 
-## V-02 — Conditional instruments
+## Conditional instruments
 
-Resolved against Brito and Pearl (2002) and the official DAGitty
-manual/source.
+The conditional-IV implementation follows Brito and Pearl (2002) and the
+official DAGitty manual and source.
 
 - Brito and Pearl establish the graphical conditional-IV setting for linear models.
 - The DAGitty manual states the operational conditional form: given a covariate
   set, the instrument remains connected to exposure and is separated from outcome
   after every outgoing exposure edge is removed. This matches §3.6's relevance and
   exclusion/exogeneity checks.
-- The literature/DAGitty ancestral-instrument search is broader than v1's explicit
-  non-descendance rule. The product intentionally adds `({Z} ∪ W) ∩ De(X) = ∅` as
+- The literature and DAGitty ancestral-instrument search is broader than this
+  implementation's explicit non-descendance rule. Dagger Board adds
+  `({Z} ∪ W) ∩ De(X) = ∅` as
   a conservative total-effect restriction. It is therefore a sound subset, not a
   claim of exhaustive literature-equivalent IV enumeration; the child-of-exposure
   negative fixtures exercise exactly the excluded failure mode.
@@ -39,12 +40,11 @@ manual/source.
 Primary sources: [Brito & Pearl (2002)](https://escholarship.org/uc/item/0gj1b2nx)
 and [official DAGitty manual, §5.5.2](https://dagitty.net/manual-3.x.pdf).
 
-**v1.x relaxation note (finding: unsafe as a drop-in).** Item 10 of §2.6
-asked to widen v1's conservative `Z, W ∉ De(X)` toward Brito & Pearl's
-ancestral-instrument family. A prototype in `src/engine/iv.ts` (kept in the
-git history) moved the non-descendance barrier to `De(Y)` and evaluated
-relevance in `G_out(X)`. Property testing against random DAGs, and direct
-computation on the existing negative fixture #16, showed the multiplicative
+### Why descendant instruments remain excluded
+
+Moving the non-descendance barrier to `De(Y)` while evaluating relevance in
+`G_out(X)` is unsafe. Property tests over random DAGs and direct computation on
+the negative fixture #16 show the multiplicative
 identity `Σ_{ZY·W} − TE · Σ_{ZX·W} = 0` failing under the relaxed rule: with
 `Z ∈ De(X)` and `U` confounding `X` and `Y`, the observed `Cov(Z, Y)` picks
 up a back-door term proportional to the confounding coefficient that the
@@ -56,7 +56,6 @@ Liśkiewicz — plus an ancestral restriction on `W`. Crucially, that mutilation
 identifies the **direct** effect of X on Y, not the total effect this engine
 targets.
 
-**V-11 — resolved (S-017) as a finding, not a relaxed criterion.**
 For the total effect, the Wald identity `Σ_{ZY·W} = TE · Σ_{ZX·W}` is validated
 by a d-separation in `G_out(X)` (all edges out of X removed). That check is a
 faithful proxy for the required covariance `Cov(Z, Y − TE·X | W) = 0` _only_
@@ -67,15 +66,12 @@ essentially necessary, and no descendant-admitting relaxation is sound.
 `tests/unit/iv-soundness.test.ts` demonstrates the failure directly: on
 fixture #16 the descendant instrument Z (Z ∈ De(X), Z ∉ De(Y)) yields
 β_IV = 0.95 while TE = 0.7. The genuinely sound ancestral-instrument relaxation
-targets the direct effect, which v1 excludes by owner ruling D-09
-(total-effect only). The misleading no-op `IvCriterion` parameter surface was
-therefore **removed** from `src/engine/iv.ts`; the single sound criterion
-stands. Widening to direct-effect identification is an owner scope decision
-(amend D-09), tracked on the Owner review list — not agent-buildable within v1.
+targets the direct effect rather than the total effect supported by Dagger
+Board. The engine consequently exposes only the sound total-effect criterion.
 
-## V-04 — Implied-CI parity semantics
+## Implied-CI parity semantics
 
-Resolved against the official DAGitty manual and pinned source.
+The parity rule follows the official DAGitty manual and pinned source.
 
 - The manual says displayed implications are minimal, observed-variable testable
   implications and explicitly says the display is not a basis set.
@@ -84,21 +80,21 @@ Resolved against the official DAGitty manual and pinned source.
   `listDseparators`, producing minimal separators for that pair.
 - The product enumerates every minimal observed separator per non-adjacent pair;
   parity is consequently asymmetric. Each oracle implication must pass our
-  d-separation query, and each emitted implication is independently re-verified
-  by PROP-7. Set equality is not claimed as a global oracle contract.
+  d-separation query, and each emitted implication is independently re-verified.
+  Set equality is not claimed as a global oracle contract.
 
 Primary sources: [official DAGitty manual, §5.6](https://dagitty.net/manual-3.x.pdf)
 and `jslib/graph/GraphAnalyzer.js` at pinned commit
 `7a657776dc8f5e5ba4e323edb028e2c2aaf29327`.
 
-## V-08 — Set-valued frontdoor
+## Set-valued front-door criterion
 
-Resolved against Pearl (2009), _Causality: Models, Reasoning, and Inference_,
-2nd ed., §3.3.2, and the vendored DAGitty source at the pinned commit.
+The implementation follows Pearl (2009), _Causality: Models, Reasoning, and
+Inference_, 2nd ed., §3.3.2, and the vendored DAGitty source at the pinned
+commit.
 
-Pearl's **Definition 3.3.3 (front-door)** applies to a **set** Z (not a single
-node) and reads verbatim: a set of variables Z is said to satisfy the
-front-door criterion relative to an ordered pair (X, Y) if
+Pearl's front-door definition applies to a **set** Z, not only a single node.
+The set qualifies relative to an ordered pair (X, Y) when:
 
 1. Z intercepts all directed paths from X to Y;
 2. there is no back-door path from X to Z; and
@@ -136,7 +132,7 @@ existing d-separation oracle against §3.4's back-door graph on the auxiliary
 `(X → Z)` and `(Z → Y | X)` queries — the same primitives Tier-2 already
 uses for adjustment parity.
 
-**Enumeration and minimality.** v1.x enumerates every subset Z of observed
+**Enumeration and minimality.** The engine enumerates every subset Z of observed
 non-role nodes within the graph bound (§3.1), applies conditions 1–3, keeps
 inclusion-minimal witnesses, and orders results by (size ascending,
 lexicographic idx). Singletons stay in the output — the singleton case is a
