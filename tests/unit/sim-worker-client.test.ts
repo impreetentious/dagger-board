@@ -23,7 +23,7 @@ function halfParameters(graph: ReturnType<typeof fixture>["graph"]): SCMParamete
   return parameters;
 }
 
-describe("sim-worker client fallback (item 8 of §2.6)", () => {
+describe("simulation-worker client fallback", () => {
   it("falls back to the main-thread async runner when Web Workers are unavailable", async () => {
     const item = fixture("01-chain.json");
     const parameters = halfParameters(item.graph);

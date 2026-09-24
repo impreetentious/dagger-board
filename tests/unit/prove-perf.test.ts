@@ -30,7 +30,7 @@ function proveOnce(): number {
   return performance.now() - start;
 }
 
-it("meets the P2 full-Prove performance budget", () => {
+it("meets the full-Prove performance budget", () => {
   // The gate is the median of five runs (docs/perf.md). One discarded warm-up
   // run keeps the first, unoptimised pass out of the sample.
   proveOnce();
@@ -39,7 +39,7 @@ it("meets the P2 full-Prove performance budget", () => {
 
   if (process.env.PERF_LOG === "1") {
     process.stdout.write(
-      `P2_PERF prove_ms=${median.toFixed(4)} runs=${runs.map((run) => run.toFixed(4)).join(",")}\n`,
+      `PROVE_PERF prove_ms=${median.toFixed(4)} runs=${runs.map((run) => run.toFixed(4)).join(",")}\n`,
     );
   }
   expect(median).toBeLessThan(250);

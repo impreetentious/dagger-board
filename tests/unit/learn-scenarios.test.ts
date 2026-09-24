@@ -7,8 +7,8 @@ import {
   scenarioBySlug,
 } from "@/content/learn/scenarios";
 
-describe("WU-7.1 Learn scenario schema", () => {
-  it("ships all six canonical traps (D-08)", () => {
+describe("Learn scenario schema", () => {
+  it("ships all six canonical traps", () => {
     expect(LEARN_SCENARIOS).toHaveLength(6);
     expect(LEARN_SLUGS).toEqual([
       "confounding",
@@ -50,7 +50,7 @@ describe("WU-7.1 Learn scenario schema", () => {
     }
   });
 
-  it("measurement-error carries the secondary reference required by WU-7.2–7.4", () => {
+  it("measurement-error carries its secondary reference", () => {
     const scenario = scenarioBySlug("measurement-error");
     expect(scenario?.secondaryReference?.label).toMatch(/latent/i);
   });

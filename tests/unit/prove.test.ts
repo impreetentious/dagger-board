@@ -9,7 +9,7 @@ function fixture(file: string) {
   return Tier1FixtureSchema.parse(JSON.parse(readFileSync(path, "utf8")));
 }
 
-describe("WU-5.1 Prove aggregation", () => {
+describe("Prove aggregation", () => {
   it("reports the degenerate zero-total-effect and supported strategy states", () => {
     const mBias = proveGraph(fixture("04-m-bias.json").graph, new Set());
     expect(mBias.verdict).toBe("zero-total-effect");

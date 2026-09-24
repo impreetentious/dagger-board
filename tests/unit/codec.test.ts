@@ -11,7 +11,7 @@ import {
 } from "@/lib/codec";
 import { exportDagittyText, importDagittyText } from "@/lib/dagitty-io";
 
-describe("WU-4.6 codec and interop", () => {
+describe("codec and interoperability", () => {
   it("round-trips URL and JSON snapshots with idx and identical seeded draws", async () => {
     const original = EXAMPLE_SNAPSHOTS["m-bias"];
     const fragment = await encodeGraphFragment(original);

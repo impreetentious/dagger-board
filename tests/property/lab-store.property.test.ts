@@ -41,7 +41,7 @@ function assertIntegrity() {
   expect(snapshot.measured).toEqual(state.measured);
 }
 
-describe("PROP-11: shared-lab mutation integrity", () => {
+describe("shared-lab mutation integrity", () => {
   it("purges dangling conditioning, measurement, and selection references on deletion", () => {
     resetStore();
     const store = useLabStore.getState();
