@@ -81,6 +81,46 @@ describe("codec and interoperability", () => {
     expect(bidirected.snapshot.graph.edges).toHaveLength(2);
   });
 
+  // Published DAGitty models are usually written with bare identifiers. Accepting
+  // only the fully quoted form dropped every edge without saying so, which turns a
+  // confounded model into "TE ≡ 0" instead of an error.
+  it("imports unquoted, unspaced, and chained DAGitty edges", () => {
+    const named = (result: ReturnType<typeof importDagittyText>) => {
+      const nameById = new Map(result.snapshot.graph.nodes.map((node) => [node.id, node.name]));
+      return result.snapshot.graph.edges
+        .map((edge) => `${nameById.get(edge.from)}->${nameById.get(edge.to)}`)
+        .sort();
+    };
+
+    const unquoted = importDagittyText(
+      "dag { X [exposure]; Y [outcome]; U [latent]; U -> X; U -> Y; X -> Y }",
+    );
+    expect(named(unquoted)).toEqual(["U->X", "U->Y", "X->Y"]);
+    expect(unquoted.warnings).toEqual([]);
+
+    expect(named(importDagittyText("dag { X [exposure]; Y [outcome]; X->M; M->Y }"))).toEqual([
+      "M->Y",
+      "X->M",
+    ]);
+    expect(named(importDagittyText("dag { X [exposure]; Y [outcome]; X -> M -> Y }"))).toEqual([
+      "M->Y",
+      "X->M",
+    ]);
+    expect(named(importDagittyText('dag { "X" -> Y }'))).toEqual(["X->Y"]);
+    expect(importDagittyText("dag { A <-> B }").snapshot.graph.edges).toHaveLength(2);
+
+    // A quoted name may itself contain an arrow; it must not be split on one.
+    const literal = importDagittyText('dag { "A -> B" -> "C" }');
+    expect(literal.snapshot.graph.nodes.map((node) => node.name)).toEqual(["A -> B", "C"]);
+    expect(literal.snapshot.graph.edges).toHaveLength(1);
+  });
+
+  it("reports statements it cannot read instead of dropping them", () => {
+    const result = importDagittyText("dag { A -- B; C }");
+    expect(result.snapshot.graph.edges).toHaveLength(0);
+    expect(result.warnings.some((warning) => warning.includes("unreadable"))).toBe(true);
+  });
+
   it("never truncates an over-limit share fragment", async () => {
     const status = await graphFragmentStatus(EXAMPLE_SNAPSHOTS["m-bias"]);
     expect(status.shareable).toBe(true);

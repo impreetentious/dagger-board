@@ -1,6 +1,6 @@
 {
   "name": "daggerboard",
-  "version": "0.16.11",
+  "version": "0.17.0",
   "private": true,
   "engines": {
     "node": ">=20.20.2 <21",

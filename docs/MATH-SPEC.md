@@ -6,8 +6,9 @@ criterion, instrumental variables, testable implications, the linear-Gaussian SC
 forms, selection truncation, the design-surface formulas, the simulation kernel, the exact-vs-
 simulated boundary, tolerances and the global consistency identities, and the CPDAG.
 
-**This document is authoritative.** Source comments cite it by section number as
-`docs/MATH-SPEC.md §X`. Section numbering is part of the contract because code citations are checked
+**This document is authoritative.** Source comments cite it by section number as `§X.Y`; a citation
+that names a document must name this one. Section numbering is part of the contract because
+`npm run check:citations` resolves every citation in `src/`, `scripts/`, `tests/`, and `fixtures/`
 against these headings.
 
 ---

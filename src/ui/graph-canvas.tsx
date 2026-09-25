@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type KeyboardEvent, type PointerEvent, type WheelEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { useLabStore } from "@/store/lab-store";
 import { graphToSvg } from "@/lib/svg-export";
 
@@ -192,19 +192,34 @@ export function GraphCanvas() {
     }
   };
 
-  const onWheel = (event: WheelEvent<SVGSVGElement>) => {
-    event.preventDefault();
-    const factor = event.deltaY > 0 ? 1.12 : 0.88;
-    const point = pointFor(event as unknown as PointerEvent<SVGSVGElement>);
-    const width = Math.min(1500, Math.max(320, viewport.width * factor));
-    const height = (width / viewport.width) * viewport.height;
-    setViewport({
-      width,
-      height,
-      x: point.x - ((point.x - viewport.x) * width) / viewport.width,
-      y: point.y - ((point.y - viewport.y) * height) / viewport.height,
-    });
-  };
+  // React registers `wheel` passively, so an onWheel prop cannot call
+  // preventDefault: the browser logs an error and scrolls the page while the
+  // canvas zooms. The listener is attached directly so the zoom consumes it.
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const onWheel = (event: globalThis.WheelEvent) => {
+      event.preventDefault();
+      const bounds = svg.getBoundingClientRect();
+      if (bounds.width === 0 || bounds.height === 0) return;
+      const factor = event.deltaY > 0 ? 1.12 : 0.88;
+      setViewport((previous) => {
+        const pointX = previous.x + ((event.clientX - bounds.left) / bounds.width) * previous.width;
+        const pointY =
+          previous.y + ((event.clientY - bounds.top) / bounds.height) * previous.height;
+        const width = Math.min(1500, Math.max(320, previous.width * factor));
+        const height = (width / previous.width) * previous.height;
+        return {
+          width,
+          height,
+          x: pointX - ((pointX - previous.x) * width) / previous.width,
+          y: pointY - ((pointY - previous.y) * height) / previous.height,
+        };
+      });
+    };
+    svg.addEventListener("wheel", onWheel, { passive: false });
+    return () => svg.removeEventListener("wheel", onWheel);
+  }, []);
 
   const positions = new Map(
     graph.nodes.map((node) => [node.id, node.position ?? { x: 120 + node.idx * 80, y: 220 }]),
@@ -251,7 +266,6 @@ export function GraphCanvas() {
           setDrag(null);
           setPanStart(null);
         }}
-        onWheel={onWheel}
         ref={svgRef}
         role="graphics-document document"
         tabIndex={0}

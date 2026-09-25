@@ -2,8 +2,10 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-/** Every numbered Markdown citation in executable code must point to the
- * normative math spec, and every cited section must resolve to a real heading. */
+/** Every numbered citation in executable code must point to the normative math
+ * spec, and every cited section must resolve to a real heading. Source comments
+ * cite sections in the bare `§X.Y` form; the qualified `<file>.md §X.Y` form is
+ * additionally required to name the spec itself rather than some other document. */
 const SPEC = "docs/MATH-SPEC.md";
 // This file legitimately contains the patterns it hunts for.
 const SELF = path.relative(process.cwd(), fileURLToPath(import.meta.url));
@@ -44,14 +46,25 @@ const files = (await Promise.all(ROOTS.map(filesUnder)))
 const offSpec = [];
 const unresolved = [];
 
+let citationCount = 0;
+
 for (const file of files) {
   const content = await readFile(file, "utf8");
   content.split("\n").forEach((line, index) => {
+    // Where a citation names its document, that document must be the spec. Those
+    // already reported as off-spec are not also measured against spec headings.
+    const reportedOffSpec = new Set();
     for (const match of line.matchAll(/([\w./-]+\.md) §(\d+(?:\.\d+)*[a-z]?)/g)) {
-      if (match[1] !== SPEC) {
-        offSpec.push(`${file}:${index + 1}: ${match[1]} §${match[2]} is not the normative spec`);
-      } else if (!specHeadings.has(match[2])) {
-        unresolved.push(`${file}:${index + 1}: §${match[2]} is not a heading in ${SPEC}`);
+      if (match[1] === SPEC) continue;
+      reportedOffSpec.add(match.index + match[1].length + 1);
+      offSpec.push(`${file}:${index + 1}: ${match[1]} §${match[2]} is not the normative spec`);
+    }
+    // Every remaining citation, qualified or bare, must resolve to a real heading.
+    for (const match of line.matchAll(/§(\d+(?:\.\d+)*[a-z]?)/g)) {
+      citationCount += 1;
+      if (reportedOffSpec.has(match.index)) continue;
+      if (!specHeadings.has(match[1])) {
+        unresolved.push(`${file}:${index + 1}: §${match[1]} is not a heading in ${SPEC}`);
       }
     }
   });
@@ -72,5 +85,5 @@ if (offSpec.length > 0 || unresolved.length > 0) {
 }
 
 console.log(
-  `citations OK — ${files.length} files scanned, every § citation resolves in ${SPEC} (${specHeadings.size} numbered headings).`,
+  `citations OK — ${files.length} files scanned, all ${citationCount} § citations resolve in ${SPEC} (${specHeadings.size} numbered headings).`,
 );

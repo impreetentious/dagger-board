@@ -25,7 +25,7 @@ This project is a pre-data instrument for stress-testing causal claims and study
 - **Exact where it claims to be exact.** Graph queries are complete combinatorics within the 12-node bound (see Limitations). Population biases come from closed forms (path-tracing rules on linear structural models), and every simulation runs under a live engine self-audit: the implied covariance matrix and the total effect are each computed two independent ways (matrix algebra vs. path/trek enumeration) and must agree to within 10⁻⁹, or the product shows an integrity error instead of a number. Simulated estimates are always displayed against their independently derived closed-form targets, so any drift is visible rather than silently absorbed.
 - **Verified against the scholarly reference.** The algorithms are classical — Pearl's identification framework, the generalized adjustment criterion, Wright's path tracing. Results are fixture-tested for parity against DAGitty, the academic reference implementation, plus a hand-derived corpus of textbook structures.
 - **Built for decision-makers, not epidemiologists.** Analytics, product, and strategy audiences get the same rigor with a product-grade surface: a keyboard-first graph editor, plain-language path diagnostics, and pedagogy that trains intuition instead of assuming it.
-- **Fully client-side.** No backend, no accounts, no analytics, no telemetry, no cookies, no third-party requests of any kind (fonts self-hosted). Scenarios persist locally, share by URL, and export as explicit JSON. Deployable as a static bundle anywhere.
+- **Fully client-side.** No backend, no accounts, no analytics, no telemetry, no cookies, no third-party requests of any kind — there are no web fonts to fetch, since the interface uses system font stacks. Scenarios persist locally, share by URL, and export as explicit JSON. Deployable as a static bundle anywhere.
 
 ## Prior art
 
@@ -97,4 +97,4 @@ MIT © Sidakpreet Singh — see [LICENSE](LICENSE). Application code is MIT; see
 
 ---
 
-**Version:** v0.16.11
+**Version:** v0.17.0

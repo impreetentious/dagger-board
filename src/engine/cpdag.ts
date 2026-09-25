@@ -14,7 +14,7 @@ import { type Graph, hasEdge } from "@/engine/graph";
  *
  * Scope (v1): the equivalence class is computed over the DAG **as drawn**, across
  * all node kinds. Observable-margin equivalence with latents marginalised out is
- * a MAG/PAG (FCI) problem and is deliberately out of v1 scope (§2.6). The input
+ * a MAG/PAG (FCI) problem and is deliberately out of scope (§3.15). The input
  * is always an acyclic directed graph (the editor enforces acyclicity), so the
  * pattern-completion below never has to break a cycle.
  *

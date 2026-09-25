@@ -67,7 +67,53 @@ interface ParsedEdge {
   operator: "->" | "<->";
 }
 
-function parseStatements(text: string): { nodes: ParsedNode[]; edges: ParsedEdge[] } {
+/**
+ * Splits an edge statement into its raw operand tokens and operators, or returns
+ * null when the statement is not an edge. DAGitty models in the wild are rarely
+ * fully quoted: the manual, the website, and hand-written models all use bare
+ * identifiers, with or without whitespace around the arrow, and chain them
+ * (`X -> M -> Y`). Accepting only `"X" -> "Y"` silently dropped every one of
+ * those edges, leaving a node-only graph and a confident, wrong verdict.
+ */
+function splitEdgeStatement(
+  statement: string,
+): { operands: string[]; operators: Array<"->" | "<->"> } | null {
+  const operands: string[] = [];
+  const operators: Array<"->" | "<->"> = [];
+  let index = 0;
+  let expectOperand = true;
+  while (index < statement.length) {
+    const rest = statement.slice(index);
+    const whitespace = /^\s+/u.exec(rest);
+    if (whitespace) {
+      index += whitespace[0].length;
+      continue;
+    }
+    if (expectOperand) {
+      // A quoted name may itself contain an arrow, so it is matched first and whole.
+      const token = (/^"(?:\\.|[^"\\])*"/u.exec(rest) ??
+        /^[^\s"]+?(?=\s|$|<->|->)/u.exec(rest))?.[0];
+      if (!token) return null;
+      operands.push(token);
+      index += token.length;
+    } else {
+      const operator = /^(<->|->)/u.exec(rest);
+      if (!operator) return null;
+      operators.push(operator[1] as "->" | "<->");
+      index += operator[0].length;
+    }
+    expectOperand = !expectOperand;
+  }
+  return operators.length > 0 && operands.length === operators.length + 1
+    ? { operands, operators }
+    : null;
+}
+
+function parseStatements(text: string): {
+  nodes: ParsedNode[];
+  edges: ParsedEdge[];
+  unparsed: string[];
+} {
   const body = text.replace(/^\s*(dag|digraph)\s*(?:[\w-]+)?\s*\{/iu, "").replace(/\}\s*$/u, "");
   const statements = body
     .split(/[;\n]/u)
@@ -75,6 +121,7 @@ function parseStatements(text: string): { nodes: ParsedNode[]; edges: ParsedEdge
     .filter(Boolean);
   const nodeMap = new Map<string, ParsedNode>();
   const edges: ParsedEdge[] = [];
+  const unparsed: string[] = [];
   const nodeFor = (raw: string) => {
     const name = unquote(raw);
     let node = nodeMap.get(name);
@@ -85,19 +132,26 @@ function parseStatements(text: string): { nodes: ParsedNode[]; edges: ParsedEdge
     return node;
   };
   for (const statement of statements) {
-    const edge = statement.match(/^\s*("(?:\\.|[^"\\])*")\s*(<->|->)\s*("(?:\\.|[^"\\])*")\s*$/u);
+    const edge = splitEdgeStatement(statement);
     if (edge) {
-      const from = unquote(edge[1]);
-      const to = unquote(edge[3]);
-      nodeFor(edge[1]);
-      nodeFor(edge[3]);
-      edges.push({ from, to, operator: edge[2] as "->" | "<->" });
+      for (const [position, operator] of edge.operators.entries()) {
+        const from = edge.operands[position];
+        const to = edge.operands[position + 1];
+        nodeFor(from);
+        nodeFor(to);
+        edges.push({ from: unquote(from), to: unquote(to), operator });
+      }
       continue;
     }
     const declaration = statement.match(
       /^\s*("(?:\\.|[^"\\])*"|[^\s\[]+)\s*(?:\[([^\]]*)\])?\s*$/u,
     );
-    if (!declaration) continue;
+    // A statement the parser cannot read is reported rather than dropped: a
+    // silently missing edge changes the identification verdict.
+    if (!declaration) {
+      unparsed.push(statement);
+      continue;
+    }
     const node = nodeFor(declaration[1]);
     const attributes = declaration[2] ?? "";
     for (const status of [
@@ -115,7 +169,7 @@ function parseStatements(text: string): { nodes: ParsedNode[]; edges: ParsedEdge
       }
     }
   }
-  return { nodes: [...nodeMap.values()], edges };
+  return { nodes: [...nodeMap.values()], edges, unparsed };
 }
 
 function nodeKind(statuses: ReadonlySet<string>): GraphNode["kind"] {
@@ -127,6 +181,14 @@ function nodeKind(statuses: ReadonlySet<string>): GraphNode["kind"] {
 export function importDagittyText(text: string): DagittyImportResult {
   const parsed = parseStatements(text);
   const warnings: string[] = [];
+  if (parsed.unparsed.length > 0) {
+    warnings.push(
+      `Ignored ${parsed.unparsed.length} unreadable statement(s): ${parsed.unparsed
+        .slice(0, 3)
+        .map(quoted)
+        .join(", ")}.`,
+    );
+  }
   const names = new Set<string>();
   const idByOriginalName = new Map<string, string>();
   const nodes: GraphNode[] = parsed.nodes.map((parsedNode, idx) => {

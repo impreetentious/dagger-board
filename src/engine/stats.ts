@@ -210,7 +210,7 @@ export function olsStandardError(
   return Math.sqrt(residualVariance / (sampleSize * exposureVariance));
 }
 
-/** Test-only homoskedastic SE for a just-identified conditional-IV row. */
+/** Homoskedastic asymptotic SE for a just-identified conditional-IV row (§3.11). */
 export function ivTestStandardError(
   context: CovarianceContext,
   instrumentId: string,

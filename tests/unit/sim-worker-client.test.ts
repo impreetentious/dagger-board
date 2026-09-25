@@ -35,4 +35,31 @@ describe("simulation-worker client fallback", () => {
     const sample = olsEstimand(run.sample, "x", "y", [], totalEffect);
     expect(sample.estimand).toBeCloseTo(totalEffect, 1);
   });
+
+  // A worker that never posts a message would otherwise leave the run promise
+  // pending forever, freezing the Simulate button on "Running…".
+  it("rejects instead of hanging when the worker itself fails", async () => {
+    const item = fixture("01-chain.json");
+    class FailingWorker extends EventTarget {
+      constructor() {
+        super();
+        queueMicrotask(() => this.dispatchEvent(new Event("error")));
+      }
+      postMessage() {}
+      terminate() {}
+    }
+    const original = Reflect.get(globalThis, "Worker");
+    Reflect.set(globalThis, "Worker", FailingWorker);
+    try {
+      await expect(
+        runSimulationInWorker(item.graph, halfParameters(item.graph), "x", "y", {
+          seed: 42,
+          n: 200,
+        }),
+      ).rejects.toThrow(/worker/i);
+    } finally {
+      if (original === undefined) Reflect.deleteProperty(globalThis, "Worker");
+      else Reflect.set(globalThis, "Worker", original);
+    }
+  });
 });

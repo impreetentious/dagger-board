@@ -1,13 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { graphFragmentStatus, snapshotJson, type LabSnapshot } from "@/lib/codec";
 import { exportDagittyText, importDagittyText } from "@/lib/dagitty-io";
 import {
   duplicateLibraryEntry,
-  loadLibrary,
+  librarySnapshot,
   saveToLibrary,
-  type SavedLabModel,
+  serverLibrarySnapshot,
+  subscribeToLibrary,
 } from "@/lib/persist";
 import { useLabStore } from "@/store/lab-store";
 
@@ -37,7 +38,7 @@ function download(filename: string, text: string) {
 export function InteropPanel() {
   const store = useLabStore();
   const snapshot = useMemo(() => snapshotFromStore(store), [store]);
-  const library: SavedLabModel[] = typeof window === "undefined" ? [] : loadLibrary();
+  const library = useSyncExternalStore(subscribeToLibrary, librarySnapshot, serverLibrarySnapshot);
   const [dagittyText, setDagittyText] = useState("");
 
   const share = async () => {

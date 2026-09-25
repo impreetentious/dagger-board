@@ -3,7 +3,7 @@ import { parentsOf, type Graph } from "@/engine/graph";
 
 /**
  * Binary/discrete SCM path. This self-contained Bernoulli-logistic oracle
- * complements the primary linear-Gaussian model. It cannot share the §3 identity-assertion
+ * complements the primary linear-Gaussian model. It cannot share the §3.14 identity-assertion
  * machinery (matrix-vs-trek Σ, path-sum vs matrix TE, Schur partials) because
  * those identities are linear equalities: Wright's path decomposition and the
  * Schur complement live in the linear-Gaussian moment algebra. The discrete

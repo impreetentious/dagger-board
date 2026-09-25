@@ -6,6 +6,7 @@
 # Next.js and static output
 /.next
 /out
+/.vercel
 
 # tests and reports
 /coverage

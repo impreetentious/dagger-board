@@ -30,11 +30,19 @@ export function WitnessCard(): React.JSX.Element {
 
   const search = (): void => {
     setSearching(true);
-    try {
-      setWitness(findWitnessPair({ graph, parameters }));
-    } finally {
-      setSearching(false);
-    }
+    // The hill-climb is synchronous and runs close to a second on a graph at the
+    // §3.1 cap. Running it straight from the click handler meant the "Searching…"
+    // state was set but never painted — the button simply froze. Two frames hands
+    // the browser one paint before the main thread is taken.
+    const run = () => {
+      try {
+        setWitness(findWitnessPair({ graph, parameters }));
+      } finally {
+        setSearching(false);
+      }
+    };
+    if (typeof requestAnimationFrame === "undefined") run();
+    else requestAnimationFrame(() => requestAnimationFrame(run));
   };
 
   const load = (side: "left" | "right"): void => {
