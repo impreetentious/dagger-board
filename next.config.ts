@@ -7,6 +7,7 @@ const pkg = JSON.parse(
 ) as { version: string };
 
 const nextConfig: NextConfig = {
+  // Static export: the product ships as files, with no server runtime to trust.
   output: "export",
   trailingSlash: true,
   images: {

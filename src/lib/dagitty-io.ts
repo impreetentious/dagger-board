@@ -180,6 +180,17 @@ function nodeKind(statuses: ReadonlySet<string>): GraphNode["kind"] {
 
 export function importDagittyText(text: string): DagittyImportResult {
   const parsed = parseStatements(text);
+  // An import that read nothing must not succeed: the panel replaces the drawn
+  // model with whatever comes back, so an empty textarea — its default state,
+  // one click from the Import button — would silently discard the user's graph
+  // and report a successful import.
+  if (parsed.nodes.length === 0) {
+    throw new Error(
+      parsed.unparsed.length > 0
+        ? `No node or edge statement could be read from this text (${parsed.unparsed.length} unreadable statement(s)).`
+        : "There is no DAGitty model in this text.",
+    );
+  }
   const warnings: string[] = [];
   if (parsed.unparsed.length > 0) {
     warnings.push(

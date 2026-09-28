@@ -59,6 +59,23 @@ describe("shared-lab mutation integrity", () => {
     expect(state.measured["node-1"]).toBeUndefined();
   });
 
+  it("refuses the interim values a number field emits instead of throwing at the caller", () => {
+    resetStore();
+    const store = useLabStore.getState();
+    for (const rows of [0, 5, 99, 1_000_001, 2500.5, Number.NaN]) {
+      store.setSampleSize(rows);
+      expect(useLabStore.getState().n).toBe(10_000);
+    }
+    for (const seed of [-1, 1.5, 0x1_0000_0000, Number.NaN]) {
+      store.setSeed(seed);
+      expect(useLabStore.getState().seed).toBe(314159);
+    }
+    store.setSampleSize(25_000);
+    store.setSeed(7);
+    expect(useLabStore.getState().n).toBe(25_000);
+    expect(useLabStore.getState().seed).toBe(7);
+  });
+
   it("never leaves a random mutation sequence in an invalid referential state", () => {
     fc.assert(
       fc.property(

@@ -1,6 +1,8 @@
+# Dependencies and build output
 node_modules
 .next
 out
 package-lock.json
 playwright-report
 test-results
+fixtures/tools/dagitty/dagitty-node.js

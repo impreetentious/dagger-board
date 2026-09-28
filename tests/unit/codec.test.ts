@@ -121,6 +121,16 @@ describe("codec and interoperability", () => {
     expect(result.warnings.some((warning) => warning.includes("unreadable"))).toBe(true);
   });
 
+  // Import replaces the drawn model. The textarea starts empty and its button
+  // sits next to it, so an import that reads nothing has to fail loudly rather
+  // than hand back an empty graph and report success.
+  it("refuses an import that reads no model instead of clearing the drawn one", () => {
+    for (const text of ["", "   ", "dag { }"]) {
+      expect(() => importDagittyText(text), JSON.stringify(text)).toThrow(/no DAGitty model/i);
+    }
+    expect(() => importDagittyText("hello world")).toThrow(/could be read/i);
+  });
+
   it("never truncates an over-limit share fragment", async () => {
     const status = await graphFragmentStatus(EXAMPLE_SNAPSHOTS["m-bias"]);
     expect(status.shareable).toBe(true);

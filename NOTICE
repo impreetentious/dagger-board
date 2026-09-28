@@ -1,11 +1,14 @@
 Third-Party Notices
 ==================
 
-This repository’s application code under `src/` is licensed under the MIT
-License (see LICENSE).
+Dagger Board
+Copyright 2025-2026 Sidakpreet Singh
+
+This product includes software developed by Sidakpreet Singh, licensed under
+the Apache License, Version 2.0 (see LICENSE).
 
 The following material is included for test and oracle purposes only and is
-not part of the MIT-licensed application runtime:
+not part of the Apache-licensed application runtime:
 
 - Path: `fixtures/tools/dagitty/dagitty-node.js`
 - Upstream: https://github.com/jtextor/dagitty

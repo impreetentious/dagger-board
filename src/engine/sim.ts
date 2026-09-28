@@ -1,5 +1,5 @@
 import * as z from "zod/mini";
-import { parentsOf } from "@/engine/graph";
+import { parentsOf, topologicalOrder } from "@/engine/graph";
 import {
   assertScmIntegrity,
   buildScmModel,
@@ -96,10 +96,22 @@ function parentEntries(
     .map((id) => ({ id, coefficient: edgeCoefficient(model.parameters, id, nodeId) }));
 }
 
+/**
+ * §3.12's generation order: topological, ties broken by ascending `idx`. Creation
+ * order is not a topological order — drawing an edge from a later-created node
+ * back to an earlier one is legal and reverses that pair — so `model.nodeIds`,
+ * which is the `idx`-ordered basis of every covariance matrix, cannot double as
+ * the order data is generated in.
+ */
+function generationOrder(model: ScmModel): string[] {
+  return topologicalOrder(model.graph);
+}
+
 function fillNodeColumn(
   model: ScmModel,
   nodeId: string,
   columns: Map<string, Float64Array>,
+  generated: ReadonlySet<string>,
   normalPair: () => { first: number; second: number },
   start: number,
   end: number,
@@ -110,7 +122,11 @@ function fillNodeColumn(
     ...parent,
     column: columns.get(parent.id),
   }));
-  if (parents.some((parent) => !parent.column))
+  // Every parent must already carry its generated values rather than the zeros
+  // `createColumns` allocated. Checking only that the column object exists
+  // cannot tell those apart, so a parent generated later would silently drop
+  // its edge from the sample while every exact readout still counts it.
+  if (parents.some((parent) => !parent.column || !generated.has(parent.id)))
     throw new Error("Parent simulation order is invalid.");
   const errorSd = model.parameters.errorSds[nodeId];
   for (let row = start; row < end; row += 2) {
@@ -161,8 +177,10 @@ export function generateSimulationData(
   const parsed = SimulationOptionsSchema.parse(options);
   const columns = createColumns(model, parsed.n);
   const normalPair = createNormalPairGenerator(parsed.seed);
-  for (const nodeId of model.nodeIds) {
-    fillNodeColumn(model, nodeId, columns, normalPair, 0, parsed.n);
+  const generated = new Set<string>();
+  for (const nodeId of generationOrder(model)) {
+    fillNodeColumn(model, nodeId, columns, generated, normalPair, 0, parsed.n);
+    generated.add(nodeId);
   }
   const selected = selectedRowIndices(model, columns, parsed.n, parsed.selection);
   return {
@@ -189,12 +207,14 @@ export async function generateSimulationDataAsync(
   const normalizedChunk = Math.max(2, Math.floor(chunkSize / 2) * 2);
   const columns = createColumns(model, parsed.n);
   const normalPair = createNormalPairGenerator(parsed.seed);
-  for (const nodeId of model.nodeIds) {
+  const generated = new Set<string>();
+  for (const nodeId of generationOrder(model)) {
     for (let start = 0; start < parsed.n; start += normalizedChunk) {
       const end = Math.min(parsed.n, start + normalizedChunk);
-      fillNodeColumn(model, nodeId, columns, normalPair, start, end);
+      fillNodeColumn(model, nodeId, columns, generated, normalPair, start, end);
       await yieldToEventLoop();
     }
+    generated.add(nodeId);
   }
   const selected = selectedRowIndices(model, columns, parsed.n, parsed.selection);
   return {

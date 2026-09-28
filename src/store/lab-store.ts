@@ -27,6 +27,14 @@ interface LabStore extends LabSnapshot {
   notice: string | null;
   past: LabSnapshot[];
   future: LabSnapshot[];
+  /**
+   * Coalescing key for the newest history entry. A continuous gesture — a
+   * pointer drag, a held arrow key — reports one tag for its whole run and so
+   * costs a single undo step. Without it a drag pushed one entry per pointer
+   * move, and two or three drags evicted every structural edit from the
+   * hundred-entry history.
+   */
+  historyTag: string | null;
   setActiveSurface: (surface: LabSurface) => void;
   selectNode: (id: string | null) => void;
   setHighlightedPath: (nodeIds: string[] | null) => void;
@@ -34,6 +42,8 @@ interface LabStore extends LabSnapshot {
   setNotice: (notice: string | null) => void;
   addNode: (kind?: NodeKind) => void;
   moveNode: (id: string, dx: number, dy: number) => void;
+  /** Closes the current gesture so the next one starts its own undo step. */
+  endGesture: () => void;
   renameNode: (id: string, name: string) => void;
   setNodeKind: (id: string, kind: NodeKind) => void;
   assignRole: (role: "exposureId" | "outcomeId", id: string) => void;
@@ -98,7 +108,9 @@ function statePatch(
   current: LabStore,
   recordHistory: boolean,
   notice?: string,
+  tag: string | null = null,
 ) {
+  const continuesGesture = recordHistory && tag !== null && tag === current.historyTag;
   return {
     ...snapshot,
     selectedNodeId:
@@ -115,18 +127,27 @@ function statePatch(
     )
       ? current.highlightedPathNodeIds
       : null,
-    past: recordHistory ? [...current.past.slice(-99), snapshotOf(current)] : current.past,
+    past:
+      recordHistory && !continuesGesture
+        ? [...current.past.slice(-99), snapshotOf(current)]
+        : current.past,
     future: recordHistory ? [] : current.future,
+    historyTag: recordHistory ? tag : null,
     notice: notice ?? current.notice,
   };
 }
 
 export const useLabStore = create<LabStore>((set, get) => {
   const initial = emptySnapshot();
-  const apply = (next: LabSnapshot, recordHistory = true, notice?: string) => {
+  const apply = (
+    next: LabSnapshot,
+    recordHistory = true,
+    notice?: string,
+    tag: string | null = null,
+  ) => {
     const current = get();
     const sanitized = pruneLabSnapshot(next);
-    set(statePatch(sanitized, current, recordHistory, notice));
+    set(statePatch(sanitized, current, recordHistory, notice, tag));
   };
   const attempt = (action: () => void) => {
     try {
@@ -144,6 +165,7 @@ export const useLabStore = create<LabStore>((set, get) => {
     notice: null,
     past: [],
     future: [],
+    historyTag: null,
     setActiveSurface: (activeSurface) => set({ activeSurface }),
     // Moving focus/selection between nodes must NOT cancel an in-progress edge:
     // the "E → navigate → Enter" workflow depends on edgeStartId surviving the
@@ -187,8 +209,13 @@ export const useLabStore = create<LabStore>((set, get) => {
               : node,
           ),
         });
-        apply({ ...snapshotOf(current), graph });
+        // One drag is one undo step: every move in the run shares this tag,
+        // and the canvas closes the run on pointer-up.
+        apply({ ...snapshotOf(current), graph }, true, undefined, `move:${id}`);
       }),
+    endGesture: () => {
+      if (get().historyTag !== null) set({ historyTag: null });
+    },
     renameNode: (id, name) =>
       attempt(() => {
         const current = get();
@@ -290,12 +317,25 @@ export const useLabStore = create<LabStore>((set, get) => {
         });
         apply({ ...snapshotOf(current), parameters }, false);
       }),
+    // A number field emits its interim value on every keystroke — empty while
+    // being cleared, out of range while being retyped, fractional if typed that
+    // way. The snapshot contract rejects all three, so they are refused with a
+    // notice here; letting them reach it threw an uncaught schema error out of
+    // the change handler and left the field showing a value the store never took.
     setSeed: (seed) => {
       const current = get();
+      if (!Number.isInteger(seed) || seed < 0 || seed > 0xffff_ffff) {
+        set({ notice: "The seed must be a whole number from 0 to 4,294,967,295." });
+        return;
+      }
       apply({ ...snapshotOf(current), seed }, false);
     },
     setSampleSize: (n) => {
       const current = get();
+      if (!Number.isInteger(n) || n < 100 || n > 1_000_000) {
+        set({ notice: "Rows must be a whole number from 100 to 1,000,000." });
+        return;
+      }
       apply({ ...snapshotOf(current), n }, false);
     },
     loadSnapshot: (snapshot, notice = "Model loaded.") => apply(snapshot, true, notice),
@@ -316,6 +356,7 @@ export const useLabStore = create<LabStore>((set, get) => {
         ...previous,
         past: current.past.slice(0, -1),
         future: [snapshotOf(current), ...current.future].slice(0, 100),
+        historyTag: null,
         selectedNodeId: null,
         edgeStartId: null,
         notice: "Undid graph edit.",
@@ -329,6 +370,7 @@ export const useLabStore = create<LabStore>((set, get) => {
         ...next,
         past: [...current.past, snapshotOf(current)].slice(-100),
         future: current.future.slice(1),
+        historyTag: null,
         selectedNodeId: null,
         edgeStartId: null,
         notice: "Redid graph edit.",

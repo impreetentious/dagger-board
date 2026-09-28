@@ -141,6 +141,16 @@ export function evaluateDesign(
   const outcomeId = graph.roles.outcomeId;
   if (!exposureId || !outcomeId) throw new Error("Design requires observed X and Y.");
   const model = buildScmModel(graph, parameters);
+  // §3.8's degeneracy guard. Every other estimator surface — Simulate, the
+  // sensitivity surface, the record's robustness line — refuses a degenerate Σ,
+  // and the Schur complements this table is built from are exactly what goes
+  // unreliable there. Without this the two surfaces disagree about one model:
+  // Simulate withholds its numbers while Design prints a full table.
+  if (model.illConditioned) {
+    throw new Error(
+      "This parameterization is degenerate: the model-implied covariance is numerically singular, so no estimand computed from it would mean anything. Move a coefficient or an error SD away from its bound.",
+    );
+  }
   const rules = normalizeSelectionInput(selection);
   const truncation =
     rules.length === 0

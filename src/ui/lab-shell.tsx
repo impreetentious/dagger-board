@@ -71,13 +71,13 @@ export function LabShell() {
         <div className="min-w-0 p-4 sm:p-6">
           <GraphCanvas />
         </div>
-        <section className="border-t border-[var(--line)] bg-[color-mix(in_srgb,var(--surface-raised)_82%,transparent)] p-5 sm:p-7 xl:border-l xl:border-t-0">
+        <aside className="border-t border-[var(--line)] bg-[color-mix(in_srgb,var(--surface-raised)_82%,transparent)] p-5 sm:p-7 xl:border-l xl:border-t-0">
           {activeSurface === "draw" ? <DrawPanel /> : null}
           {activeSurface === "prove" ? <ProvePanel /> : null}
           {activeSurface === "simulate" ? <SimulatePanel /> : null}
           {activeSurface === "design" ? <DesignPanel /> : null}
           {activeSurface === "communicate" ? <CommunicatePanel /> : null}
-        </section>
+        </aside>
       </section>
     </main>
   );

@@ -1,9 +1,12 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { addEdge, addNode, EMPTY_GRAPH, setRoles } from "@/engine/graph";
 import {
   buildScmModel,
+  covarianceAt,
   defaultScmParameters,
+  edgeParameterKey,
   matrixTotalEffect,
   type SCMParameters,
 } from "@/engine/scm";
@@ -114,6 +117,29 @@ describe("deterministic simulation", () => {
       totalEffect,
     });
     expect(series.at(-1)?.estimate).toBeCloseTo(exact, 2);
+  });
+
+  it("generates in topological order when creation order reverses it", async () => {
+    // Draw A, draw B, then draw the edge B → A. Acyclic and ordinary, but the
+    // `idx` order (A, B) that indexes every covariance matrix is the reverse of
+    // the order the data has to be generated in.
+    let graph = addNode(EMPTY_GRAPH, { name: "A", kind: "observed" });
+    graph = addNode(graph, { name: "B", kind: "observed" });
+    const [a, b] = graph.nodes.map((node) => node.id);
+    graph = setRoles(addEdge(graph, { from: b, to: a }), { exposureId: b, outcomeId: a });
+    const parameters = defaultScmParameters(graph);
+    parameters.edgeCoefficients[edgeParameterKey(b, a)] = 1.5;
+    const model = buildScmModel(graph, parameters);
+    expect(model.nodeIds).toEqual([a, b]);
+
+    const options = { seed: 0xa17, n: 200_000 };
+    const sample = sampleMoments(generateSimulationData(model, options));
+    const chunked = sampleMoments(await generateSimulationDataAsync(model, options, 4096));
+    const at = (moments: typeof sample, left: string, right: string) =>
+      moments.covariance[moments.indexById.get(left)!][moments.indexById.get(right)!];
+    expect(at(sample, a, b)).toBeCloseTo(covarianceAt(model, a, b), 2);
+    expect(at(sample, a, a)).toBeCloseTo(covarianceAt(model, a, a), 1);
+    expect(at(chunked, a, b)).toBe(at(sample, a, b));
   });
 
   it("matches the selection closed form within the realized 4·SE demonstration tolerance", () => {

@@ -54,3 +54,22 @@ test("all shipped routes and workbench surfaces have no automated accessibility 
     expect(results.violations).toEqual([]);
   }
 });
+
+// A focused node <g> bubbles its keydown to the canvas <svg>. When both carried
+// the handler, every command ran twice — the count below is what caught it.
+test("each keystroke runs its editor command exactly once", async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+
+  await page.goto("/lab");
+  await page.getByLabel("Causal graph editor").focus();
+  for (let count = 0; count < 4; count += 1) {
+    await page.keyboard.press("n");
+    await expect(page.locator("[data-node-id]")).toHaveCount(count + 1);
+  }
+
+  await page.keyboard.press("Delete");
+  await expect(page.locator("[data-node-id]")).toHaveCount(3);
+  await expect(page.locator("p[aria-live='polite']")).toHaveText("Node deleted.");
+  expect(pageErrors).toEqual([]);
+});

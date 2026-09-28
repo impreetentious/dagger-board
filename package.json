@@ -1,6 +1,6 @@
 {
   "name": "daggerboard",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "private": true,
   "engines": {
     "node": ">=20.20.2 <21",
@@ -27,44 +27,48 @@
     "check:csp": "node scripts/check-csp.mjs"
   },
   "dependencies": {
-    "next": "16.2.4",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "zod": "^4.4.2",
-    "zustand": "^5.0.12"
+    "next": "16.3.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
   },
   "overrides": {
-    "postcss": "^8.5.13",
+    "postcss": "^8.5.18",
     "next": {
-      "sharp": "^0.34.5"
-    }
+      "sharp": "0.35.4"
+    },
+    "sharp": "0.35.4",
+    "js-yaml@>=4.0.0 <4.3.2": "4.3.2",
+    "fast-uri@>=3.0.0 <3.1.6": "3.1.6",
+    "browserslist@<=4.28.6": "4.28.7"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.3",
-    "@playwright/test": "^1.59.1",
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "eslint": "^9",
-    "eslint-config-next": "16.2.4",
-    "fast-check": "^4.7.0",
-    "prettier": "^3.8.3",
+    "eslint-config-next": "16.3.3",
+    "fast-check": "^4.9.0",
+    "prettier": "^3.9.6",
     "serve": "^14.2.6",
     "tailwindcss": "^4",
     "typescript": "^5",
     "underscore": "^1.13.8",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.10"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "Sidakpreet Singh",
   "description": "Client-side causal DAG design instrument with exact identification and simulation.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ItsMonarch04/dagger-board.git"
+    "url": "git+https://github.com/impreetentious/dagger-board.git"
   },
   "bugs": {
-    "url": "https://github.com/ItsMonarch04/dagger-board/issues"
+    "url": "https://github.com/impreetentious/dagger-board/issues"
   },
-  "homepage": "https://github.com/ItsMonarch04/dagger-board"
+  "homepage": "https://github.com/impreetentious/dagger-board"
 }

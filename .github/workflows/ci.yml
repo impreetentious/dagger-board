@@ -5,6 +5,7 @@ on:
   push:
     branches: [main]
 
+# Least privilege: the job only reads the checkout, it never writes back.
 permissions:
   contents: read
 

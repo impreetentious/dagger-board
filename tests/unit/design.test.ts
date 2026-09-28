@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { diffDesignReports, evaluateDesign } from "@/engine/design";
-import { defaultScmParameters } from "@/engine/scm";
+import { buildScmModel, defaultScmParameters } from "@/engine/scm";
 import { Tier1FixtureSchema } from "../../fixtures/tier1/schema";
 
 function fixture(file: string) {
@@ -57,6 +57,23 @@ describe("design table", () => {
       ["m"],
     );
     expect(report.forbiddenConditioningNodeIds).toEqual(["m"]);
+  });
+
+  it("refuses a degenerate parameterization instead of tabulating it", () => {
+    const graph = fixture("14-adversarial-perf.json").graph;
+    const parameters = defaultScmParameters(graph);
+    // Every value below is inside the UI's own bounds (§3.8), yet the chain of
+    // twos drives Σ's condition number past the degeneracy guard.
+    for (const key of Object.keys(parameters.edgeCoefficients)) {
+      parameters.edgeCoefficients[key] = 2;
+    }
+    for (const [index, id] of Object.keys(parameters.errorSds).entries()) {
+      parameters.errorSds[id] = index === 0 ? 3 : 0.05;
+    }
+    expect(buildScmModel(graph, parameters).illConditioned).toBe(true);
+    expect(() =>
+      evaluateDesign(graph, parameters, allMeasured(graph), undefined, 10_000, []),
+    ).toThrow(/degenerate/i);
   });
 
   it("diffs two design reports symmetrically for A/B side-by-side", () => {

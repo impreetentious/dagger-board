@@ -78,3 +78,43 @@ test("a saved model does not break hydration on reload", async ({ page }) => {
   await expect(page.getByText("SAVED MODELS")).toBeVisible();
   expect(pageErrors).toEqual([]);
 });
+
+// A drag emits one store edit per pointer move. Recording each of those as its
+// own history entry made undo useless: a couple of drags evicted every
+// structural edit from the hundred-entry stack, and each Ctrl+Z only walked the
+// node back eight pixels.
+test("a drag costs one undo step, not one per pointer move", async ({ page }) => {
+  const dragBy = async (steps: number) => {
+    const box = await page.locator('[data-node-id="x"] circle').first().boundingBox();
+    if (!box) throw new Error("The exposure node had no pointer target.");
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    for (let step = 1; step <= steps; step += 1) {
+      await page.mouse.move(box.x + box.width / 2 + step * 4, box.y + box.height / 2 + step * 2);
+    }
+    await page.mouse.up();
+  };
+
+  await page.goto("/lab");
+  await page.getByRole("button", { name: "Load M-bias" }).click();
+  const canvas = page.getByLabel("Causal graph editor");
+  await canvas.evaluate((element) => element.scrollIntoView({ block: "center" }));
+
+  const circle = page.locator('[data-node-id="x"] circle').first();
+  const start = await circle.getAttribute("cx");
+  await dragBy(30);
+  const afterFirst = await circle.getAttribute("cx");
+  expect(afterFirst).not.toBe(start);
+  await dragBy(20);
+  expect(await circle.getAttribute("cx")).not.toBe(afterFirst);
+
+  await canvas.focus();
+  await page.keyboard.press("Control+z");
+  await expect(circle).toHaveAttribute("cx", afterFirst ?? "");
+  await page.keyboard.press("Control+z");
+  await expect(circle).toHaveAttribute("cx", start ?? "");
+
+  // The example load that preceded both drags is still reachable.
+  await page.keyboard.press("Control+z");
+  await expect(page.locator("[data-node-id]")).toHaveCount(0);
+});

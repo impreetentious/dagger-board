@@ -41,6 +41,7 @@ export function GraphCanvas() {
   const highlightedPathNodeIds = useLabStore((state) => state.highlightedPathNodeIds);
   const selectNode = useLabStore((state) => state.selectNode);
   const moveNode = useLabStore((state) => state.moveNode);
+  const endGesture = useLabStore((state) => state.endGesture);
   const addNode = useLabStore((state) => state.addNode);
   const assignRole = useLabStore((state) => state.assignRole);
   const setNodeKind = useLabStore((state) => state.setNodeKind);
@@ -85,6 +86,10 @@ export function GraphCanvas() {
     focusNode(next.id);
   };
 
+  // Bound on the <svg> only. A focused node <g> bubbles its keydown here, so
+  // binding this on both surfaces ran every command twice for the one case that
+  // matters — N added two nodes, Alt+arrow moved sixteen pixels, and the second
+  // Delete reported "Unknown node" for the one it had just removed.
   const handleKey = (event: KeyboardEvent<SVGSVGElement | SVGGElement>) => {
     const activeId = selectedNodeId;
     const key = event.key.toLowerCase();
@@ -178,6 +183,15 @@ export function GraphCanvas() {
     setDrag({ id, ...point });
   };
 
+  // Also bound to pointercancel: a cancelled pointer (an interrupting system
+  // gesture on touch, say) never delivers pointerup, and the node would stay
+  // glued to the cursor with no button held.
+  const endPointerInteraction = () => {
+    if (drag) endGesture();
+    setDrag(null);
+    setPanStart(null);
+  };
+
   const onPointerMove = (event: PointerEvent<SVGSVGElement>) => {
     const point = pointFor(event);
     if (drag) {
@@ -262,10 +276,8 @@ export function GraphCanvas() {
         // A dragged node captures the pointer on its <g>. Listen during capture
         // on the SVG so the movement still reaches this shared drag controller.
         onPointerMoveCapture={onPointerMove}
-        onPointerUp={() => {
-          setDrag(null);
-          setPanStart(null);
-        }}
+        onPointerCancel={endPointerInteraction}
+        onPointerUp={endPointerInteraction}
         ref={svgRef}
         role="graphics-document document"
         tabIndex={0}

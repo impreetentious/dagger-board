@@ -145,8 +145,8 @@ export function CommunicatePanel() {
           </li>
           {doc.selection ? (
             <li>
-              selection rule active: keep the top {(1 - doc.selection.quantile) * 100}% of{" "}
-              <span className="font-mono">{doc.selection.nodeName}</span>
+              selection rule active: keep the top {((1 - doc.selection.quantile) * 100).toFixed(0)}%
+              of <span className="font-mono">{doc.selection.nodeName}</span>
             </li>
           ) : null}
         </ul>

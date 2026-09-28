@@ -1,3 +1,4 @@
+// Regenerates the DAGitty parity corpus. Its output is committed; never hand-edit the fixtures.
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";

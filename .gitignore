@@ -1,7 +1,5 @@
 # dependencies
 /node_modules
-/.pnp
-.pnp.*
 
 # Next.js and static output
 /.next

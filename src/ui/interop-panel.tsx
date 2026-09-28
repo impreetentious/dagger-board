@@ -32,7 +32,9 @@ function download(filename: string, text: string) {
   link.href = url;
   link.download = filename;
   link.click();
-  URL.revokeObjectURL(url);
+  // Deferred, as in the other two export paths: revoking in the same tick can
+  // beat the browser to reading the blob and drop the download.
+  setTimeout(() => URL.revokeObjectURL(url), 500);
 }
 
 export function InteropPanel() {
@@ -50,7 +52,15 @@ export function InteropPanel() {
       }
       const url = `${window.location.origin}${window.location.pathname}${status.fragment}`;
       window.history.replaceState(null, "", status.fragment);
-      await navigator.clipboard?.writeText(url);
+      // `navigator.clipboard` is absent outside a secure context, and the
+      // optional call then quietly does nothing — so the copy has to be
+      // confirmed rather than assumed. The address bar already carries the
+      // fragment either way.
+      if (!navigator.clipboard) {
+        store.setNotice("Share link is in the address bar; this context cannot use the clipboard.");
+        return;
+      }
+      await navigator.clipboard.writeText(url);
       store.setNotice("Share link copied to the clipboard.");
     } catch (error) {
       store.setNotice(error instanceof Error ? error.message : "Unable to encode share link.");

@@ -51,11 +51,14 @@ export function DesignPanel() {
   const diff = pinned && !(report instanceof Error) ? diffDesignReports(pinned, report) : [];
 
   if (report instanceof Error) {
+    const rolesMissing = !graph.roles.exposureId || !graph.roles.outcomeId;
     return (
       <section>
         <p className="font-mono text-xs font-bold tracking-[0.18em] text-[var(--signal)]">DESIGN</p>
         <h2 className="mt-2 text-2xl font-black tracking-[-0.05em]">
-          Designate X and Y to compare designs.
+          {rolesMissing
+            ? "Designate X and Y to compare designs."
+            : "This model cannot be read as a design."}
         </h2>
         <p className="mt-3 text-sm text-[var(--muted)]">{report.message}</p>
       </section>
