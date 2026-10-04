@@ -19,12 +19,12 @@ eqs. 2.10–2.13. Residualization follows the Frisch–Waugh–Lovell theorem.
 
 ## Seeded-run portability
 
-The golden test runtime is Node 20.20.2, matching `.nvmrc` and the declared
+The golden test runtime is Node 22.23.3, matching `.nvmrc` and the declared
 engine range. Same-runtime seeded runs are bit-identical because the generator,
 stream order, edge ordering, and arithmetic order are pinned. Cross-engine bit
 equality is intentionally not asserted: ECMAScript classifies `Math.sin`,
 `Math.cos`, and `Math.log` as implementation-approximated, so tests outside the
 pinned engine use numeric tolerances.
 
-Primary sources: [Node 20.20.2 archive](https://nodejs.org/en/download/archive/v20.20.2)
+Primary sources: [Node 22.23.3 archive](https://nodejs.org/en/download/archive/v22.23.3)
 and [ECMAScript Math specification](https://tc39.es/ecma262/2025/multipage/numbers-and-dates.html).

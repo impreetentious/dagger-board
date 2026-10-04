@@ -101,4 +101,4 @@ Apache-2.0 © 2025-2026 Sidakpreet Singh — see [LICENSE](LICENSE). Test-only D
 
 ---
 
-**Version:** v0.17.1
+**Version:** v0.17.2

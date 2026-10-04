@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "runtime": "Node 20.20.2",
+  "runtime": "Node 22.23.3",
   "note": "Golden values are bit-identical only on the pinned Node/V8 runtime; cross-engine checks use numeric tolerances.",
   "cases": [
     {

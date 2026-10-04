@@ -10,12 +10,12 @@ const pkg = JSON.parse(read("package.json"));
 const version = pkg.version;
 const errors = [];
 const EXPECTED = {
-  nvmrc: "20.20.2",
-  engines: ">=20.20.2 <21",
+  nvmrc: "22.23.3",
+  engines: ">=22.23.3 <23",
   workflow: ".github/workflows/ci.yml",
   appConfig: "next.config.ts",
   appVersion: "src/lib/app-version.ts",
-  ciNode: "20.20.2",
+  ciNode: "22.23.3",
 };
 
 function markerVersion(file) {

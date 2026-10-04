@@ -1,6 +1,6 @@
 # Architecture decisions
 
-- Node 20.20.2 is pinned in `.nvmrc`; npm 10 is the supported package manager.
+- Node 22.23.3 is pinned in `.nvmrc`; npm 10 is the supported package manager.
 - Next.js uses the App Router, static export, and trailing-slash output so the
   generated `out/` directory remains portable across static hosts.
 - Light and dark themes use CSS custom properties. A small pre-hydration script
