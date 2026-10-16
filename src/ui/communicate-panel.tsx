@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { buildAdrDocument, readAdrDocument, type AdrDocument } from "@/engine/adr";
 import { APP_VERSION } from "@/lib/app-version";
 import { mathematicalSnapshotJson, pruneLabSnapshot } from "@/lib/codec";
-import { graphToSvg } from "@/lib/svg-export";
+import { graphLayoutWarning, graphToSvg } from "@/lib/svg-export";
 import { useLabStore } from "@/store/lab-store";
 
 function download(name: string, payload: string, type = "application/json") {
@@ -45,6 +45,7 @@ export function CommunicatePanel() {
   const seed = useLabStore((state) => state.seed);
   const n = useLabStore((state) => state.n);
   const [timestamp, setTimestamp] = useState<string | null>(null);
+  const layoutWarning = graphLayoutWarning(graph);
   const svg = useMemo(() => {
     void fontRevision;
     try {
@@ -105,7 +106,7 @@ export function CommunicatePanel() {
       n: latest.n,
       timestamp: new Date().toISOString(),
       appVersion: APP_VERSION,
-      svg: graphToSvg(latest.graph),
+      svg: graphLayoutWarning(latest.graph) ? "" : graphToSvg(latest.graph),
     });
     download(`daggerboard-adr-${record.appVersion}.json`, JSON.stringify(record, null, 2));
   };
@@ -161,6 +162,9 @@ export function CommunicatePanel() {
         </p>
       ) : null}
       {notice ? <p role="status">{notice}</p> : null}
+      {layoutWarning ? (
+        <p role="status">{layoutWarning} SVG export is unavailable until separated.</p>
+      ) : null}
       {legacy ? (
         <article>
           <p>
@@ -204,7 +208,24 @@ export function CommunicatePanel() {
         <button
           className="tool-button"
           data-testid="svg-download"
-          onClick={() => download("daggerboard-dag.svg", svg, "image/svg+xml")}
+          disabled={Boolean(layoutWarning)}
+          onClick={() =>
+            void document.fonts.ready
+              .then(() => {
+                if (!alive.current) return;
+                const latest = useLabStore.getState().graph;
+                const warning = graphLayoutWarning(latest);
+                if (warning) {
+                  setNotice(warning);
+                  return;
+                }
+                download("daggerboard-dag.svg", graphToSvg(latest), "image/svg+xml");
+              })
+              .catch((error: unknown) => {
+                if (alive.current)
+                  setNotice(error instanceof Error ? error.message : "SVG export refused.");
+              })
+          }
           type="button"
         >
           Download DAG SVG

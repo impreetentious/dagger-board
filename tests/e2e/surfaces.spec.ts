@@ -77,3 +77,43 @@ test("simulation evidence expires on seed edits and ADR inputs roundtrip", async
   await page.getByRole("tab", { name: /Simulate/i }).click();
   await expect(page.getByLabel("Simulation seed")).toHaveValue("47");
 });
+test("single-edge analysis applies one variant through normal undo", async ({ page }) => {
+  await page.goto("/lab");
+  await page.getByRole("button", { name: "Load M-bias" }).click();
+  await page.getByRole("tab", { name: /Prove/i }).click();
+  await page.getByRole("button", { name: "Analyze single-edge changes" }).click();
+  await expect(
+    page.getByText(/All structurally admissible single-edge variants inspected/),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Apply this edge change" }).first().click();
+  await expect(
+    page.getByText(/All structurally admissible single-edge variants inspected/),
+  ).toHaveCount(0);
+  await page.getByRole("tab", { name: /Draw/i }).click();
+  await page.getByRole("button", { name: /Undo/ }).click();
+  await page.getByRole("tab", { name: /Prove/i }).click();
+  await expect(page.getByText("TE ≡ 0 under your own assumptions.")).toBeVisible();
+});
+
+test("canvas arrow tips remain outside the actual node outlines", async ({ page }) => {
+  await page.goto("/lab");
+  await page.getByRole("button", { name: "Load M-bias" }).click();
+  const distances = await page.evaluate(() => {
+    const centers = Array.from(document.querySelectorAll("[data-node-id]")).map((node) => {
+      const circle = node.querySelector("circle");
+      return { x: Number(circle?.getAttribute("cx")), y: Number(circle?.getAttribute("cy")) };
+    });
+    return Array.from(
+      document.querySelectorAll<SVGPathElement>('path[marker-end="url(#causal-arrow)"]'),
+    ).map((path) => {
+      const start = path.getPointAtLength(0),
+        end = path.getPointAtLength(path.getTotalLength());
+      return [
+        Math.min(...centers.map((center) => Math.hypot(start.x - center.x, start.y - center.y))),
+        Math.min(...centers.map((center) => Math.hypot(end.x - center.x, end.y - center.y))),
+      ];
+    });
+  });
+  expect(distances.length).toBeGreaterThan(0);
+  for (const pair of distances) for (const distance of pair) expect(distance).toBeCloseTo(32, 2);
+});

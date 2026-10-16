@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { pathSpecificEffects } from "@/engine/effects";
-import { proveGraph } from "@/engine/prove";
+import { analyzeSingleEdgeVariants, proveGraph } from "@/engine/prove";
+import { graphicalSnapshotJson, pruneLabSnapshot, type LabSnapshot } from "@/lib/codec";
 import { useLabStore } from "@/store/lab-store";
 import { WitnessCard } from "@/ui/witness-card";
 
@@ -11,6 +12,81 @@ function setLabel(ids: readonly string[], names: (id: string) => string): string
 }
 
 export function ProvePanel() {
+  const state = useLabStore();
+  const identity = graphicalSnapshotJson(state);
+  const [sensitivity, setSensitivity] = useState<{
+    identity: string;
+    snapshot: LabSnapshot;
+    result: Awaited<ReturnType<typeof analyzeSingleEdgeVariants>>;
+  } | null>(null);
+  const [progress, setProgress] = useState<{
+    done: number;
+    total: number;
+    identity: string;
+  } | null>(null);
+  const [sensitivityError, setSensitivityError] = useState<string | null>(null);
+  const request = useRef<{ token: number; controller: AbortController } | null>(null);
+  const generation = useRef(0);
+  function stopSensitivity() {
+    generation.current += 1;
+    request.current?.controller.abort();
+    request.current = null;
+    setSensitivity(null);
+    setProgress(null);
+    setSensitivityError(null);
+  }
+  useEffect(() => {
+    let previous = graphicalSnapshotJson(useLabStore.getState());
+    const unsubscribe = useLabStore.subscribe((next) => {
+      const latest = graphicalSnapshotJson(next);
+      if (latest === previous) return;
+      previous = latest;
+      generation.current += 1;
+      request.current?.controller.abort();
+      request.current = null;
+      setSensitivity(null);
+      setProgress(null);
+      setSensitivityError(null);
+    });
+    return () => {
+      generation.current += 1;
+      request.current?.controller.abort();
+      unsubscribe();
+    };
+  }, []);
+  async function analyzeEdges() {
+    stopSensitivity();
+    const snapshot = structuredClone(pruneLabSnapshot(useLabStore.getState()));
+    const sourceIdentity = graphicalSnapshotJson(snapshot),
+      token = ++generation.current;
+    const controller = new AbortController();
+    request.current = { token, controller };
+    const current = () =>
+      token === generation.current &&
+      graphicalSnapshotJson(useLabStore.getState()) === sourceIdentity;
+    setProgress({ done: 0, total: 0, identity: sourceIdentity });
+    try {
+      const result = await analyzeSingleEdgeVariants(
+        snapshot.graph,
+        new Set(snapshot.conditioning),
+        snapshot.selection ? { nodeId: snapshot.selection.nodeId } : undefined,
+        controller.signal,
+        (done, total) => {
+          if (current()) setProgress({ done, total, identity: sourceIdentity });
+        },
+      );
+      if (current()) setSensitivity({ identity: sourceIdentity, snapshot, result });
+    } catch (error) {
+      if (current())
+        setSensitivityError(error instanceof Error ? error.message : "Edge analysis unavailable.");
+    } finally {
+      if (current()) {
+        request.current = null;
+        setProgress(null);
+      }
+    }
+  }
+  const currentSensitivity = sensitivity?.identity === identity ? sensitivity : null;
   const graph = useLabStore((state) => state.graph);
   const parameters = useLabStore((state) => state.parameters);
   const conditioning = useLabStore((state) => state.conditioning);
@@ -100,6 +176,80 @@ export function ProvePanel() {
           </div>
         ) : null}
       </article>
+
+      <section aria-label="Single-edge assumption changes">
+        <button className="tool-button" type="button" onClick={() => void analyzeEdges()}>
+          Analyze single-edge changes
+        </button>
+        {progress?.identity === identity ? (
+          <>
+            <button type="button" className="tool-button" onClick={stopSensitivity}>
+              Cancel edge analysis
+            </button>
+            <p role="status">
+              {progress.done}/{progress.total} admissible variants inspected.
+            </p>
+          </>
+        ) : null}
+        <p>
+          Directed edge deletion/addition only. Roles, conditioning, node kinds and selection stay
+          fixed; at most 128 acyclic variants are inspected. This is not robustness to all causal
+          models.
+        </p>
+        {sensitivityError ? <p role="status">{sensitivityError}</p> : null}
+        {currentSensitivity ? (
+          <>
+            <p role="status">
+              {currentSensitivity.result.inspected}/{currentSensitivity.result.total} inspected.{" "}
+              {currentSensitivity.result.incomplete
+                ? "Incomplete: 128-variant cap reached."
+                : "All structurally admissible single-edge variants inspected."}
+            </p>
+            <ul>
+              {currentSensitivity.result.entries.map((entry) => (
+                <li key={`${entry.change.kind}:${entry.change.from}:${entry.change.to}`}>
+                  {entry.change.kind} {name(entry.change.from)} → {name(entry.change.to)}:{" "}
+                  {entry.refusal ??
+                    (entry.changed
+                      ? `changed conclusion: ${entry.report!.verdict}; adjustment ${entry.report!.adjustment?.minimalSets.map((ids) => `{${ids.map(name).join(",")}}`).join(" / ") || "none"}`
+                      : "unchanged verdict and minimal adjustment sets")}
+                  .
+                  <button
+                    className="tool-button"
+                    type="button"
+                    onClick={() => {
+                      if (
+                        graphicalSnapshotJson(useLabStore.getState()) !==
+                        currentSensitivity.identity
+                      )
+                        return;
+                      useLabStore.getState().loadSnapshot(
+                        pruneLabSnapshot({
+                          ...pruneLabSnapshot(useLabStore.getState()),
+                          graph: {
+                            ...entry.graph,
+                            nodes: entry.graph.nodes.map((node) => ({
+                              ...node,
+                              position:
+                                useLabStore
+                                  .getState()
+                                  .graph.nodes.find((current) => current.id === node.id)
+                                  ?.position ?? node.position,
+                            })),
+                          },
+                        }),
+                        "Single-edge variant applied; undo restores the original graph.",
+                      );
+                    }}
+                  >
+                    Apply this edge change
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
+      </section>
 
       <details open>
         <summary className="cursor-pointer text-sm font-bold">Conditioning playground</summary>

@@ -86,7 +86,7 @@ describe("reproducible ADR input provenance", () => {
       seed: base.seed,
       n: base.n,
       timestamp: "2026-10-03T00:00:00.000Z",
-      appVersion: "0.17.3",
+      appVersion: "0.17.4",
       labSnapshot: base,
     };
     const original = buildAdrDocument(inputs);

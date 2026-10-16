@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { useLabStore } from "@/store/lab-store";
-import { graphToSvg } from "@/lib/svg-export";
+import { clipEdge, graphLayoutWarning, graphToSvg } from "@/lib/svg-export";
 
 interface Viewport {
   x: number;
@@ -21,19 +21,6 @@ function diamondPoints(x: number, y: number, radius: number): string {
   return `${x},${y - radius} ${x + radius},${y} ${x},${y + radius} ${x - radius},${y}`;
 }
 
-function curvePath(
-  from: { x: number; y: number },
-  to: { x: number; y: number },
-  bend: number,
-): string {
-  const middleX = (from.x + to.x) / 2;
-  const middleY = (from.y + to.y) / 2;
-  const length = Math.max(1, Math.hypot(to.x - from.x, to.y - from.y));
-  const controlX = middleX + ((from.y - to.y) / length) * bend;
-  const controlY = middleY + ((to.x - from.x) / length) * bend;
-  return `M ${from.x} ${from.y} Q ${controlX} ${controlY} ${to.x} ${to.y}`;
-}
-
 export function GraphCanvas() {
   const graph = useLabStore((state) => state.graph);
   const selectedNodeId = useLabStore((state) => state.selectedNodeId);
@@ -50,6 +37,8 @@ export function GraphCanvas() {
   const completeEdge = useLabStore((state) => state.completeEdge);
   const undo = useLabStore((state) => state.undo);
   const redo = useLabStore((state) => state.redo);
+  const layoutWarning = graphLayoutWarning(graph);
+  const nodesById = new Map(graph.nodes.map((node) => [node.id, node]));
   const svgRef = useRef<SVGSVGElement>(null);
   const [viewport, setViewport] = useState<Viewport>({ x: 0, y: 0, width: 800, height: 520 });
   const [drag, setDrag] = useState<DragState | null>(null);
@@ -238,7 +227,8 @@ export function GraphCanvas() {
   const positions = new Map(
     graph.nodes.map((node) => [node.id, node.position ?? { x: 120 + node.idx * 80, y: 220 }]),
   );
-  const downloadSvg = () => {
+  const downloadSvg = async () => {
+    await document.fonts.ready;
     const url = URL.createObjectURL(new Blob([graphToSvg(graph)], { type: "image/svg+xml" }));
     const anchor = document.createElement("a");
     anchor.href = url;
@@ -257,11 +247,15 @@ export function GraphCanvas() {
     <div className="relative min-h-[31rem] overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--canvas)]">
       <button
         className="tool-button absolute right-3 top-3 z-10"
-        onClick={downloadSvg}
+        onClick={() => void downloadSvg()}
+        disabled={Boolean(layoutWarning)}
         type="button"
       >
         Download SVG
       </button>
+      {layoutWarning ? (
+        <p role="status">{layoutWarning} Diagram export is unavailable until separated.</p>
+      ) : null}
       <svg
         aria-describedby="canvas-help"
         aria-label="Causal graph editor"
@@ -298,7 +292,8 @@ export function GraphCanvas() {
             markerHeight="8"
             markerWidth="8"
             orient="auto"
-            refX="7"
+            refX="8"
+            markerUnits="userSpaceOnUse"
             refY="4"
           >
             <path d="M 0 0 L 8 4 L 0 8 z" fill="var(--ink)" />
@@ -317,13 +312,31 @@ export function GraphCanvas() {
             const from = positions.get(edge.from);
             const to = positions.get(edge.to);
             if (!from || !to) return null;
+            let path: string;
+            try {
+              path = clipEdge(
+                from,
+                to,
+                {
+                  ...nodesById.get(edge.from)!,
+                  radius: nodesById.get(edge.from)?.kind === "selection" ? 31 : 30,
+                },
+                {
+                  ...nodesById.get(edge.to)!,
+                  radius: nodesById.get(edge.to)?.kind === "selection" ? 31 : 30,
+                },
+                index % 2 === 0 ? 12 : -12,
+              ).path;
+            } catch {
+              return null;
+            }
             const isConnected = edge.from === selectedNodeId || edge.to === selectedNodeId;
             const isHighlighted =
               highlightedPairs.has(`${edge.from}\u0000${edge.to}`) ||
               highlightedPairs.has(`${edge.to}\u0000${edge.from}`);
             return (
               <path
-                d={curvePath(from, to, index % 2 === 0 ? 12 : -12)}
+                d={path}
                 fill="none"
                 key={`${edge.from}-${edge.to}`}
                 markerEnd="url(#causal-arrow)"
