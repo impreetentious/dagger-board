@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { buildAdrDocument, type AdrDocument } from "@/engine/adr";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { buildAdrDocument, readAdrDocument, type AdrDocument } from "@/engine/adr";
 import { APP_VERSION } from "@/lib/app-version";
+import { mathematicalSnapshotJson, pruneLabSnapshot } from "@/lib/codec";
 import { graphToSvg } from "@/lib/svg-export";
 import { useLabStore } from "@/store/lab-store";
 
@@ -21,6 +22,21 @@ function nodeNameLookup(document: AdrDocument): Record<string, string> {
 }
 
 export function CommunicatePanel() {
+  const state = useLabStore();
+  const snapshot = useMemo(() => pruneLabSnapshot(state), [state]);
+  const identity = mathematicalSnapshotJson(snapshot);
+  const importGeneration = useRef(0);
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+      importGeneration.current += 1;
+    };
+  }, []);
+  const [legacy, setLegacy] = useState<AdrDocument | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [fontRevision, setFontRevision] = useState(0);
   const graph = useLabStore((state) => state.graph);
   const conditioning = useLabStore((state) => state.conditioning);
   const parameters = useLabStore((state) => state.parameters);
@@ -29,7 +45,23 @@ export function CommunicatePanel() {
   const seed = useLabStore((state) => state.seed);
   const n = useLabStore((state) => state.n);
   const [timestamp, setTimestamp] = useState<string | null>(null);
-  const svg = useMemo(() => graphToSvg(graph), [graph]);
+  const svg = useMemo(() => {
+    void fontRevision;
+    try {
+      return graphToSvg(graph);
+    } catch {
+      return "";
+    }
+  }, [graph, fontRevision]);
+  useEffect(() => {
+    let alive = true;
+    void document.fonts.ready.then(() => {
+      if (alive) setFontRevision((value) => value + 1);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setTimestamp(new Date().toISOString()), 0);
@@ -49,9 +81,66 @@ export function CommunicatePanel() {
         svg,
         parameters,
         reliability,
+        labSnapshot: snapshot,
       }),
-    [graph, conditioning, selection, seed, n, timestamp, svg, parameters, reliability],
+    [graph, conditioning, selection, seed, n, timestamp, svg, parameters, reliability, snapshot],
   );
+
+  const exportRecord = async () => {
+    await document.fonts.ready;
+    if (!alive.current) return;
+    const latest = pruneLabSnapshot(useLabStore.getState());
+    if (mathematicalSnapshotJson(latest) !== identity) {
+      setNotice("Workspace changed while preparing the record. Request export again.");
+      return;
+    }
+    const record = buildAdrDocument({
+      graph: latest.graph,
+      conditioning: new Set(latest.conditioning),
+      selection: latest.selection,
+      parameters: latest.parameters,
+      reliability: latest.reliability,
+      labSnapshot: latest,
+      seed: latest.seed,
+      n: latest.n,
+      timestamp: new Date().toISOString(),
+      appVersion: APP_VERSION,
+      svg: graphToSvg(latest.graph),
+    });
+    download(`daggerboard-adr-${record.appVersion}.json`, JSON.stringify(record, null, 2));
+  };
+  const importRecord = async (file: File) => {
+    const request = ++importGeneration.current;
+    const current = () => alive.current && request === importGeneration.current;
+    const before = mathematicalSnapshotJson(pruneLabSnapshot(useLabStore.getState()));
+    try {
+      const candidate = readAdrDocument(await file.text());
+      if (!current()) return;
+      if (mathematicalSnapshotJson(pruneLabSnapshot(useLabStore.getState())) !== before) {
+        setNotice("Workspace changed during import. Choose the record again.");
+        return;
+      }
+      if (candidate.kind === "legacy") {
+        setLegacy(candidate.document);
+        setNotice(
+          "Legacy summary-only record: stored values remain readable; inputs and recomputation are unavailable.",
+        );
+        return;
+      }
+      useLabStore
+        .getState()
+        .loadSnapshot(
+          candidate.snapshot,
+          "Reproducible ADR inputs loaded; results recomputed locally.",
+        );
+      setLegacy(null);
+      setNotice(
+        "Reproducible record imported. Stored verdicts and numerical summaries were recomputed from its validated inputs.",
+      );
+    } catch (error) {
+      if (current()) setNotice(error instanceof Error ? error.message : "ADR import refused.");
+    }
+  };
 
   const names = nodeNameLookup(doc);
   const missingRoles = !doc.exposureId || !doc.outcomeId;
@@ -71,13 +160,43 @@ export function CommunicatePanel() {
           Designate an exposure and outcome in Draw before exporting the Analysis Design Record.
         </p>
       ) : null}
+      {notice ? <p role="status">{notice}</p> : null}
+      {legacy ? (
+        <article>
+          <p>
+            Legacy stored summary, separate from the current workspace. Recomputation unavailable.
+          </p>
+          <pre>{JSON.stringify({ ...legacy, svg: undefined }, null, 2)}</pre>
+          <button
+            className="tool-button"
+            type="button"
+            onClick={() => download("daggerboard-dag.svg", legacy.svg, "image/svg+xml")}
+          >
+            Download stored SVG as inert content
+          </button>
+        </article>
+      ) : null}
+      <label>
+        Import ADR JSON{" "}
+        <input
+          type="file"
+          accept=".json,application/json"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (file) void importRecord(file);
+          }}
+        />
+      </label>
+      <p>
+        Reproducible record with validated graph, conditioning, SCM parameters, selection and
+        measurement reliability.
+      </p>
       <div className="flex flex-wrap gap-2">
         <button
           className="tool-button"
           data-testid="adr-download"
-          onClick={() =>
-            download(`daggerboard-adr-${doc.appVersion}.json`, JSON.stringify(doc, null, 2))
-          }
+          onClick={() => void exportRecord()}
           type="button"
         >
           Download ADR JSON

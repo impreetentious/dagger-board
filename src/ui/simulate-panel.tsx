@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { proveGraph } from "@/engine/prove";
 import { averageCausalEffect, defaultDiscreteParameters } from "@/engine/discrete-scm";
 import { auditScmIntegrity, edgeParameterKey, matrixTotalEffect } from "@/engine/scm";
@@ -14,6 +14,12 @@ import {
 } from "@/engine/stats";
 import { runSimulationInWorker } from "@/lib/sim-worker-client";
 import { createUniformGenerator, randomizedCoefficient } from "@/lib/rng";
+import {
+  mathematicalSnapshotJson,
+  validateLabSnapshot,
+  pruneLabSnapshot,
+  type LabSnapshot,
+} from "@/lib/codec";
 import { useLabStore } from "@/store/lab-store";
 
 function number(value: number | null | undefined): string {
@@ -75,21 +81,53 @@ export function SimulatePanel() {
   const setErrorSd = useLabStore((state) => state.setErrorSd);
   const setSeed = useLabStore((state) => state.setSeed);
   const setSampleSize = useLabStore((state) => state.setSampleSize);
-  const [run, setRun] = useState<SimulationRun | null>(null);
+  const live = useLabStore();
+  const identity = mathematicalSnapshotJson(live);
+  const generation = useRef(0);
+  const inFlight = useRef(false);
+  const mounted = useRef(true);
+  const [accepted, setAccepted] = useState<{
+    run: SimulationRun;
+    snapshot: LabSnapshot;
+    identity: string;
+    generation: number;
+  } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const exposureId = graph.roles.exposureId;
-  const outcomeId = graph.roles.outcomeId;
-  const names = new Map(graph.nodes.map((node) => [node.id, node.name]));
+  const current = accepted?.identity === identity ? accepted : null;
+  const run = current?.run ?? null;
+  const analysisGraph = current?.snapshot.graph ?? graph;
+  const analysisConditioning = current?.snapshot.conditioning ?? conditioning;
+  const analysisSelection = current?.snapshot.selection ?? selection;
+  useEffect(() => {
+    mounted.current = true;
+    let previous = mathematicalSnapshotJson(useLabStore.getState());
+    const unsubscribe = useLabStore.subscribe((next) => {
+      const latest = mathematicalSnapshotJson(next);
+      if (latest === previous) return;
+      previous = latest;
+      generation.current += 1;
+      setAccepted(null);
+      setError(null);
+    });
+    return () => {
+      mounted.current = false;
+      generation.current += 1;
+      unsubscribe();
+    };
+  }, []);
+  const exposureId = analysisGraph.roles.exposureId;
+  const outcomeId = analysisGraph.roles.outcomeId;
+  const names = new Map(analysisGraph.nodes.map((node) => [node.id, node.name]));
   const name = (id: string) => names.get(id) ?? id;
   const report = useMemo(
     () =>
       proveGraph(
-        graph,
-        new Set(conditioning),
-        selection ? { nodeId: selection.nodeId } : undefined,
+        analysisGraph,
+        new Set(analysisConditioning),
+        analysisSelection ? { nodeId: analysisSelection.nodeId } : undefined,
       ),
-    [conditioning, graph, selection],
+    [analysisConditioning, analysisGraph, analysisSelection],
   );
   const discreteReadout = useMemo(() => {
     if (!exposureId || !outcomeId) return null;
@@ -126,11 +164,17 @@ export function SimulatePanel() {
     try {
       const totalEffect = matrixTotalEffect(run.model, exposureId, outcomeId);
       const exactContext = run.truncation ?? run.model;
-      const exactOls = olsEstimand(exactContext, exposureId, outcomeId, conditioning, totalEffect);
+      const exactOls = olsEstimand(
+        exactContext,
+        exposureId,
+        outcomeId,
+        analysisConditioning,
+        totalEffect,
+      );
       const sampleOls =
         run.sample.sampleSize < 50
           ? null
-          : olsEstimand(run.sample, exposureId, outcomeId, conditioning, totalEffect);
+          : olsEstimand(run.sample, exposureId, outcomeId, analysisConditioning, totalEffect);
       const exactIv = selectedInstrument
         ? ivEstimand(
             exactContext,
@@ -163,7 +207,7 @@ export function SimulatePanel() {
         kind: "ols",
         exposureId,
         outcomeId,
-        conditionedIds: conditioning,
+        conditionedIds: analysisConditioning,
         totalEffect,
       });
       const frontdoorSeries = selectedFrontdoor
@@ -190,28 +234,48 @@ export function SimulatePanel() {
     } catch (cause) {
       return { error: cause instanceof Error ? cause.message : "Simulation readout failed." };
     }
-  }, [conditioning, exposureId, outcomeId, run, selectedFrontdoor, selectedInstrument]);
+  }, [analysisConditioning, exposureId, outcomeId, run, selectedFrontdoor, selectedInstrument]);
 
   const launch = async () => {
-    if (!exposureId || !outcomeId) {
+    if (inFlight.current) return;
+    let snapshot: LabSnapshot;
+    try {
+      snapshot = structuredClone(validateLabSnapshot(pruneLabSnapshot(useLabStore.getState())));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Invalid analysis inputs.");
+      return;
+    }
+    const x = snapshot.graph.roles.exposureId,
+      y = snapshot.graph.roles.outcomeId;
+    if (!x || !y) {
       setError("Designate observed X and Y before running the SCM.");
       return;
     }
+    const token = ++generation.current;
+    const sourceIdentity = mathematicalSnapshotJson(snapshot);
+    inFlight.current = true;
     setBusy(true);
     setError(null);
+    setAccepted(null);
     try {
-      setRun(
-        await runSimulationInWorker(graph, parameters, exposureId, outcomeId, {
-          seed,
-          n,
-          selection: selection ?? undefined,
-        }),
-      );
+      const run = await runSimulationInWorker(snapshot.graph, snapshot.parameters, x, y, {
+        seed: snapshot.seed,
+        n: snapshot.n,
+        selection: snapshot.selection ?? undefined,
+      });
+      if (
+        !mounted.current ||
+        token !== generation.current ||
+        mathematicalSnapshotJson(useLabStore.getState()) !== sourceIdentity
+      )
+        return;
+      setAccepted({ run, snapshot, identity: sourceIdentity, generation: token });
     } catch (cause) {
-      setRun(null);
-      setError(cause instanceof Error ? cause.message : "Simulation could not run.");
+      if (mounted.current && token === generation.current)
+        setError(cause instanceof Error ? cause.message : "Simulation could not run.");
     } finally {
-      setBusy(false);
+      inFlight.current = false;
+      if (mounted.current) setBusy(false);
     }
   };
 
@@ -259,6 +323,17 @@ export function SimulatePanel() {
       >
         {busy ? "Running deterministic sample…" : "Run simulation"}
       </button>
+      {!run ? (
+        <p role="status">
+          {busy
+            ? "Simulation pending; edited assumptions require a fresh run after this request settles."
+            : "A new simulation is required for the current assumptions."}
+        </p>
+      ) : (
+        <p>
+          Captured simulation: seed {current!.snapshot.seed}, rows {current!.snapshot.n}.
+        </p>
+      )}
       {error ? (
         <p className="rounded-xl bg-[var(--signal-soft)] p-3 text-xs leading-5">{error}</p>
       ) : null}
@@ -348,7 +423,10 @@ export function SimulatePanel() {
           </div>
           <article className="rounded-2xl border border-[var(--line)] bg-[var(--surface-raised)] p-4">
             <p className="font-mono text-[11px] font-bold tracking-[0.14em] text-[var(--signal)]">
-              OLS {conditioning.length ? `| ${conditioning.map(name).join(", ")}` : "| ∅"}
+              OLS{" "}
+              {analysisConditioning.length
+                ? `| ${analysisConditioning.map(name).join(", ")}`
+                : "| ∅"}
             </p>
             <p className="mt-2 text-2xl font-black">
               {readout.sampleOls

@@ -2,13 +2,13 @@
 
 > Draw your assumptions. See your bias. Before the data.
 
-## The problem
+## The Problem
 
-Every strategy deck, A/B readout and observational analysis makes causal claims — and almost all of them are made by vibes. The graphical machinery to actually check those claims — d-separation, adjustment criteria, do-calculus — has existed for decades, but it lives in academic tools built for epidemiologists, not for the people shipping decisions.
+Every strategy deck, A/B readout and observational analysis makes causal claims and almost all of them are made by vibes. The graphical machinery to actually check those claims: d-separation, adjustment criteria, do-calculus, has existed for decades, but it lives in academic tools built for epidemiologists, not for the people shipping decisions.
 
-## The instrument
+## The Instrument
 
-This project is a pre-data instrument for stress-testing causal claims and study designs:
+This project is an instrument for stress-testing causal claims and study designs:
 
 1. **Draw** your causal assumptions as a directed acyclic graph — observed, latent and selection nodes; pick an exposure and an outcome.
 2. **Prove** — the engine computes, _exactly_, what your assumptions already imply: whether your effect is identified by the classical strategies — covariate adjustment, front-door, instrumental variables — and exactly how (and it tells you honestly when its strategy set is exhausted rather than claiming non-identifiability), every minimal valid adjustment set, every biasing path, available instruments, frontdoor routes and the conditional independencies your model claims are testable.
@@ -18,7 +18,7 @@ This project is a pre-data instrument for stress-testing causal claims and study
 6. **Learn** — a curriculum of canonical traps, each a playable scenario: you make the analysis call first, then the engine reveals what happened and the theory underneath.
 7. **Communicate** — export an Analysis Design Record: the graph, the assumptions (including what you assumed _absent_), the chosen identification strategy, the known threats and the robustness line that says how wrong the assumptions would have to be.
 
-## What makes it different
+## What makes it DIFFERENT
 
 - **Pre-data by design.** This is not a data-analysis tool. It interrogates the reasoning that comes before data — the part every existing tool skips past.
 - **Honest about its own assumptions, quantitatively.** Most tools in this space stop at "conditional on your DAG". This one prices that condition: the sensitivity surface is Cinelli & Hazlett's omitted-variable framework, which is _exact_ in a linear model rather than approximate — and since this engine's models are linear-Gaussian by construction and pre-data, the confounder benchmarks are exact counterfactuals rather than bounds.
@@ -27,7 +27,7 @@ This project is a pre-data instrument for stress-testing causal claims and study
 - **Built for decision-makers, not epidemiologists.** Analytics, product and strategy audiences get the same rigor with a product-grade surface: a keyboard-first graph editor, plain-language path diagnostics and pedagogy that trains intuition instead of assuming it.
 - **Fully client-side.** No backend, no accounts, no analytics, no telemetry, no cookies, no third-party requests of any kind — there are no web fonts to fetch, since the interface uses system font stacks. Scenarios persist locally, share by URL and export as explicit JSON. Deployable as a static bundle anywhere.
 
-## Prior art
+## Prior Art
 
 **DAGitty** is the authoritative academic tool for graphical identification and this project treats it as the reference to be checked against rather than as a competitor. **Tetrad** does causal discovery from data; **CausalWizard** does estimation from uploaded data. The open space this product occupies: a product-grade _design_ instrument with bias-quantifying simulation and built-in pedagogy, aimed at people who make decisions with analyses rather than publish them.
 
@@ -45,7 +45,7 @@ This project is a pre-data instrument for stress-testing causal claims and study
 
 Next.js App Router (static export) · React · TypeScript strict · Tailwind CSS · Zustand · Zod · Vitest + fast-check · Playwright. Hand-rolled SVG for visualizations.
 
-## Run locally
+## Run Locally
 
 Requires Node `20.20.x` (see `.nvmrc` / `package.json` engines).
 
@@ -69,7 +69,7 @@ npm run test:full
 citations, formatting, unit and property tests, the production build, browser
 and accessibility behavior, the static-host policy and bundle budgets.
 
-## Build and deploy
+## Build and Deploy
 
 ```bash
 npm run build
@@ -79,7 +79,7 @@ This emits a plain static site in `out/`, which serves from any static host. `np
 
 Whatever host you use should send the response headers documented in [docs/STATIC-HOST-HEADERS.md](docs/STATIC-HOST-HEADERS.md). `vercel.json` applies them on Vercel and `serve.json` applies the same policy to the local preview, so the browser test suite runs against the real policy. `npm run check:csp` fails if the two host configs and the document ever disagree.
 
-## Third-party notice
+## Third-Party Notice
 
 Test-only DAGitty fixtures under `fixtures/tools/dagitty/` are GPL-2.0-or-later. Application code under `src/` does not import that fixture tooling. See [NOTICE](NOTICE).
 
@@ -101,4 +101,4 @@ Apache-2.0 © 2025-2026 Sidakpreet Singh — see [LICENSE](LICENSE). Test-only D
 
 ---
 
-**Version:** v0.17.2
+**Version:** v0.17.3

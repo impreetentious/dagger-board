@@ -1,3 +1,4 @@
+import { validateLabSnapshot, type LabSnapshot } from "@/lib/codec";
 import { hasEdge, type Graph, type GraphNode } from "@/engine/graph";
 import { attenuateCovariance, type ReliabilityMap } from "@/engine/measurement";
 import { proveGraph, type ProveReport } from "@/engine/prove";
@@ -9,6 +10,7 @@ import type { SelectionRule } from "@/engine/truncation";
 
 export interface AdrInputs {
   graph: Graph;
+  labSnapshot?: LabSnapshot;
   conditioning: ReadonlySet<string>;
   selection: SelectionRule | null;
   seed: number | null;
@@ -38,6 +40,7 @@ interface AdrSelectionSummary {
 
 export interface AdrDocument {
   v: 1;
+  labSnapshot?: LabSnapshot;
   appVersion: string;
   timestamp: string;
   exposureId: string | null;
@@ -84,6 +87,18 @@ function selectionContext(inputs: AdrInputs): SelectionContext | undefined {
 }
 
 export function buildAdrDocument(inputs: AdrInputs): AdrDocument {
+  const snapshot = inputs.labSnapshot ? validateLabSnapshot(inputs.labSnapshot) : undefined;
+  if (snapshot)
+    inputs = {
+      ...inputs,
+      graph: snapshot.graph,
+      conditioning: new Set(snapshot.conditioning),
+      selection: snapshot.selection,
+      parameters: snapshot.parameters,
+      reliability: snapshot.reliability,
+      seed: snapshot.seed,
+      n: snapshot.n,
+    };
   const { graph, conditioning, selection } = inputs;
   const selectionCtx = selectionContext(inputs);
   const report = proveGraph(graph, conditioning, selectionCtx);
@@ -101,6 +116,7 @@ export function buildAdrDocument(inputs: AdrInputs): AdrDocument {
   const robustness = buildRobustness(inputs);
   return {
     v: 1,
+    ...(snapshot ? { labSnapshot: snapshot } : {}),
     appVersion: inputs.appVersion,
     timestamp: inputs.timestamp,
     exposureId: graph.roles.exposureId ?? null,
@@ -170,4 +186,57 @@ function buildRobustness(inputs: AdrInputs): AdrDocument["robustness"] {
   } catch {
     return undefined;
   }
+}
+
+export function readAdrDocument(
+  text: string,
+):
+  | { kind: "legacy"; document: AdrDocument }
+  | { kind: "reproducible"; snapshot: LabSnapshot; document: AdrDocument } {
+  const value: unknown = JSON.parse(text);
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    throw new Error("ADR must be an object.");
+  const record = value as Partial<AdrDocument>;
+  if (
+    record.v !== 1 ||
+    typeof record.appVersion !== "string" ||
+    typeof record.timestamp !== "string"
+  )
+    throw new Error("Unsupported or malformed ADR.");
+  if (record.labSnapshot !== undefined) {
+    const snapshot = validateLabSnapshot(record.labSnapshot);
+    return {
+      kind: "reproducible",
+      snapshot,
+      document: buildAdrDocument({
+        graph: snapshot.graph,
+        conditioning: new Set(snapshot.conditioning),
+        selection: snapshot.selection,
+        parameters: snapshot.parameters,
+        reliability: snapshot.reliability,
+        seed: snapshot.seed,
+        n: snapshot.n,
+        labSnapshot: snapshot,
+        timestamp: new Date().toISOString(),
+        appVersion: record.appVersion,
+      }),
+    };
+  }
+  if (
+    !Array.isArray(record.nodes) ||
+    !record.nodes.every(
+      (node) => node && typeof node.id === "string" && typeof node.name === "string",
+    ) ||
+    !Array.isArray(record.edges) ||
+    !Array.isArray(record.absentEdges) ||
+    !Array.isArray(record.threats) ||
+    !Array.isArray(record.adjustmentSets) ||
+    !Array.isArray(record.implications) ||
+    !Array.isArray(record.instruments) ||
+    !Array.isArray(record.frontdoorMediatorIds) ||
+    typeof record.identificationVerdict !== "string" ||
+    typeof record.svg !== "string"
+  )
+    throw new Error("Malformed summary-only ADR.");
+  return { kind: "legacy", document: record as AdrDocument };
 }

@@ -100,6 +100,75 @@ export function pruneLabSnapshot(input: unknown): LabSnapshot {
   };
 }
 
+/** Strict mathematical import: view pruning never repairs a changed causal model. */
+export function validateLabSnapshot(input: unknown): LabSnapshot {
+  const wire = LabSnapshotWireSchema.parse(input);
+  const graph = validateGraph(wire.graph);
+  if (!wire.parameters) throw new Error("Reproducible records require SCM parameters.");
+  if (
+    graph.edges.some(
+      (edge) => wire.parameters!.edgeCoefficients[`${edge.from}\u0000${edge.to}`] === undefined,
+    ) ||
+    graph.nodes.some((node) => wire.parameters!.errorSds[node.id] === undefined)
+  )
+    throw new Error("Record SCM parameters are incomplete.");
+  normalizeScmParameters(graph, wire.parameters);
+  const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+  if (
+    new Set(wire.conditioning).size !== wire.conditioning.length ||
+    wire.conditioning.some(
+      (id) =>
+        nodes.get(id)?.kind !== "observed" ||
+        id === graph.roles.exposureId ||
+        id === graph.roles.outcomeId,
+    )
+  )
+    throw new Error("Invalid conditioning set in the record.");
+  if (wire.selection && nodes.get(wire.selection.nodeId)?.kind !== "selection")
+    throw new Error("Invalid selection node in the record.");
+  if (Object.keys(wire.reliability).some((id) => nodes.get(id)?.kind !== "observed"))
+    throw new Error("Reliability references a missing observed node.");
+  return pruneLabSnapshot(wire);
+}
+
+/** Deterministic analysis identity; positions and measurement-view toggles are presentation. */
+export function mathematicalSnapshotJson(snapshot: LabSnapshot): string {
+  const canonical = pruneLabSnapshot(snapshot);
+  const inputs = { ...canonical };
+  delete (inputs as Partial<LabSnapshot>).measured;
+  return JSON.stringify(
+    sortObject({
+      ...inputs,
+      graph: {
+        ...canonical.graph,
+        nodes: canonical.graph.nodes.map((node) => {
+          const copy = { ...node };
+          delete copy.position;
+          return copy;
+        }),
+      },
+    }),
+  );
+}
+
+export function graphicalSnapshotJson(snapshot: LabSnapshot): string {
+  const graph = snapshot.graph;
+  return JSON.stringify(
+    sortObject({
+      graph: {
+        ...graph,
+        nodes: graph.nodes.map((node) => {
+          const copy = { ...node };
+          delete copy.position;
+          return copy;
+        }),
+      },
+      conditioning: [...snapshot.conditioning].sort(),
+      selection: snapshot.selection,
+    }),
+  );
+}
+
 function canonicalizeSnapshot(snapshot: LabSnapshot): LabSnapshot {
   return pruneLabSnapshot(snapshot);
 }
